@@ -7,15 +7,8 @@ var HEIGHT = window.innerHeight-20;
 canvas.width = WIDTH;
 canvas.height = HEIGHT;
 
-// base stats
-var player_status = {
-    speed: 0.4,
-    max_health: 100,
-    projectile_speed: 1,
-    time_between_projectiles: 5,
-    damage: 10,
-    invincibility_time: 1000,
-}
+// fetch player status configuration
+var player_status = Object.assign({}, player_status_configurations[selected_player_status_configuration]);
 
 // global variables
 var angle_between_player_and_mouse = 0;
