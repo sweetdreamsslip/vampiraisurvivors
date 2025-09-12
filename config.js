@@ -6,6 +6,7 @@ var player_status_configurations = {
         time_between_projectiles: 100,
         damage: 10,
         invincibility_time: 1000,
+        magnet_max_distance: 200,
     },
     "debug": {
         speed: 1,
@@ -14,6 +15,7 @@ var player_status_configurations = {
         time_between_projectiles: 5,
         damage: 10,
         invincibility_time: 1000,
+        magnet_max_distance: 100,
     },
     "custom": {
         speed: 0.5,
@@ -22,6 +24,7 @@ var player_status_configurations = {
         time_between_projectiles: 100,
         damage: 10,
         invincibility_time: 1000,
+        magnet_max_distance: 100,
     }
 }
 

@@ -6,6 +6,8 @@ var PlayerObject = function(spriteSheet){
     radius: 16 * scale, // Raio de colisão, ajustado pela escala
     invincibility_time: 0,
     health: player_status.max_health,
+    experience: 0,
+    level: 1,
 
     // Propriedades do Sprite
     sprite: spriteSheet,
@@ -27,6 +29,9 @@ var PlayerObject = function(spriteSheet){
             }
             this.invincibility_time = player_status.invincibility_time;
         }
+    },
+    gain_experience: function(experience){
+        this.experience += experience;
     },
     render: function(ctx){
         ctx.save();
@@ -265,4 +270,33 @@ var ParticleObject = function(x, y, color, speed, angle, lifespan) {
             ctx.restore();
         }
     };
+};
+
+var ExperienceOrbObject = function(x, y, radius, color, experience_value) {
+    return {
+        x: x,
+        y: y,
+        max_speed: 1,
+        radius: radius,
+        color: color,
+        experience_value: experience_value,
+        exists: true,
+        render: function(ctx){
+            ctx.save();
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.restore();
+        },
+        update: function(dt, destination_x, destination_y){
+            let dist2 = distSquared(this.x, this.y, destination_x, destination_y);
+            let distance_ratio = dist2 / (player_status.magnet_max_distance * player_status.magnet_max_distance);
+            if(dist2 <= player_status.magnet_max_distance * player_status.magnet_max_distance){
+                let direction = angleBetweenPoints(this.x, this.y, destination_x, destination_y);
+                this.x += Math.cos(direction) * this.max_speed * dt * (1-distance_ratio);
+                this.y += Math.sin(direction) * this.max_speed * dt * (1-distance_ratio);
+            }
+        }
+    }
 };

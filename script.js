@@ -18,6 +18,7 @@ var player;
 var enemies_list = [];
 var projectiles_list = [];
 var particles_list = [];
+var experience_orbs_list = [];
 
 // sprites
 var playerSprite = new Image();
@@ -134,6 +135,15 @@ function update(dt) {
         p.update(dt);
     });
 
+    // update experience orbs
+    experience_orbs_list.forEach(function(orb) {
+        orb.update(dt, player.x, player.y);
+        if(aabbCircleCollision(orb, player)){
+            player.gain_experience(orb.experience_value);
+            orb.exists = false;
+        }
+    });
+
     // remove projectiles that are no longer exists
     projectiles_list = projectiles_list.filter(function(projectile) {
         return projectile.exists;
@@ -142,12 +152,19 @@ function update(dt) {
     particles_list = particles_list.filter(function(p) {
         return p.lifespan > 0;
     });
+    // remove experience orbs that are no longer exists
+    experience_orbs_list = experience_orbs_list.filter(function(orb) {
+        return orb.exists;
+    });
 }
 
 // render function
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     //enemy rendering
+    experience_orbs_list.forEach(function(orb) {
+        orb.render(ctx);
+    });
     enemies_list.forEach(function(enemy) {
         enemy.render(ctx);
     });
@@ -187,6 +204,11 @@ function initialize() {
     //initialize enemies
     for(var i = 0; i < 10; i++){
         enemies_list.push(new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 100, 100));
+    }
+
+    //initialize experience orbs
+    for(var i = 0; i < 160; i++){
+        experience_orbs_list.push(new ExperienceOrbObject(randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 5, "orange", randomIntBetween(1, 10)));
     }
     //initialize last update time
     lastUpdateTime = performance.now();
