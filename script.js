@@ -20,10 +20,13 @@ var player_status = {
 // global variables
 var angle_between_player_and_mouse = 0;
 var time_since_last_projectile = 0;
-var projectiles_list = [];
+// game objects
+var player;
 var enemies_list = [];
+var projectiles_list = [];
 var particles_list = [];
 
+// controller support
 var is_gamepad_connected = false;
 
 // control variables
@@ -34,224 +37,17 @@ var mouse = {
 };
 var keys_down = [];
 
-// player object
-var player = {
-    x: 400,
-    y: 400,
-    radius: 10,
-    invincibility_time: 0,
-    health: player_status.max_health,
-    take_damage: function(damage){
-        if(this.invincibility_time <= 0){
-            this.health -= damage;
-            if(this.health <= 0){
-                this.health = 0;
-            }
-            this.invincibility_time = player_status.invincibility_time;
-        }
-    },
-    render: function(ctx){
-        ctx.save();
-        if(this.invincibility_time > 0){
-            ctx.fillStyle = "red";
-        }else{
-            ctx.fillStyle = "blue";
-        }
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.restore();
-    },
-    update: function(dt, moveVector = {x: 0, y: 0}){
-        //movement
-        if(this.invincibility_time > 0){
-            this.invincibility_time -= dt;
-        }
-
-        // Prioriza o movimento pelo controle se ele estiver sendo usado
-        if (moveVector.x !== 0 || moveVector.y !== 0) {
-            this.x += moveVector.x * player_status.speed * dt;
-            this.y += moveVector.y * player_status.speed * dt;
-        } else { // Caso contrário, usa o teclado
-            if(keys_down.includes("w")){
-                this.y -= player_status.speed * dt;
-            }
-            if(keys_down.includes("s")){
-                this.y += player_status.speed * dt;
-            }
-            if(keys_down.includes("a")){
-                this.x -= player_status.speed * dt;
-            }
-            if(keys_down.includes("d")){
-                this.x += player_status.speed * dt;
-            }
-        }
-        //boundary check (so player doesn't go off the screen)
-        if(this.x < 0){
-            this.x = 0;
-        }
-        if(this.x > WIDTH){
-            this.x = WIDTH;
-        }
-        if(this.y < 0){
-            this.y = 0;
-        }
-        if(this.y > HEIGHT){
-            this.y = HEIGHT;
-        }
-    }
-}; 
-
-// enemy object
-var enemy = function(x, y, health, max_health, radius, color){
-    return {
-        x: x,
-        y: y,
-        health: health,
-        max_health: max_health,
-        radius: radius,
-        collision: false,
-        color: color,
-        base_speed: 0.1,
-        base_damage: 10,
-        take_damage: function(damage){
-            this.health -= damage;
-        },
-        render: function(ctx){
-            ctx.save();
-            // enemy
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-            ctx.fill();
-            // health bar
-            ctx.fillStyle = "red";
-            ctx.fillRect(this.x - this.radius, this.y - this.radius - 15, this.radius * 2, 10);
-            ctx.fillStyle = "green";
-            ctx.fillRect(this.x - this.radius, this.y - this.radius - 15, (this.health / this.max_health) * this.radius * 2, 10);
-            ctx.restore();
-        },
-        update: function(dt){
-        // Move enemy towards player by its base_speed * dt
-        var dx = player.x - this.x;
-        var dy = player.y - this.y;
-        var distancesq = distSquared(this.x, this.y, player.x, player.y);
-        if (distancesq > 0) {
-            var moveDist = this.base_speed * dt;
-            var angle = angleBetweenPoints(this.x, this.y, player.x, player.y);
-            this.x += Math.cos(angle) * moveDist;
-            this.y += Math.sin(angle) * moveDist;
-        }
-
-
-
-        },
-        respawn: function(){
-            this.x = randomIntBetween(0, WIDTH);
-            this.y = randomIntBetween(0, HEIGHT);
-            this.health = this.max_health;
-        }
-    }
-};
-
-// projectile object
-var projectile = function(x, y, initial_angle) {
-    return {
-        x: x,
-        y: y,
-        radius: 5,
-        initial_angle: initial_angle,
-        exists: true,
-        render: function(ctx){
-            ctx.save();
-            ctx.fillStyle = "green";
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-            ctx.fill();
-            ctx.restore();
-        },
-        update: function(dt){
-            this.x += Math.cos(this.initial_angle) * player_status.projectile_speed * dt;
-            this.y += Math.sin(this.initial_angle) * player_status.projectile_speed * dt;
-            if(outOfBounds(this.x, this.y, WIDTH, HEIGHT)){
-                this.exists = false;
-            }
-        },
-    }
-}
-
-// particle object
-var particle = function(x, y, color, speed, angle, lifespan) {
-    return {
-        x: x,
-        y: y,
-        color: color,
-        radius: randomIntBetween(1, 3),
-        initial_lifespan: lifespan,
-        lifespan: lifespan, // in milliseconds
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        update: function(dt) {
-            this.x += this.vx * dt;
-            this.y += this.vy * dt;
-            this.lifespan -= dt;
-            // add some friction/drag
-            this.vx *= 0.98;
-            this.vy *= 0.98;
-        },
-        render: function(ctx) {
-            if (this.lifespan <= 0) return;
-            ctx.save();
-            // Fade out effect
-            ctx.globalAlpha = Math.max(0, this.lifespan / this.initial_lifespan);
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-            ctx.fill();
-            ctx.restore();
-        }
-    };
-};
 
 function createParticleExplosion(x, y, color, count) {
     for (var i = 0; i < count; i++) {
         var angle = Math.random() * 2 * Math.PI;
         var speed = (Math.random() * 0.2) + 0.05; // random speed
         var lifespan = randomIntBetween(400, 700); // random lifespan
-        particles_list.push(new particle(x, y, color, speed, angle, lifespan));
+        particles_list.push(new ParticleObject(x, y, color, speed, angle, lifespan));
     }
 }
 
-function pollGamepad() {
-    const state = {
-        moveVector: { x: 0, y: 0 },
-        isShooting: false,
-        aimAngle: null
-    };
 
-    if (!is_gamepad_connected) return state;
-    const gp = navigator.getGamepads()[0];
-    if (!gp) return state;
-
-    // --- Movimento do Jogador (Analógico Esquerdo: eixos 0, 1) ---
-    const leftStickX = gp.axes[0];
-    const leftStickY = gp.axes[1];
-    const moveDeadzone = 0.2;
-    if (Math.abs(leftStickX) > moveDeadzone) state.moveVector.x = leftStickX;
-    if (Math.abs(leftStickY) > moveDeadzone) state.moveVector.y = leftStickY;
-
-    // --- Mira e Disparo (Analógico Direito: eixos 2, 3) ---
-    const rightStickX = gp.axes[2];
-    const rightStickY = gp.axes[3];
-    const aimDeadzone = 0.25;
-    if (Math.sqrt(rightStickX * rightStickX + rightStickY * rightStickY) > aimDeadzone) {
-        state.aimAngle = Math.atan2(rightStickY, rightStickX);
-        state.isShooting = true; // Atira quando o analógico de mira é movido
-    }
-
-    return state;
-}
-    
 // event listeners
 canvas.addEventListener("mousemove", function(e) {
     var rect = canvas.getBoundingClientRect();
@@ -272,16 +68,17 @@ window.addEventListener("keyup", function(e) {
         return key !== e.key;
     });
 });
-
+// gamepad connection
 window.addEventListener("gamepadconnected", function(e) {
     console.log("Controle conectado no índice %d: %s.", e.gamepad.index, e.gamepad.id);
     is_gamepad_connected = true;
 });
-
 window.addEventListener("gamepaddisconnected", function(e) {
     console.log("Controle desconectado do índice %d: %s", e.gamepad.index, e.gamepad.id);
     is_gamepad_connected = false;
 });
+
+
 
 // update function
 function update(dt) {
@@ -298,7 +95,7 @@ function update(dt) {
     //projectile firing
     time_since_last_projectile += dt;
     if ((mouse.mouseDown || gamepadState.isShooting) && time_since_last_projectile >= player_status.time_between_projectiles) {
-        projectiles_list.push(new projectile(player.x, player.y, angle_between_player_and_mouse));
+        projectiles_list.push(new ProjectileObject(player.x, player.y, angle_between_player_and_mouse));
         time_since_last_projectile = 0;
     }
     
@@ -387,9 +184,11 @@ function run() {
 }
 
 function initialize() {
+    //initialize player
+    player = PlayerObject();
     //initialize enemies
     for(var i = 0; i < 10; i++){
-        enemies_list.push(new enemy(randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 100, 100, 20, "blue"));
+        enemies_list.push(new EnemyObject(randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 100, 100, 20, "blue"));
     }
     //initialize last update time
     lastUpdateTime = performance.now();
