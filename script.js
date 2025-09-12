@@ -10,10 +10,11 @@ canvas.height = HEIGHT;
 // base stats
 var player_status = {
     speed: 0.4,
-    health: 100,
+    max_health: 100,
     projectile_speed: 1,
-    time_between_projectiles: 100,
+    time_between_projectiles: 5,
     damage: 10,
+    invincibility_time: 1000,
 }
 
 // global variables
@@ -35,9 +36,24 @@ var player = {
     x: 400,
     y: 400,
     radius: 10,
+    invincibility_time: 0,
+    health: player_status.max_health,
+    take_damage: function(damage){
+        if(this.invincibility_time <= 0){
+            this.health -= damage;
+            if(this.health <= 0){
+                this.health = 0;
+            }
+            this.invincibility_time = player_status.invincibility_time;
+        }
+    },
     render: function(ctx){
         ctx.save();
-        ctx.fillStyle = "red";
+        if(this.invincibility_time > 0){
+            ctx.fillStyle = "red";
+        }else{
+            ctx.fillStyle = "blue";
+        }
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
         ctx.fill();
@@ -45,6 +61,9 @@ var player = {
     },
     update: function(dt){
         //movement
+        if(this.invincibility_time > 0){
+            this.invincibility_time -= dt;
+        }
         if(keys_down.includes("w")){
             this.y -= player_status.speed * dt;
         }
@@ -84,6 +103,10 @@ var enemy = function(x, y, health, max_health, radius, color){
         collision: false,
         color: color,
         base_speed: 0.1,
+        base_damage: 10,
+        take_damage: function(damage){
+            this.health -= damage;
+        },
         render: function(ctx){
             ctx.save();
             // enemy
@@ -186,12 +209,20 @@ function update(dt) {
         projectile.update(dt);
     });
     
+
+    //player collision
+    for(var i = 0; i < enemies_list.length; i++){
+        if(aabbCircleCollision(player, enemies_list[i])){
+            player.take_damage(enemies_list[i].base_damage);
+        }
+    }
+
     //projectile collision
     for(var i = 0; i < projectiles_list.length; i++){
         for(var j = 0; j < enemies_list.length; j++){
             if(aabbCircleCollision(projectiles_list[i], enemies_list[j])){
                 projectiles_list[i].exists = false;	
-                enemies_list[j].health -= player_status.damage;
+                enemies_list[j].take_damage(player_status.damage);
                 if(enemies_list[j].health <= 0){
                     enemies_list[j].respawn();
                 }
@@ -229,12 +260,13 @@ function render() {
     ctx.fillText("Mouse: x=" + mouse.x + " y=" + mouse.y, 20, 40);
     ctx.fillText("Angle: " + angle_between_player_and_mouse, 20, 60);
     ctx.fillText("Projectiles: " + projectiles_list.length, 20, 80);
+    ctx.fillText("Player Health: " + player.health, 20, 100);
 }
 
 // run function
 function run() {
     var now = performance.now();
-    var dt = (now - lastUpdateTime); // dt in seconds
+    var dt = (now - lastUpdateTime);
     lastUpdateTime = now;
     update(dt);
     render();
