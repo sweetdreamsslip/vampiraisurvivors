@@ -1,10 +1,24 @@
-var PlayerObject = function(){
+var PlayerObject = function(spriteSheet){
+    const scale = 3;
     return {
     x: 400,
     y: 400,
-    radius: 10,
+    radius: 16 * scale, // Raio de colisão, ajustado pela escala
     invincibility_time: 0,
     health: player_status.max_health,
+
+    // Propriedades do Sprite
+    sprite: spriteSheet,
+    frameWidth: 32,
+    frameHeight: 32,
+    scale: scale,
+    
+    // Propriedades da Animação
+    animationTimer: 0,
+    animationSpeed: 200, // milissegundos por frame
+    currentFrame: 0,
+    frameCount: 2, // 2 colunas para a animação
+    isMoving: false,
     take_damage: function(damage){
         if(this.invincibility_time <= 0){
             this.health -= damage;
@@ -16,18 +30,41 @@ var PlayerObject = function(){
     },
     render: function(ctx){
         ctx.save();
+        // Efeito de piscar quando invencível
         if(this.invincibility_time > 0){
-            ctx.fillStyle = "red";
-        }else{
-            ctx.fillStyle = "blue";
+            if (Math.floor(this.invincibility_time / 100) % 2 === 0) {
+                ctx.globalAlpha = 0.5;
+            }
         }
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-        ctx.fill();
+
+        ctx.translate(this.x, this.y);
+        // Vira o sprite com base na direção da mira
+        if (angle_between_player_and_mouse < Math.PI / 2 || angle_between_player_and_mouse > 3 * Math.PI / 2) {
+            ctx.scale(-1, 1);
+        }
+
+        // Calcula qual frame desenhar (usando a primeira linha do spritesheet)
+        let frameX = this.currentFrame * this.frameWidth;
+        let frameY = 0;
+
+        const renderWidth = this.frameWidth * this.scale;
+        const renderHeight = this.frameHeight * this.scale;
+
+        ctx.drawImage(
+            this.sprite,
+            frameX, frameY, // origem x, y
+            this.frameWidth, this.frameHeight, // origem largura, altura
+            -renderWidth / 2, -renderHeight / 2, // destino x, y (centralizado na origem)
+            renderWidth, renderHeight // destino largura, altura
+        );
+
         ctx.restore();
     },
     update: function(dt, moveVector = {x: 0, y: 0}){
         //movement
+        let oldX = this.x;
+        let oldY = this.y;
+
         if(this.invincibility_time > 0){
             this.invincibility_time -= dt;
         }
@@ -50,6 +87,20 @@ var PlayerObject = function(){
                 this.x += player_status.speed * dt;
             }
         }
+
+        this.isMoving = (this.x !== oldX || this.y !== oldY);
+
+        // Atualização da animação
+        if (this.isMoving) {
+            this.animationTimer += dt;
+            if (this.animationTimer > this.animationSpeed) {
+                this.currentFrame = (this.currentFrame + 1) % this.frameCount;
+                this.animationTimer = 0;
+            }
+        } else {
+            this.currentFrame = 0; // Frame de repouso
+        }
+
         //boundary check (so player doesn't go off the screen)
         if(this.x < 0){
             this.x = 0;
@@ -67,48 +118,72 @@ var PlayerObject = function(){
 }
 };
 
-var EnemyObject = function(x, y, health, max_health, radius, color){
+var EnemyObject = function(spriteSheet, x, y, health, max_health){
+    const scale = 2.5;
     return {
         x: x,
         y: y,
         health: health,
         max_health: max_health,
-        radius: radius,
-        collision: false,
-        color: color,
+        radius: 16 * scale, // Raio de colisão
         base_speed: 0.1,
         base_damage: 10,
+
+        // Propriedades do Sprite
+        sprite: spriteSheet,
+        frameWidth: 32,
+        frameHeight: 32,
+        scale: scale,
+
+        // Propriedades da Animação
+        animationTimer: 0,
+        animationSpeed: 150, // ms por frame
+        currentFrame: 0,
+        frameCount: 4, // 2x2 grid
+        numColumns: 2,
+
         take_damage: function(damage){
             this.health -= damage;
         },
         render: function(ctx){
             ctx.save();
-            // enemy
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-            ctx.fill();
-            // health bar
+
+            // Vira o sprite para encarar o jogador
+            ctx.translate(this.x, this.y);
+            if (player.x < this.x) {
+                ctx.scale(-1, 1);
+            }
+
+            // Calcula o frame da animação
+            const frameX = (this.currentFrame % this.numColumns) * this.frameWidth;
+            const frameY = Math.floor(this.currentFrame / this.numColumns) * this.frameHeight;
+            const renderWidth = this.frameWidth * this.scale;
+            const renderHeight = this.frameHeight * this.scale;
+
+            // Desenha o sprite
+            ctx.drawImage(this.sprite, frameX, frameY, this.frameWidth, this.frameHeight, -renderWidth / 2, -renderHeight / 2, renderWidth, renderHeight);
+            
+            ctx.restore(); // Restaura a transformação (translate/scale)
+
+            // Barra de vida (desenhada separadamente para não ser afetada pela escala/virada do sprite)
             ctx.fillStyle = "red";
             ctx.fillRect(this.x - this.radius, this.y - this.radius - 15, this.radius * 2, 10);
             ctx.fillStyle = "green";
             ctx.fillRect(this.x - this.radius, this.y - this.radius - 15, (this.health / this.max_health) * this.radius * 2, 10);
-            ctx.restore();
         },
         update: function(dt){
-        // Move enemy towards player by its base_speed * dt
-        var dx = player.x - this.x;
-        var dy = player.y - this.y;
-        var distancesq = distSquared(this.x, this.y, player.x, player.y);
-        if (distancesq > 0) {
+            // Atualiza a animação
+            this.animationTimer += dt;
+            if (this.animationTimer > this.animationSpeed) {
+                this.currentFrame = (this.currentFrame + 1) % this.frameCount;
+                this.animationTimer = 0;
+            }
+
+            // Move o inimigo em direção ao jogador
             var moveDist = this.base_speed * dt;
             var angle = angleBetweenPoints(this.x, this.y, player.x, player.y);
             this.x += Math.cos(angle) * moveDist;
             this.y += Math.sin(angle) * moveDist;
-        }
-
-
-
         },
         respawn: function(){
             this.x = randomIntBetween(0, WIDTH);
@@ -119,19 +194,34 @@ var EnemyObject = function(x, y, health, max_health, radius, color){
 };
 
 // projectile object
-var ProjectileObject = function(x, y, initial_angle) {
+var ProjectileObject = function(spriteSheet, x, y, initial_angle) {
+    const scale = 2.3;
     return {
         x: x,
         y: y,
-        radius: 5,
+        radius: 16 * scale, 
         initial_angle: initial_angle,
         exists: true,
+
+        // Propriedades do Sprite
+        sprite: spriteSheet,
+        frameWidth: 32,
+        frameHeight: 32,
+        scale: scale,
+
         render: function(ctx){
             ctx.save();
-            ctx.fillStyle = "green";
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-            ctx.fill();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.initial_angle + Math.PI);
+
+            const renderWidth = this.frameWidth * this.scale;
+            const renderHeight = this.frameHeight * this.scale;
+
+            ctx.drawImage(
+                this.sprite,
+                -renderWidth / 2, -renderHeight / 2, // Centraliza o sprite no destino
+                renderWidth, renderHeight
+            );
             ctx.restore();
         },
         update: function(dt){
@@ -142,7 +232,7 @@ var ProjectileObject = function(x, y, initial_angle) {
             }
         },
     }
-}
+};
 
 // particle object
 var ParticleObject = function(x, y, color, speed, angle, lifespan) {

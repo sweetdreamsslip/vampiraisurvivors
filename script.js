@@ -19,6 +19,11 @@ var enemies_list = [];
 var projectiles_list = [];
 var particles_list = [];
 
+// sprites
+var playerSprite = new Image();
+var projectileSprite = new Image();
+var enemySprite = new Image();
+
 // controller support
 var is_gamepad_connected = false;
 
@@ -88,7 +93,7 @@ function update(dt) {
     //projectile firing
     time_since_last_projectile += dt;
     if ((mouse.mouseDown || gamepadState.isShooting) && time_since_last_projectile >= player_status.time_between_projectiles) {
-        projectiles_list.push(new ProjectileObject(player.x, player.y, angle_between_player_and_mouse));
+        projectiles_list.push(new ProjectileObject(projectileSprite, player.x, player.y, angle_between_player_and_mouse));
         time_since_last_projectile = 0;
     }
     
@@ -109,7 +114,7 @@ function update(dt) {
     for(var i = 0; i < projectiles_list.length; i++){
         for(var j = 0; j < enemies_list.length; j++){
             if(aabbCircleCollision(projectiles_list[i], enemies_list[j])){
-                createParticleExplosion(enemies_list[j].x, enemies_list[j].y, enemies_list[j].color, randomIntBetween(10, 20));
+                createParticleExplosion(enemies_list[j].x, enemies_list[j].y, "#8A2BE2", randomIntBetween(10, 20)); // Cor roxa para explosão do livro
                 projectiles_list[i].exists = false;	
                 enemies_list[j].take_damage(player_status.damage);
                 if(enemies_list[j].health <= 0){
@@ -178,13 +183,28 @@ function run() {
 
 function initialize() {
     //initialize player
-    player = PlayerObject();
+    player = PlayerObject(playerSprite);
     //initialize enemies
     for(var i = 0; i < 10; i++){
-        enemies_list.push(new EnemyObject(randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 100, 100, 20, "blue"));
+        enemies_list.push(new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 100, 100));
     }
     //initialize last update time
     lastUpdateTime = performance.now();
     run();
 }
-initialize();
+
+let imagesToLoad = 3;
+function onImageLoaded() {
+    imagesToLoad--;
+    if (imagesToLoad === 0) {
+        initialize();
+    }
+}
+
+playerSprite.onload = onImageLoaded;
+projectileSprite.onload = onImageLoaded;
+enemySprite.onload = onImageLoaded;
+
+playerSprite.src = "estudante.png";
+projectileSprite.src = "lapis2.png";
+enemySprite.src = "livro ptbr.png";
