@@ -28,4 +28,15 @@ var player_status_configurations = {
     }
 }
 
+
+var enemy_spawn_configurations = {
+    "default": {
+        time_between_enemy_spawn: 500,
+    },
+    "debug": {
+        time_between_enemy_spawn: 100,
+    }
+}
+
+var selected_enemy_spawn_configuration = "default";
 var selected_player_status_configuration = "default";

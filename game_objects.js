@@ -133,6 +133,7 @@ var EnemyObject = function(spriteSheet, x, y, health, max_health){
         radius: 16 * scale, // Raio de colisão
         base_speed: 0.1,
         base_damage: 10,
+        alive: true,
 
         // Propriedades do Sprite
         sprite: spriteSheet,
@@ -189,6 +190,9 @@ var EnemyObject = function(spriteSheet, x, y, health, max_health){
             var angle = angleBetweenPoints(this.x, this.y, player.x, player.y);
             this.x += Math.cos(angle) * moveDist;
             this.y += Math.sin(angle) * moveDist;
+            if(this.health <= 0){
+                this.alive = false;
+            }
         },
         respawn: function(){
             this.x = randomIntBetween(0, WIDTH);
@@ -298,5 +302,14 @@ var ExperienceOrbObject = function(x, y, radius, color, experience_value) {
                 this.y += Math.sin(direction) * this.max_speed * dt * (1-distance_ratio);
             }
         }
+    }
+};
+
+var GunDroneObject = function(x, y, distance_to_player) {
+    return {
+        x: x,
+        y: y,
+        distance_to_player: distance_to_player,
+        exists: true,
     }
 };

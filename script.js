@@ -9,10 +9,13 @@ canvas.height = HEIGHT;
 
 // fetch player status configuration
 var player_status = Object.assign({}, player_status_configurations[selected_player_status_configuration]);
+var enemy_spawn = Object.assign({}, enemy_spawn_configurations[selected_enemy_spawn_configuration]);
 
 // global variables
 var angle_between_player_and_mouse = 0;
 var time_since_last_projectile = 0;
+var time_since_last_enemy_spawn = 0;
+
 // game objects
 var player;
 var enemies_list = [];
@@ -81,6 +84,7 @@ window.addEventListener("gamepaddisconnected", function(e) {
 
 // update function
 function update(dt) {
+    time_since_last_enemy_spawn += dt;
     const gamepadState = pollGamepad();
 
     // Define o ângulo de mira: prioriza o controle, senão usa o mouse
@@ -118,9 +122,6 @@ function update(dt) {
                 createParticleExplosion(enemies_list[j].x, enemies_list[j].y, "#8A2BE2", randomIntBetween(10, 20)); // Cor roxa para explosão do livro
                 projectiles_list[i].exists = false;	
                 enemies_list[j].take_damage(player_status.damage);
-                if(enemies_list[j].health <= 0){
-                    enemies_list[j].respawn();
-                }
             }
         }
     }
@@ -128,6 +129,9 @@ function update(dt) {
     // enemy updating
     enemies_list.forEach(function(enemy) {
         enemy.update(dt);
+        if(!enemy.alive) {
+            experience_orbs_list.push(new ExperienceOrbObject(enemy.x, enemy.y, 5, "orange", randomIntBetween(1, 10)));
+        }
     });
 
     // update particles
@@ -144,6 +148,10 @@ function update(dt) {
         }
     });
 
+    // remove enemies that are no longer exists
+    enemies_list = enemies_list.filter(function(enemy) {
+        return enemy.alive;
+    });
     // remove projectiles that are no longer exists
     projectiles_list = projectiles_list.filter(function(projectile) {
         return projectile.exists;
@@ -156,6 +164,13 @@ function update(dt) {
     experience_orbs_list = experience_orbs_list.filter(function(orb) {
         return orb.exists;
     });
+
+    // enemy spawning
+    if(time_since_last_enemy_spawn >= enemy_spawn.time_between_enemy_spawn){
+        enemies_list.push(new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 30, 30));
+        time_since_last_enemy_spawn -= enemy_spawn.time_between_enemy_spawn;
+    }
+
 }
 
 // render function
@@ -186,12 +201,14 @@ function render() {
     ctx.fillText("Projectiles: " + projectiles_list.length, 20, 80);
     ctx.fillText("Player Health: " + player.health, 20, 100);
     ctx.fillText("Particles: " + particles_list.length, 20, 120);
+    ctx.fillText("Experience: " + player.experience, 20, 140);
+    ctx.fillText("Level: " + player.level, 20, 160);
 }
 
 // run function
 function run() {
     var now = performance.now();
-    var dt = (now - lastUpdateTime);
+    var dt = (now - lastUpdateTime); // dt is in milliseconds
     lastUpdateTime = now;
     update(dt);
     render();
@@ -203,13 +220,15 @@ function initialize() {
     player = PlayerObject(playerSprite);
     //initialize enemies
     for(var i = 0; i < 10; i++){
-        enemies_list.push(new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 100, 100));
+        enemies_list.push(new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 30, 30));
     }
 
     //initialize experience orbs
+    /*
     for(var i = 0; i < 160; i++){
         experience_orbs_list.push(new ExperienceOrbObject(randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 5, "orange", randomIntBetween(1, 10)));
     }
+    */
     //initialize last update time
     lastUpdateTime = performance.now();
     run();
