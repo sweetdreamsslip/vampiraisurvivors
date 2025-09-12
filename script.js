@@ -7,27 +7,30 @@ var HEIGHT = window.innerHeight-20;
 canvas.width = WIDTH;
 canvas.height = HEIGHT;
 
-//top-down game
+// base stats
 var player_status = {
     speed: 0.4,
     health: 100,
     projectile_speed: 1,
-    time_between_projectiles: 170,
+    time_between_projectiles: 100,
     damage: 10,
 }
 
+// global variables
 var angle_between_player_and_mouse = 0;
 var time_since_last_projectile = 0;
+var projectiles_list = [];
+var enemies_list = [];
 
-
+// control variables
 var mouse = {
     x: 0,
     y: 0,
     mouseDown: false,
 };
-
 var keys_down = [];
 
+// player object
 var player = {
     x: 400,
     y: 400,
@@ -69,38 +72,56 @@ var player = {
         }
     }
 }; 
-var enemy = {
-    x: 200,
-    y: 200,
-    health: 100,
-    max_health: 100,
-    radius: 50,
-    collision: false,
-    color: "blue",
-    render: function(ctx){
-        ctx.save();
-        // enemy
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-        ctx.fill();
-        // health bar
-        ctx.fillStyle = "red";
-        ctx.fillRect(this.x - this.radius, this.y - this.radius - 15, this.radius * 2, 10);
-        ctx.fillStyle = "green";
-        ctx.fillRect(this.x - this.radius, this.y - this.radius - 15, (this.health / this.max_health) * this.radius * 2, 10);
-        ctx.restore();
-    },
-    update: function(dt){
 
-    },
-    respawn: function(){
-        this.x = randomIntBetween(0, WIDTH);
-        this.y = randomIntBetween(0, HEIGHT);
-        this.health = this.max_health;
+// enemy object
+var enemy = function(x, y, health, max_health, radius, color){
+    return {
+        x: x,
+        y: y,
+        health: health,
+        max_health: max_health,
+        radius: radius,
+        collision: false,
+        color: color,
+        base_speed: 0.1,
+        render: function(ctx){
+            ctx.save();
+            // enemy
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+            ctx.fill();
+            // health bar
+            ctx.fillStyle = "red";
+            ctx.fillRect(this.x - this.radius, this.y - this.radius - 15, this.radius * 2, 10);
+            ctx.fillStyle = "green";
+            ctx.fillRect(this.x - this.radius, this.y - this.radius - 15, (this.health / this.max_health) * this.radius * 2, 10);
+            ctx.restore();
+        },
+        update: function(dt){
+        // Move enemy towards player by its base_speed * dt
+        var dx = player.x - this.x;
+        var dy = player.y - this.y;
+        var distancesq = distSquared(this.x, this.y, player.x, player.y);
+        if (distancesq > 0) {
+            var moveDist = this.base_speed * dt;
+            var angle = angleBetweenPoints(this.x, this.y, player.x, player.y);
+            this.x += Math.cos(angle) * moveDist;
+            this.y += Math.sin(angle) * moveDist;
+        }
+
+
+
+        },
+        respawn: function(){
+            this.x = randomIntBetween(0, WIDTH);
+            this.y = randomIntBetween(0, HEIGHT);
+            this.health = this.max_health;
+        }
     }
 };
 
+// projectile object
 var projectile = function(x, y, initial_angle) {
     return {
         x: x,
@@ -125,14 +146,8 @@ var projectile = function(x, y, initial_angle) {
         },
     }
 }
-
-var createProjectile = function(x, y, initial_angle) {
-    return projectile(x, y, initial_angle);
-}
     
-projectiles_list = [];
-
-
+// event listeners
 canvas.addEventListener("mousemove", function(e) {
     var rect = canvas.getBoundingClientRect();
     mouse.x = e.clientX - rect.left;
@@ -141,14 +156,11 @@ canvas.addEventListener("mousemove", function(e) {
 canvas.addEventListener("mousedown", function(e) {
     mouse.mouseDown = true;
 });
-
 canvas.addEventListener("mouseup", function(e) {
     mouse.mouseDown = false;
 });
-
 window.addEventListener("keydown", function(e) {
     keys_down.push(e.key);
-    console.log(keys_down);
 });
 window.addEventListener("keyup", function(e) {
     keys_down = keys_down.filter(function(key) {
@@ -157,45 +169,61 @@ window.addEventListener("keyup", function(e) {
 });
 
 
+// update function
 function update(dt) {
     angle_between_player_and_mouse = angleBetweenPoints(player.x, player.y, mouse.x, mouse.y);
     player.update(dt);
-    enemy.collision = aabbCircleCollision(player, enemy);
-    enemy.update(dt);
+
+    //projectile firing
     time_since_last_projectile += dt;
     if (mouse.mouseDown && time_since_last_projectile >= player_status.time_between_projectiles) {
-        projectiles_list.push(createProjectile(player.x, player.y, angle_between_player_and_mouse));
+        projectiles_list.push(new projectile(player.x, player.y, angle_between_player_and_mouse));
         time_since_last_projectile = 0;
-        //mouse.mouseDown = false; // Prevent continuous firing while holding mouse
     }
     
+    //projectile updating
     projectiles_list.forEach(function(projectile) {
         projectile.update(dt);
     });
-
+    
+    //projectile collision
     for(var i = 0; i < projectiles_list.length; i++){
-        if(!projectiles_list[i].exists){
-            projectiles_list.splice(i, 1);
-            continue;
-        }
-        if(aabbCircleCollision(projectiles_list[i], enemy)){
-            projectiles_list.splice(i, 1);
-            enemy.health -= player_status.damage;
-            if(enemy.health <= 0){
-                enemy.respawn();
-                enemy.health = 100;
+        for(var j = 0; j < enemies_list.length; j++){
+            if(aabbCircleCollision(projectiles_list[i], enemies_list[j])){
+                projectiles_list[i].exists = false;	
+                enemies_list[j].health -= player_status.damage;
+                if(enemies_list[j].health <= 0){
+                    enemies_list[j].respawn();
+                }
             }
         }
     }
+
+    // enemy updating
+    enemies_list.forEach(function(enemy) {
+        enemy.update(dt);
+    });
+
+    // remove projectiles that are no longer exists
+    projectiles_list = projectiles_list.filter(function(projectile) {
+        return projectile.exists;
+    });
 }
 
+// render function
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    enemy.render(ctx);
+    //enemy rendering
+    enemies_list.forEach(function(enemy) {
+        enemy.render(ctx);
+    });
+    //player rendering
     player.render(ctx);
+    //projectile rendering
     projectiles_list.forEach(function(projectile) {
         projectile.render(ctx);
     });
+    //debug text
     ctx.fillStyle = "red";
     ctx.font = "24px Arial";
     ctx.fillText("Mouse: x=" + mouse.x + " y=" + mouse.y, 20, 40);
@@ -203,6 +231,7 @@ function render() {
     ctx.fillText("Projectiles: " + projectiles_list.length, 20, 80);
 }
 
+// run function
 function run() {
     var now = performance.now();
     var dt = (now - lastUpdateTime); // dt in seconds
@@ -212,5 +241,13 @@ function run() {
     requestAnimationFrame(run);
 }
 
-lastUpdateTime = performance.now();
-run();
+function initialize() {
+    //initialize enemies
+    for(var i = 0; i < 10; i++){
+        enemies_list.push(new enemy(randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 100, 100, 20, "blue"));
+    }
+    //initialize last update time
+    lastUpdateTime = performance.now();
+    run();
+}
+initialize();
