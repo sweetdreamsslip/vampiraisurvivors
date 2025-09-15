@@ -1,336 +1,132 @@
 // Sistema de Upgrades e Quiz para Vampiraí Survivors
 
-// Banco de perguntas sobre Piraí e Tecnologia
-var quizQuestions = {
-    "pirai": [
-        {
-            question: "Qual é a principal atividade econômica de Piraí?",
-            options: ["Agricultura", "Pecuária", "Indústria", "Tecnologia"],
-            correct: 3,
-            upgrade: "piercing_shot"
-        },
-        {
-            question: "Piraí é conhecida como a 'Capital da Tecnologia' de qual estado?",
-            options: ["São Paulo", "Rio de Janeiro", "Minas Gerais", "Bahia"],
-            correct: 1,
-            upgrade: "double_shot"
-        },
-        {
-            question: "Qual empresa de tecnologia tem sede em Piraí?",
-            options: ["Microsoft", "Google", "IBM", "Nenhuma das anteriores"],
-            correct: 3,
-            upgrade: "damage_reduction"
-        },
-        {
-            question: "Piraí fica na região do Vale do Paraíba?",
-            options: ["Sim", "Não", "Parcialmente", "Depende da estação"],
-            correct: 0,
-            upgrade: "damage_zones"
-        },
-        {
-            question: "Qual é o nome do parque tecnológico de Piraí?",
-            options: ["Tech Valley", "Piraí Tech Park", "Vale do Silício Brasileiro", "Não possui"],
-            correct: 3,
-            upgrade: "tech_boost"
-        },
-        {
-            question: "Piraí é considerada uma cidade inteligente?",
-            options: ["Sim, totalmente", "Parcialmente", "Não", "Apenas no futuro"],
-            correct: 0,
-            upgrade: "fire_rate"
-        },
-        {
-            question: "Qual curso de tecnologia é oferecido em Piraí?",
-            options: ["Ciência da Computação", "Engenharia de Software", "Sistemas de Informação", "Todos os anteriores"],
-            correct: 3,
-            upgrade: "magnet_range"
-        }
-    ],
-    "tecnologia": [
-        {
-            question: "Qual linguagem de programação é mais usada para desenvolvimento web?",
-            options: ["Python", "JavaScript", "C++", "Assembly"],
-            correct: 1,
-            upgrade: "piercing_shot"
-        },
-        {
-            question: "O que significa HTML?",
-            options: ["HyperText Markup Language", "High Tech Modern Language", "Home Tool Markup Language", "Hyperlink Text Management Language"],
-            correct: 0,
-            upgrade: "double_shot"
-        },
-        {
-            question: "Qual protocolo é usado para comunicação segura na web?",
-            options: ["HTTP", "FTP", "HTTPS", "SMTP"],
-            correct: 2,
-            upgrade: "damage_reduction"
-        },
-        {
-            question: "O que é um algoritmo?",
-            options: ["Um tipo de hardware", "Uma sequência de passos para resolver um problema", "Uma linguagem de programação", "Um sistema operacional"],
-            correct: 1,
-            upgrade: "damage_zones"
-        },
-        {
-            question: "Qual é a diferença entre RAM e ROM?",
-            options: ["Não há diferença", "RAM é volátil, ROM é permanente", "ROM é volátil, RAM é permanente", "Ambas são voláteis"],
-            correct: 1,
-            upgrade: "experience_boost"
-        },
-        {
-            question: "O que significa CSS?",
-            options: ["Computer Style Sheets", "Cascading Style Sheets", "Creative Style System", "Central Style Service"],
-            correct: 1,
-            upgrade: "tech_boost"
-        },
-        {
-            question: "Qual é o principal objetivo do Git?",
-            options: ["Editar código", "Controlar versões", "Executar programas", "Criar interfaces"],
-            correct: 1,
-            upgrade: "speed_boost"
-        },
-        {
-            question: "O que é uma API?",
-            options: ["Um tipo de banco de dados", "Interface de programação de aplicações", "Linguagem de programação", "Sistema operacional"],
-            correct: 1,
-            upgrade: "health_boost"
-        },
-        {
-            question: "Qual é a diferença entre frontend e backend?",
-            options: ["Não há diferença", "Frontend é visual, backend é servidor", "Backend é visual, frontend é servidor", "Ambos são iguais"],
-            correct: 1,
-            upgrade: "damage_boost"
-        },
-        {
-            question: "O que é um framework?",
-            options: ["Um tipo de hardware", "Estrutura de desenvolvimento de software", "Linguagem de programação", "Sistema operacional"],
-            correct: 1,
-            upgrade: "fire_rate"
-        }
-    ]
-};
+// Usar o sistema completo de perguntas do arquivo JSON
+var QuizSystem = CompleteQuizSystem;
 
-// Sistema de upgrades disponíveis
-var availableUpgrades = {
-    "piercing_shot": {
+// Sistema de Upgrades disponíveis
+var availableUpgrades = [
+    {
         name: "Tiro Perfurante",
-        description: "Seus ataques atravessam todos os inimigos em linha",
-        effect: function() {
-            player.piercing_shot = true;
-        }
+        description: "Projéteis atravessam inimigos",
+        type: "piercing_shot",
+        icon: "💥"
     },
-    "double_shot": {
+    {
         name: "Tiro Duplo",
-        description: "Atira duas vezes por ataque",
-        effect: function() {
-            player.double_shot = true;
-        }
+        description: "Dispara dois projéteis simultaneamente",
+        type: "double_shot",
+        icon: "⚡"
     },
-    "damage_reduction": {
-        name: "Armadura Tecnológica",
-        description: "Reduz dano sofrido em 1 ponto",
-        effect: function() {
-            player.damage_reduction += 1;
-        }
+    {
+        name: "Redução de Dano",
+        description: "Reduz dano recebido em 1",
+        type: "damage_reduction",
+        icon: "🛡️"
     },
-    "damage_zones": {
+    {
         name: "Zonas de Dano",
-        description: "Cria zonas que causam dano contínuo aos inimigos",
-        effect: function() {
-            player.damage_zones = true;
-        }
+        description: "Cria zonas que causam dano",
+        type: "damage_zones",
+        icon: "💢"
     },
-    "tech_boost": {
-        name: "Impulso Tecnológico",
-        description: "Aumenta velocidade de movimento em 15%",
-        effect: function() {
-            player_status.speed *= 1.15;
-        }
+    {
+        name: "Velocidade",
+        description: "Aumenta velocidade de movimento",
+        type: "speed_boost",
+        icon: "🏃"
     },
-    "speed_boost": {
-        name: "Velocidade Supersônica",
-        description: "Aumenta velocidade de movimento em 20%",
-        effect: function() {
-            player_status.speed *= 1.2;
-        }
+    {
+        name: "Taxa de Tiro",
+        description: "Aumenta velocidade de disparo",
+        type: "fire_rate",
+        icon: "🔥"
     },
-    "health_boost": {
+    {
+        name: "Dano",
+        description: "Aumenta dano dos projéteis",
+        type: "damage_boost",
+        icon: "💪"
+    },
+    {
+        name: "Vida",
+        description: "Aumenta vida máxima",
+        type: "health_boost",
+        icon: "❤️"
+    },
+    {
+        name: "Experiência",
+        description: "Aumenta ganho de experiência",
+        type: "experience_boost",
+        icon: "⭐"
+    },
+    {
+        name: "Magnetismo",
+        description: "Aumenta alcance de coleta de XP",
+        type: "magnet_range",
+        icon: "🧲"
+    },
+    {
+        name: "Bumerangue",
+        description: "Projéteis retornam ao jogador",
+        type: "boomerang",
+        icon: "🪃"
+    },
+    {
+        name: "Explosão",
+        description: "Projéteis explodem ao atingir inimigos",
+        type: "explosive",
+        icon: "💥"
+    },
+    {
+        name: "Congelamento",
+        description: "Projéteis congelam inimigos temporariamente",
+        type: "freeze",
+        icon: "❄️"
+    },
+    {
         name: "Vida Extra",
-        description: "Aumenta vida máxima em 25 pontos",
-        effect: function() {
-            player_status.max_health += 25;
-            player.health = player_status.max_health;
-        }
+        description: "Ganha +1 vida máxima permanentemente",
+        type: "extra_life",
+        icon: "💖"
     },
-    "damage_boost": {
-        name: "Dano Devastador",
-        description: "Aumenta dano em 3 pontos",
-        effect: function() {
-            player_status.damage += 3;
-        }
+    {
+        name: "Velocidade de Projétil",
+        description: "Projéteis voam 50% mais rápido",
+        type: "projectile_speed",
+        icon: "⚡"
     },
-    "fire_rate": {
-        name: "Taxa de Tiro Rápida",
-        description: "Reduz tempo entre disparos em 20%",
-        effect: function() {
-            player_status.time_between_projectiles *= 0.8;
-        }
+    {
+        name: "Regeneração",
+        description: "Regenera 1 HP a cada 3 segundos",
+        type: "regeneration",
+        icon: "🔄"
     },
-    "magnet_range": {
-        name: "Ímã de Experiência",
-        description: "Aumenta alcance de atração de experiência em 30%",
-        effect: function() {
-            player_status.magnet_max_distance *= 1.3;
-        }
-    },
-    "invincibility_time": {
-        name: "Invencibilidade Estendida",
-        description: "Aumenta tempo de invencibilidade em 25%",
-        effect: function() {
-            player_status.invincibility_time *= 1.25;
-        }
-    },
-    "experience_boost": {
-        name: "Experiência Duplicada",
-        description: "Ganha 1.5x mais experiência",
-        effect: function() {
-            experienceMultiplier = 1.5;
-        }
+    {
+        name: "Multiplicador de XP",
+        description: "Ganha 2x mais experiência",
+        type: "xp_multiplier",
+        icon: "🌟"
     }
-};
+];
 
-// Variáveis do sistema de upgrade
-var upgradeScreenVisible = false;
-var currentQuizQuestion = null;
-var selectedUpgrade = null;
-
-// Função para mostrar tela de upgrade
-function showUpgradeScreen() {
-    upgradeScreenVisible = true;
+// Função para mostrar interface de seleção de upgrade
+function createUpgradeSelectionInterface() {
+    // Pausar jogo
     gamePaused = true;
     
-    // Escolher categoria aleatória
-    var categories = Object.keys(quizQuestions);
-    var randomCategory = categories[Math.floor(Math.random() * categories.length)];
-    var questions = quizQuestions[randomCategory];
-    currentQuizQuestion = questions[Math.floor(Math.random() * questions.length)];
-    
-    // Criar interface de quiz primeiro
-    createQuizInterface();
-}
-
-// Função para criar interface de quiz
-function createQuizInterface() {
-    // Remover interface anterior se existir
-    var existingInterface = document.getElementById('upgradeInterface');
-    if (existingInterface) {
-        existingInterface.remove();
-    }
-    
-    // Criar div da interface
-    var upgradeDiv = document.createElement('div');
-    upgradeDiv.id = 'upgradeInterface';
-    upgradeDiv.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 2000;
-        color: white;
-        font-family: 'Arial', sans-serif;
-    `;
-    
-    // Título
-    var title = document.createElement('h1');
-    title.textContent = '🎉 LEVEL UP! 🎉';
-    title.style.cssText = 'color: #FFD700; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
-    upgradeDiv.appendChild(title);
-    
-    // Pergunta do quiz
-    var questionDiv = document.createElement('div');
-    questionDiv.style.cssText = 'background: rgba(255, 107, 107, 0.2); padding: 20px; border-radius: 10px; margin-bottom: 30px; max-width: 600px; text-align: center;';
-    
-    var questionText = document.createElement('h2');
-    questionText.textContent = currentQuizQuestion.question;
-    questionText.style.cssText = 'margin-bottom: 20px; font-size: 1.5em;';
-    questionDiv.appendChild(questionText);
-    
-    // Opções de resposta
-    var optionsDiv = document.createElement('div');
-    optionsDiv.style.cssText = 'display: flex; flex-direction: column; gap: 10px;';
-    
-    currentQuizQuestion.options.forEach((option, index) => {
-        var optionButton = document.createElement('button');
-        optionButton.textContent = `${String.fromCharCode(65 + index)}) ${option}`;
-        optionButton.style.cssText = `
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 2px solid #ff6b6b;
-            padding: 15px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            transition: all 0.3s ease;
-        `;
-        
-        optionButton.addEventListener('mouseenter', function() {
-            this.style.background = 'rgba(255, 107, 107, 0.3)';
-            this.style.transform = 'scale(1.05)';
-        });
-        
-        optionButton.addEventListener('mouseleave', function() {
-            this.style.background = 'rgba(255, 255, 255, 0.1)';
-            this.style.transform = 'scale(1)';
-        });
-        
-        optionButton.addEventListener('click', function() {
-            selectAnswer(index);
-        });
-        
-        optionsDiv.appendChild(optionButton);
-    });
-    
-    questionDiv.appendChild(optionsDiv);
-    upgradeDiv.appendChild(questionDiv);
-    
-    // Instruções
-    var instructions = document.createElement('p');
-    instructions.textContent = 'Responda corretamente para escolher entre 3 upgrades!';
-    instructions.style.cssText = 'font-size: 1.2em; color: #ccc; margin-top: 20px;';
-    upgradeDiv.appendChild(instructions);
-    
-    document.body.appendChild(upgradeDiv);
-}
-
-// Função para criar interface de seleção de upgrades
-function createUpgradeSelectionInterface() {
-    // Remover interface anterior se existir
-    var existingInterface = document.getElementById('upgradeInterface');
-    if (existingInterface) {
-        existingInterface.remove();
-    }
-    
-    // Escolher 3 upgrades aleatórios
-    var upgradeKeys = Object.keys(availableUpgrades);
+    // Selecionar 3 upgrades aleatórios
     var selectedUpgrades = [];
+    var available = [...availableUpgrades];
     
-    // Garantir que não repita upgrades
-    while (selectedUpgrades.length < 3) {
-        var randomUpgrade = upgradeKeys[Math.floor(Math.random() * upgradeKeys.length)];
-        if (!selectedUpgrades.includes(randomUpgrade)) {
-            selectedUpgrades.push(randomUpgrade);
-        }
+    for (var i = 0; i < 3; i++) {
+        var randomIndex = Math.floor(Math.random() * available.length);
+        selectedUpgrades.push(available[randomIndex]);
+        available.splice(randomIndex, 1);
     }
     
-    // Criar div da interface
+    // Criar interface
     var upgradeDiv = document.createElement('div');
-    upgradeDiv.id = 'upgradeInterface';
+    upgradeDiv.id = 'upgradeSelection';
     upgradeDiv.style.cssText = `
         position: fixed;
         top: 0;
@@ -342,261 +138,162 @@ function createUpgradeSelectionInterface() {
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        z-index: 2000;
-        color: white;
-        font-family: 'Arial', sans-serif;
+        z-index: 1000;
+        font-family: 'Courier New', monospace;
     `;
     
-    // Título
-    var title = document.createElement('h1');
-    title.textContent = '🎉 LEVEL UP! 🎉';
-    title.style.cssText = 'color: #FFD700; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
-    upgradeDiv.appendChild(title);
+    upgradeDiv.innerHTML = `
+        <div style="background: #1a1a1a; padding: 30px; border-radius: 15px; border: 3px solid #ff6b6b; max-width: 600px; text-align: center;">
+            <h2 style="color: #ff6b6b; margin-bottom: 20px; font-size: 1.8em;">🎯 ESCOLHA SEU UPGRADE!</h2>
+            <p style="color: #ccc; margin-bottom: 30px; font-size: 1.1em;">Você acertou a pergunta! Escolha um upgrade:</p>
+            
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                ${selectedUpgrades.map((upgrade, index) => `
+                    <div class="upgrade-option" data-upgrade="${upgrade.type}" style="
+                        background: #2a2a2a;
+                        border: 2px solid #ff6b6b;
+                        border-radius: 10px;
+                        padding: 20px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        min-width: 150px;
+                        text-align: center;
+                    " onmouseover="this.style.background='#3a3a3a'; this.style.borderColor='#ffd700';" onmouseout="this.style.background='#2a2a2a'; this.style.borderColor='#ff6b6b';">
+                        <div style="font-size: 2em; margin-bottom: 10px;">${upgrade.icon}</div>
+                        <h3 style="color: #ffd700; margin-bottom: 10px; font-size: 1.2em;">${upgrade.name}</h3>
+                        <p style="color: #ccc; font-size: 0.9em;">${upgrade.description}</p>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
     
-    // Instruções
-    var instructions = document.createElement('p');
-    instructions.textContent = 'Escolha um upgrade para continuar:';
-    instructions.style.cssText = 'font-size: 1.5em; margin-bottom: 30px; color: #ccc;';
-    upgradeDiv.appendChild(instructions);
-    
-    // Container dos upgrades
-    var upgradesContainer = document.createElement('div');
-    upgradesContainer.style.cssText = 'display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 900px;';
-    
-    // Criar botões para cada upgrade
-    selectedUpgrades.forEach((upgradeKey, index) => {
-        var upgrade = availableUpgrades[upgradeKey];
-        var upgradeCard = document.createElement('div');
-        upgradeCard.style.cssText = `
-            background: rgba(255, 107, 107, 0.1);
-            border: 2px solid #ff6b6b;
-            border-radius: 15px;
-            padding: 20px;
-            width: 250px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        `;
-        
-        // Número do upgrade
-        var number = document.createElement('div');
-        number.textContent = `${index + 1}`;
-        number.style.cssText = `
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            background: #ff6b6b;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2em;
-        `;
-        upgradeCard.appendChild(number);
-        
-        // Nome do upgrade
-        var name = document.createElement('h3');
-        name.textContent = upgrade.name;
-        name.style.cssText = 'color: #FFD700; font-size: 1.3em; margin-bottom: 10px;';
-        upgradeCard.appendChild(name);
-        
-        // Descrição do upgrade
-        var description = document.createElement('p');
-        description.textContent = upgrade.description;
-        description.style.cssText = 'font-size: 1em; margin-bottom: 15px; color: #ccc;';
-        upgradeCard.appendChild(description);
-        
-        // Efeitos de hover
-        upgradeCard.addEventListener('mouseenter', function() {
-            this.style.background = 'rgba(255, 107, 107, 0.3)';
-            this.style.transform = 'scale(1.05)';
-            this.style.borderColor = '#FFD700';
-        });
-        
-        upgradeCard.addEventListener('mouseleave', function() {
-            this.style.background = 'rgba(255, 107, 107, 0.1)';
-            this.style.transform = 'scale(1)';
-            this.style.borderColor = '#ff6b6b';
-        });
-        
-        // Evento de clique
-        upgradeCard.addEventListener('click', function() {
-            selectUpgrade(upgradeKey);
-        });
-        
-        upgradesContainer.appendChild(upgradeCard);
-    });
-    
-    upgradeDiv.appendChild(upgradesContainer);
     document.body.appendChild(upgradeDiv);
+    
+    // Adicionar event listeners
+    document.querySelectorAll('.upgrade-option').forEach(option => {
+        option.addEventListener('click', function() {
+            var upgradeType = this.dataset.upgrade;
+            selectUpgrade(upgradeType);
+        });
+    });
 }
 
 // Função para selecionar upgrade
-function selectUpgrade(upgradeKey) {
-    var upgrade = availableUpgrades[upgradeKey];
-    
+function selectUpgrade(upgradeType) {
     // Aplicar upgrade
-    upgrade.effect();
+    applyUpgrade(upgradeType);
     
-    // Remover interface atual
-    var upgradeInterface = document.getElementById('upgradeInterface');
-    if (upgradeInterface) {
-        upgradeInterface.remove();
+    // Remover interface
+    var upgradeDiv = document.getElementById('upgradeSelection');
+    if (upgradeDiv) {
+        upgradeDiv.remove();
     }
+    
+    // Despausar jogo
+    gamePaused = false;
     
     // Mostrar resultado
-    showUpgradeResult(true, upgradeKey);
+    showUpgradeResult(true, upgradeType);
 }
 
-// Função para selecionar resposta
-function selectAnswer(selectedIndex) {
-    var isCorrect = selectedIndex === currentQuizQuestion.correct;
-    
-    // Remover interface atual
-    var upgradeInterface = document.getElementById('upgradeInterface');
-    if (upgradeInterface) {
-        upgradeInterface.remove();
-    }
-    
-    if (isCorrect) {
-        // Se acertou, mostrar seleção de 3 upgrades
-        createUpgradeSelectionInterface();
-    } else {
-        // Se errou, mostrar resultado e upgrade básico
-        showUpgradeResult(false, null);
+// Função para aplicar upgrade
+function applyUpgrade(upgradeType) {
+    switch(upgradeType) {
+        case 'piercing_shot':
+            player_status.piercing_shot = true;
+            break;
+        case 'double_shot':
+            player_status.double_shot = true;
+            break;
+        case 'damage_reduction':
+            player.damage_reduction += 1;
+            break;
+        case 'damage_zones':
+            player_status.damage_zones = true;
+            break;
+        case 'speed_boost':
+            player_status.speed *= 1.2;
+            break;
+        case 'fire_rate':
+            player_status.time_between_projectiles *= 0.8;
+            break;
+        case 'damage_boost':
+            player_status.damage += 5;
+            break;
+        case 'health_boost':
+            player_status.max_health += 20;
+            player.health += 20;
+            break;
+        case 'experience_boost':
+            player_status.experience_multiplier = 1.5;
+            break;
+        case 'magnet_range':
+            player_status.magnet_max_distance += 50;
+            break;
+        case 'boomerang':
+            player.boomerang = true;
+            break;
+        case 'explosive':
+            player.explosive = true;
+            break;
+        case 'freeze':
+            player.freeze = true;
+            break;
+        case 'extra_life':
+            player.extra_lives += 1;
+            player.max_health += 20;
+            player.health += 20;
+            break;
+        case 'projectile_speed':
+            player.projectile_speed_multiplier *= 1.5;
+            break;
+        case 'regeneration':
+            player.regeneration = true;
+            break;
+        case 'xp_multiplier':
+            player.xp_multiplier *= 2.0;
+            break;
     }
 }
 
 // Função para mostrar resultado do upgrade
-function showUpgradeResult(isCorrect, upgradeType) {
+function showUpgradeResult(correct, upgradeType) {
     var resultDiv = document.createElement('div');
-    resultDiv.id = 'upgradeResult';
     resultDiv.style.cssText = `
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 2000;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: ${correct ? '#4CAF50' : '#F44336'};
         color: white;
-        font-family: 'Arial', sans-serif;
-    `;
-    
-    if (isCorrect) {
-        var upgrade = availableUpgrades[upgradeType];
-        
-        // Título de sucesso
-        var title = document.createElement('h1');
-        title.textContent = '✅ UPGRADE SELECIONADO! ✅';
-        title.style.cssText = 'color: #4CAF50; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
-        resultDiv.appendChild(title);
-        
-        // Informações do upgrade
-        var upgradeInfo = document.createElement('div');
-        upgradeInfo.style.cssText = 'background: rgba(76, 175, 80, 0.2); padding: 30px; border-radius: 15px; text-align: center; max-width: 500px;';
-        
-        var upgradeName = document.createElement('h2');
-        upgradeName.textContent = upgrade.name;
-        upgradeName.style.cssText = 'color: #FFD700; font-size: 2em; margin-bottom: 15px;';
-        upgradeInfo.appendChild(upgradeName);
-        
-        var upgradeDesc = document.createElement('p');
-        upgradeDesc.textContent = upgrade.description;
-        upgradeDesc.style.cssText = 'font-size: 1.3em; margin-bottom: 20px;';
-        upgradeInfo.appendChild(upgradeDesc);
-        
-        resultDiv.appendChild(upgradeInfo);
-        
-    } else {
-        // Título de erro
-        var title = document.createElement('h1');
-        title.textContent = '❌ RESPOSTA INCORRETA ❌';
-        title.style.cssText = 'color: #f44336; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
-        resultDiv.appendChild(title);
-        
-        // Resposta correta
-        var correctAnswer = document.createElement('div');
-        correctAnswer.style.cssText = 'background: rgba(244, 67, 54, 0.2); padding: 20px; border-radius: 10px; text-align: center; max-width: 500px;';
-        
-        var correctText = document.createElement('p');
-        correctText.textContent = `Resposta correta: ${currentQuizQuestion.options[currentQuizQuestion.correct]}`;
-        correctText.style.cssText = 'font-size: 1.3em; margin-bottom: 15px;';
-        correctAnswer.appendChild(correctText);
-        
-        var explanation = document.createElement('p');
-        explanation.textContent = 'Você ainda ganha um upgrade básico!';
-        explanation.style.cssText = 'font-size: 1.1em; color: #FFD700;';
-        correctAnswer.appendChild(explanation);
-        
-        resultDiv.appendChild(correctAnswer);
-        
-        // Aplicar upgrade básico
-        applyBasicUpgrade();
-    }
-    
-    // Botão para continuar
-    var continueButton = document.createElement('button');
-    continueButton.textContent = 'CONTINUAR JOGO';
-    continueButton.style.cssText = `
-        background: #ff6b6b;
-        color: white;
-        border: none;
-        padding: 15px 30px;
-        font-size: 1.2em;
+        padding: 20px 40px;
         border-radius: 10px;
-        cursor: pointer;
-        margin-top: 30px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        transition: all 0.3s ease;
+        font-size: 1.5em;
+        font-weight: bold;
+        z-index: 1001;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     `;
     
-    continueButton.addEventListener('mouseenter', function() {
-        this.style.background = '#ff5252';
-        this.style.transform = 'scale(1.05)';
-    });
-    
-    continueButton.addEventListener('mouseleave', function() {
-        this.style.background = '#ff6b6b';
-        this.style.transform = 'scale(1)';
-    });
-    
-    continueButton.addEventListener('click', function() {
-        closeUpgradeScreen();
-    });
-    
-    resultDiv.appendChild(continueButton);
-    document.body.appendChild(resultDiv);
-}
-
-// Função para aplicar upgrade básico
-function applyBasicUpgrade() {
-    var basicUpgrades = ['health_boost', 'damage_boost', 'speed_boost', 'damage_reduction'];
-    var randomUpgrade = basicUpgrades[Math.floor(Math.random() * basicUpgrades.length)];
-    availableUpgrades[randomUpgrade].effect();
-}
-
-// Função para fechar tela de upgrade
-function closeUpgradeScreen() {
-    var resultDiv = document.getElementById('upgradeResult');
-    if (resultDiv) {
-        resultDiv.remove();
+    if (correct) {
+        resultDiv.innerHTML = `
+            <div style="font-size: 2em; margin-bottom: 10px;">🎉</div>
+            <div>UPGRADE SELECIONADO!</div>
+            <div style="font-size: 0.8em; margin-top: 10px;">${upgradeType}</div>
+        `;
+    } else {
+        resultDiv.innerHTML = `
+            <div style="font-size: 2em; margin-bottom: 10px;">❌</div>
+            <div>RESPOSTA INCORRETA</div>
+            <div style="font-size: 0.8em; margin-top: 10px;">Upgrade básico aplicado</div>
+        `;
     }
     
-    upgradeScreenVisible = false;
-    gamePaused = false;
-}
-
-// Modificar a função levelUp no game_objects.js para usar o sistema de upgrade
-function triggerUpgradeScreen() {
-    showUpgradeScreen();
+    document.body.appendChild(resultDiv);
+    
+    // Remover após 3 segundos
+    setTimeout(() => {
+        resultDiv.remove();
+    }, 3000);
 }

@@ -11,6 +11,24 @@
     <div id="startScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000;">
         <h1 style="color: #ff6b6b; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">VAMPIRAÍ SURVIVORS</h1>
         <p style="color: white; font-size: 1.2em; margin-bottom: 30px; text-align: center;">Sobreviva aos livros vampiros e colete experiência!</p>
+        
+        <!-- Seletor de Dificuldade -->
+        <div style="margin-bottom: 30px; text-align: center;">
+            <h3 style="color: white; margin-bottom: 15px; font-size: 1.1em;">Escolha a Dificuldade:</h3>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <button id="easyBtn" class="difficulty-btn" data-difficulty="easy" style="background: #4CAF50; color: white; border: 2px solid #4CAF50; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; font-size: 0.9em;">
+                    🟢 Fácil
+                </button>
+                <button id="normalBtn" class="difficulty-btn" data-difficulty="normal" style="background: #FF9800; color: white; border: 2px solid #FF9800; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; font-size: 0.9em;">
+                    🟠 Normal
+                </button>
+                <button id="hardBtn" class="difficulty-btn" data-difficulty="hard" style="background: #F44336; color: white; border: 2px solid #F44336; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; font-size: 0.9em;">
+                    🔴 Difícil
+                </button>
+            </div>
+            <p id="difficultyDescription" style="color: #ccc; font-size: 0.8em; margin-top: 8px;">Equilibrado para jogadores médios</p>
+        </div>
+        
         <button id="startButton" style="background: #ff6b6b; color: white; border: none; padding: 15px 30px; font-size: 1.2em; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">INICIAR JOGO</button>
         
         <!-- Controles -->
@@ -48,6 +66,13 @@
     <script src="utils.js"></script>
     <script src="gamepad_utils.js"></script>
     <script src="game_objects.js"></script>
+    <script src="boss_system.js"></script>
+    <script src="fast_enemy.js"></script>
+    <script src="shooting_enemy.js"></script>
+    <script src="tank_enemy.js"></script>
+    <script src="flying_enemy.js"></script>
+    <script src="enemy_system.js"></script>
+    <script src="complete_questions.js"></script>
     <script src="config.js"></script>
     <script src="upgrade_system.js"></script>
     <script src="script.js"></script>
@@ -60,6 +85,45 @@
             document.getElementById('restartButton').addEventListener('click', function() {
                 location.reload();
             });
+            
+            // Controle do seletor de dificuldade
+            var difficultyButtons = document.querySelectorAll('.difficulty-btn');
+            var difficultyDescription = document.getElementById('difficultyDescription');
+            
+            // Adicionar eventos aos botões de dificuldade
+            difficultyButtons.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var difficulty = this.getAttribute('data-difficulty');
+                    setDifficulty(difficulty);
+                    
+                    // Atualizar visual dos botões
+                    difficultyButtons.forEach(function(b) {
+                        b.style.transform = 'scale(1)';
+                        b.style.boxShadow = 'none';
+                    });
+                    this.style.transform = 'scale(1.1)';
+                    this.style.boxShadow = '0 0 15px rgba(255,255,255,0.5)';
+                    
+                    // Atualizar descrição
+                    difficultyDescription.textContent = difficulty_modes[difficulty].description;
+                });
+                
+                // Efeitos hover
+                btn.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('selected')) {
+                        this.style.transform = 'scale(1.05)';
+                    }
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('selected')) {
+                        this.style.transform = 'scale(1)';
+                    }
+                });
+            });
+            
+            // Selecionar Normal por padrão
+            document.getElementById('normalBtn').click();
         });
     </script>
     

@@ -41,13 +41,32 @@ var PlayerObject = function(spriteSheet){
         this.checkLevelUp();
     },
     attack: function(angle) {
-        // Criar projétil normal
-        projectiles_list.push(new ProjectileObject(projectileSprite, this.x, this.y, angle));
+        // Criar projétil com propriedades especiais
+        var projectile = new ProjectileObject(projectileSprite, this.x, this.y, angle);
+        
+        // Aplicar multiplicador de velocidade
+        if (this.projectile_speed_multiplier) {
+            projectile.speed *= this.projectile_speed_multiplier;
+        }
+        
+        // Aplicar propriedades especiais
+        projectile.boomerang = this.boomerang;
+        projectile.explosive = this.explosive;
+        projectile.freeze = this.freeze;
+        
+        projectiles_list.push(projectile);
         
         // Tiro duplo - atira duas vezes
         if (this.double_shot) {
             setTimeout(() => {
-                projectiles_list.push(new ProjectileObject(projectileSprite, this.x, this.y, angle));
+                var projectile2 = new ProjectileObject(projectileSprite, this.x, this.y, angle);
+                if (this.projectile_speed_multiplier) {
+                    projectile2.speed *= this.projectile_speed_multiplier;
+                }
+                projectile2.boomerang = this.boomerang;
+                projectile2.explosive = this.explosive;
+                projectile2.freeze = this.freeze;
+                projectiles_list.push(projectile2);
             }, 50); // Pequeno delay entre os tiros
         }
         
@@ -82,7 +101,7 @@ var PlayerObject = function(spriteSheet){
         console.log("Level Up! Agora você está no nível " + this.level);
         
         // Mostrar tela de upgrade com quiz
-        triggerUpgradeScreen();
+        showPowerUpQuiz();
     },
     render: function(ctx){
         ctx.save();
@@ -262,6 +281,17 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle) {
         radius: 16 * scale, 
         initial_angle: initial_angle,
         exists: true,
+        speed: player_status.projectile_speed,
+        
+        // Propriedades especiais
+        boomerang: false,
+        explosive: false,
+        freeze: false,
+        boomerang_timer: 0,
+        boomerang_duration: 2000, // 2 segundos antes de retornar
+        boomerang_returning: false,
+        start_x: x,
+        start_y: y,
 
         // Propriedades do Sprite
         sprite: spriteSheet,
@@ -277,6 +307,31 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle) {
             const renderWidth = this.frameWidth * this.scale;
             const renderHeight = this.frameHeight * this.scale;
 
+            // Efeito visual especial
+            if (this.boomerang) {
+                ctx.globalAlpha = 0.8;
+                ctx.fillStyle = '#00FF00';
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius + 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            if (this.explosive) {
+                ctx.globalAlpha = 0.7;
+                ctx.fillStyle = '#FF4500';
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius + 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            if (this.freeze) {
+                ctx.globalAlpha = 0.6;
+                ctx.fillStyle = '#00BFFF';
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius + 1, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
             ctx.drawImage(
                 this.sprite,
                 -renderWidth / 2, -renderHeight / 2, // Centraliza o sprite no destino
@@ -285,8 +340,33 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle) {
             ctx.restore();
         },
         update: function(dt){
-            this.x += Math.cos(this.initial_angle) * player_status.projectile_speed * dt;
-            this.y += Math.sin(this.initial_angle) * player_status.projectile_speed * dt;
+            this.boomerang_timer += dt;
+            
+            if (this.boomerang && this.boomerang_timer >= this.boomerang_duration) {
+                this.boomerang_returning = true;
+            }
+            
+            if (this.boomerang && this.boomerang_returning) {
+                // Retornar ao jogador
+                var dx = player.x - this.x;
+                var dy = player.y - this.y;
+                var distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance > 0) {
+                    this.x += (dx / distance) * this.speed * dt;
+                    this.y += (dy / distance) * this.speed * dt;
+                    
+                    // Se chegou perto do jogador, remover
+                    if (distance < 20) {
+                        this.exists = false;
+                    }
+                }
+            } else {
+                // Movimento normal
+                this.x += Math.cos(this.initial_angle) * this.speed * dt;
+                this.y += Math.sin(this.initial_angle) * this.speed * dt;
+            }
+            
             if(outOfBounds(this.x, this.y, WIDTH, HEIGHT)){
                 this.exists = false;
             }
@@ -425,6 +505,144 @@ var DamageZoneObject = function(x, y, radius, duration) {
             
             if (this.duration <= 0) {
                 this.exists = false;
+            }
+        }
+    }
+};
+
+// Sistema de Power-ups Temporários
+var PowerUpObject = function(x, y, type) {
+    return {
+        x: x,
+        y: y,
+        radius: 20,
+        type: type, // 'speed', 'damage', 'health', 'fire_rate', 'shield'
+        duration: 10000, // 10 segundos
+        exists: true,
+        collected: false,
+        
+        render: function(ctx) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            
+            // Cores diferentes para cada tipo
+            var colors = {
+                'speed': '#00FF00',      // Verde
+                'damage': '#FF0000',     // Vermelho
+                'health': '#FF69B4',     // Rosa
+                'fire_rate': '#00BFFF',  // Azul
+                'shield': '#FFD700',     // Dourado
+                'antivirus': '#00FF7F',  // Verde claro
+                'vpn': '#8A2BE2',        // Roxo
+                'cluster': '#FF4500',    // Laranja
+                'firewall': '#FF6347',   // Tomate
+                'proxy': '#1E90FF'       // Azul dodger
+            };
+            
+            var icons = {
+                'speed': '⚡',
+                'damage': '💥',
+                'health': '❤️',
+                'fire_rate': '🔥',
+                'shield': '🛡️',
+                'antivirus': '🛡️',
+                'vpn': '👻',
+                'cluster': '💥',
+                'firewall': '💢',
+                'proxy': '🌀'
+            };
+            
+            // Desenhar círculo de fundo
+            ctx.fillStyle = colors[this.type] || '#FFFFFF';
+            ctx.beginPath();
+            ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Desenhar borda
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            // Desenhar ícone
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(icons[this.type] || '?', 0, 0);
+            
+            ctx.restore();
+        },
+        
+        update: function(dt) {
+            // Efeito de pulsação
+            this.radius = 20 + Math.sin(Date.now() * 0.005) * 3;
+        }
+    };
+};
+
+// Sistema de Quiz removido - usando apenas CompleteQuizSystem do complete_questions.js
+
+// Orbe de Experiência
+var ExperienceOrbObject = function(spriteSheet, x, y, experience_value) {
+    const scale = 1.5;
+    return {
+        x: x,
+        y: y,
+        max_speed: 1,
+        radius: 16 * scale,
+        experience_value: experience_value,
+        exists: true,
+
+        // Sprite properties
+        sprite: spriteSheet,
+        frameWidth: 32,
+        frameHeight: 32,
+        scale: scale,
+
+        render: function(ctx){
+            ctx.save();
+            ctx.translate(this.x, this.y);
+
+            const renderWidth = this.frameWidth * this.scale;
+            const renderHeight = this.frameHeight * this.scale;
+
+            // Se não há sprite, desenhar círculo colorido
+            if (!this.sprite || !this.sprite.complete) {
+                ctx.fillStyle = '#FFD700';
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Borda
+                ctx.strokeStyle = '#FFA500';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Símbolo XP
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('XP', 0, 0);
+            } else {
+                ctx.drawImage(
+                    this.sprite,
+                    0, 0,
+                    this.frameWidth, this.frameHeight,
+                    -renderWidth / 2, -renderHeight / 2,
+                    renderWidth, renderHeight
+                );
+            }
+            ctx.restore();
+        },
+        
+        update: function(dt, destination_x, destination_y){
+            let dist2 = distSquared(this.x, this.y, destination_x, destination_y);
+            let distance_ratio = dist2 / (player_status.magnet_max_distance * player_status.magnet_max_distance);
+            if(dist2 <= player_status.magnet_max_distance * player_status.magnet_max_distance){
+                let direction = angleBetweenPoints(this.x, this.y, destination_x, destination_y);
+                this.x += Math.cos(direction) * this.max_speed * dt * (1-distance_ratio);
+                this.y += Math.sin(direction) * this.max_speed * dt * (1-distance_ratio);
             }
         }
     }
