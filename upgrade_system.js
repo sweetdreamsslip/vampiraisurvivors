@@ -1,169 +1,435 @@
-/**
- * SISTEMA DE UPGRADES
- * Responsável por: gerenciar upgrades do jogador, interface de seleção, aplicação de melhorias
- * 
- * Como usar:
- * - showUpgradeInterface() - mostra interface de seleção
- * - applyUpgrade(upgradeType) - aplica upgrade específico
- * - getPlayerDamage() - retorna dano atual do jogador
- * - getProjectileSpeed() - retorna velocidade atual dos projéteis
- * - getFireRate() - retorna taxa de tiro atual
- * - isPiercingShot() - verifica se tiro perfurante está ativo
- * - isDoubleShot() - verifica se tiro duplo está ativo
- * - getExplosionDamage() - retorna dano de explosão atual
- * - getExplosionRadius() - retorna raio de explosão atual
- */
+// Sistema de Upgrades e Quiz para Vampiraí Survivors
+
+// Banco de perguntas sobre Piraí e Tecnologia
+var quizQuestions = {
+    "pirai": [
+        {
+            question: "Qual é a principal atividade econômica de Piraí?",
+            options: ["Agricultura", "Pecuária", "Indústria", "Tecnologia"],
+            correct: 3,
+            upgrade: "tech_boost"
+        },
+        {
+            question: "Piraí é conhecida como a 'Capital da Tecnologia' de qual estado?",
+            options: ["São Paulo", "Rio de Janeiro", "Minas Gerais", "Bahia"],
+            correct: 1,
+            upgrade: "speed_boost"
+        },
+        {
+            question: "Qual empresa de tecnologia tem sede em Piraí?",
+            options: ["Microsoft", "Google", "IBM", "Nenhuma das anteriores"],
+            correct: 3,
+            upgrade: "health_boost"
+        },
+        {
+            question: "Piraí fica na região do Vale do Paraíba?",
+            options: ["Sim", "Não", "Parcialmente", "Depende da estação"],
+            correct: 0,
+            upgrade: "damage_boost"
+        },
+        {
+            question: "Qual é o nome do parque tecnológico de Piraí?",
+            options: ["Tech Valley", "Piraí Tech Park", "Vale do Silício Brasileiro", "Não possui"],
+            correct: 3,
+            upgrade: "projectile_speed"
+        },
+        {
+            question: "Piraí é considerada uma cidade inteligente?",
+            options: ["Sim, totalmente", "Parcialmente", "Não", "Apenas no futuro"],
+            correct: 0,
+            upgrade: "fire_rate"
+        },
+        {
+            question: "Qual curso de tecnologia é oferecido em Piraí?",
+            options: ["Ciência da Computação", "Engenharia de Software", "Sistemas de Informação", "Todos os anteriores"],
+            correct: 3,
+            upgrade: "magnet_range"
+        }
+    ],
+    "tecnologia": [
+        {
+            question: "Qual linguagem de programação é mais usada para desenvolvimento web?",
+            options: ["Python", "JavaScript", "C++", "Assembly"],
+            correct: 1,
+            upgrade: "projectile_speed"
+        },
+        {
+            question: "O que significa HTML?",
+            options: ["HyperText Markup Language", "High Tech Modern Language", "Home Tool Markup Language", "Hyperlink Text Management Language"],
+            correct: 0,
+            upgrade: "fire_rate"
+        },
+        {
+            question: "Qual protocolo é usado para comunicação segura na web?",
+            options: ["HTTP", "FTP", "HTTPS", "SMTP"],
+            correct: 2,
+            upgrade: "magnet_range"
+        },
+        {
+            question: "O que é um algoritmo?",
+            options: ["Um tipo de hardware", "Uma sequência de passos para resolver um problema", "Uma linguagem de programação", "Um sistema operacional"],
+            correct: 1,
+            upgrade: "invincibility_time"
+        },
+        {
+            question: "Qual é a diferença entre RAM e ROM?",
+            options: ["Não há diferença", "RAM é volátil, ROM é permanente", "ROM é volátil, RAM é permanente", "Ambas são voláteis"],
+            correct: 1,
+            upgrade: "experience_boost"
+        },
+        {
+            question: "O que significa CSS?",
+            options: ["Computer Style Sheets", "Cascading Style Sheets", "Creative Style System", "Central Style Service"],
+            correct: 1,
+            upgrade: "tech_boost"
+        },
+        {
+            question: "Qual é o principal objetivo do Git?",
+            options: ["Editar código", "Controlar versões", "Executar programas", "Criar interfaces"],
+            correct: 1,
+            upgrade: "speed_boost"
+        },
+        {
+            question: "O que é uma API?",
+            options: ["Um tipo de banco de dados", "Interface de programação de aplicações", "Linguagem de programação", "Sistema operacional"],
+            correct: 1,
+            upgrade: "health_boost"
+        },
+        {
+            question: "Qual é a diferença entre frontend e backend?",
+            options: ["Não há diferença", "Frontend é visual, backend é servidor", "Backend é visual, frontend é servidor", "Ambos são iguais"],
+            correct: 1,
+            upgrade: "damage_boost"
+        },
+        {
+            question: "O que é um framework?",
+            options: ["Um tipo de hardware", "Estrutura de desenvolvimento de software", "Linguagem de programação", "Sistema operacional"],
+            correct: 1,
+            upgrade: "projectile_speed"
+        }
+    ]
+};
+
+// Sistema de upgrades disponíveis
+var availableUpgrades = {
+    "tech_boost": {
+        name: "Impulso Tecnológico",
+        description: "Aumenta velocidade de movimento em 20%",
+        effect: function() {
+            player_status.speed *= 1.2;
+        }
+    },
+    "speed_boost": {
+        name: "Velocidade Supersônica",
+        description: "Aumenta velocidade de movimento em 30%",
+        effect: function() {
+            player_status.speed *= 1.3;
+        }
+    },
+    "health_boost": {
+        name: "Vida Extra",
+        description: "Aumenta vida máxima em 50 pontos",
+        effect: function() {
+            player_status.max_health += 50;
+            player.health = player_status.max_health;
+        }
+    },
+    "damage_boost": {
+        name: "Dano Devastador",
+        description: "Aumenta dano em 5 pontos",
+        effect: function() {
+            player_status.damage += 5;
+        }
+    },
+    "projectile_speed": {
+        name: "Projéteis Relâmpago",
+        description: "Aumenta velocidade dos projéteis em 40%",
+        effect: function() {
+            player_status.projectile_speed *= 1.4;
+        }
+    },
+    "fire_rate": {
+        name: "Taxa de Tiro Rápida",
+        description: "Reduz tempo entre disparos em 30%",
+        effect: function() {
+            player_status.time_between_projectiles *= 0.7;
+        }
+    },
+    "magnet_range": {
+        name: "Ímã de Experiência",
+        description: "Aumenta alcance de atração de experiência em 50%",
+        effect: function() {
+            player_status.magnet_max_distance *= 1.5;
+        }
+    },
+    "invincibility_time": {
+        name: "Invencibilidade Estendida",
+        description: "Aumenta tempo de invencibilidade em 50%",
+        effect: function() {
+            player_status.invincibility_time *= 1.5;
+        }
+    },
+    "experience_boost": {
+        name: "Experiência Duplicada",
+        description: "Ganha 2x mais experiência",
+        effect: function() {
+            experienceMultiplier = 2;
+        }
+    }
+};
 
 // Variáveis do sistema de upgrade
-var upgrade_interface_visible = false;
-var available_upgrades = [];
+var upgradeScreenVisible = false;
+var currentQuizQuestion = null;
+var selectedUpgrade = null;
 
-// Funções para calcular stats baseados nos upgrades
-function getPlayerDamage() {
-    return player_status.damage + (player.upgrades.damage_boost * 5);
-}
-
-function getProjectileSpeed() {
-    return player_status.projectile_speed + (player.upgrades.projectile_speed * 0.2);
-}
-
-function getFireRate() {
-    return Math.max(10, player_status.time_between_projectiles - (player.upgrades.fire_rate * 15));
-}
-
-function isPiercingShot() {
-    return player.upgrades.piercing_shot > 0;
-}
-
-function isDoubleShot() {
-    return player.upgrades.double_shot > 0;
-}
-
-function getExplosionDamage() {
-    return player.upgrades.explosion_damage * 15; // 15 de dano por nível
-}
-
-function getExplosionRadius() {
-    return 80 + (player.upgrades.explosion_damage * 20); // 80 + 20 por nível
-}
-
-// Função para mostrar interface de upgrade
-function showUpgradeInterface() {
-    upgrade_interface_visible = true;
-    generateAvailableUpgrades();
-}
-
-// Função para gerar upgrades disponíveis
-function generateAvailableUpgrades() {
-    available_upgrades = [];
+// Função para mostrar tela de upgrade
+function showUpgradeScreen() {
+    upgradeScreenVisible = true;
+    gamePaused = true;
     
-    for(var upgradeType in upgrade_types) {
-        var upgrade = upgrade_types[upgradeType];
-        if(player.upgrades[upgradeType] < upgrade.max_level) {
-            available_upgrades.push(upgradeType);
-        }
+    // Escolher categoria aleatória
+    var categories = Object.keys(quizQuestions);
+    var randomCategory = categories[Math.floor(Math.random() * categories.length)];
+    var questions = quizQuestions[randomCategory];
+    currentQuizQuestion = questions[Math.floor(Math.random() * questions.length)];
+    
+    // Criar interface de upgrade
+    createUpgradeInterface();
+}
+
+// Função para criar interface de upgrade
+function createUpgradeInterface() {
+    // Remover interface anterior se existir
+    var existingInterface = document.getElementById('upgradeInterface');
+    if (existingInterface) {
+        existingInterface.remove();
     }
     
-    // Se não há upgrades disponíveis, não mostra a interface
-    if(available_upgrades.length === 0) {
-        upgrade_interface_visible = false;
-        return;
-    }
-    
-    // Limita a 3 opções aleatórias
-    if(available_upgrades.length > 3) {
-        var shuffled = available_upgrades.sort(() => 0.5 - Math.random());
-        available_upgrades = shuffled.slice(0, 3);
-    }
-}
-
-// Função para aplicar upgrade
-function applyUpgrade(upgradeType) {
-    if(player.upgrades[upgradeType] < upgrade_types[upgradeType].max_level) {
-        player.upgrades[upgradeType]++;
-        upgrade_interface_visible = false;
-    }
-}
-
-// Função para renderizar interface de upgrade
-function renderUpgradeInterface(ctx) {
-    // Fundo semi-transparente
-    ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    // Criar div da interface
+    var upgradeDiv = document.createElement('div');
+    upgradeDiv.id = 'upgradeInterface';
+    upgradeDiv.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        color: white;
+        font-family: 'Arial', sans-serif;
+    `;
     
     // Título
-    ctx.fillStyle = "white";
-    ctx.font = "32px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("ESCOLHA SEU UPGRADE", WIDTH / 2, 100);
+    var title = document.createElement('h1');
+    title.textContent = '🎉 LEVEL UP! 🎉';
+    title.style.cssText = 'color: #FFD700; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
+    upgradeDiv.appendChild(title);
     
-    // Opções de upgrade
-    var startX = WIDTH / 2 - 200;
-    var startY = 200;
-    var cardWidth = 120;
-    var cardHeight = 150;
-    var spacing = 20;
+    // Pergunta do quiz
+    var questionDiv = document.createElement('div');
+    questionDiv.style.cssText = 'background: rgba(255, 107, 107, 0.2); padding: 20px; border-radius: 10px; margin-bottom: 30px; max-width: 600px; text-align: center;';
     
-    for(var i = 0; i < available_upgrades.length; i++) {
-        var upgradeType = available_upgrades[i];
-        var upgrade = upgrade_types[upgradeType];
-        var x = startX + i * (cardWidth + spacing);
-        var y = startY;
-        
-        // Card background
-        ctx.fillStyle = "rgba(50, 50, 50, 0.9)";
-        ctx.fillRect(x, y, cardWidth, cardHeight);
-        
-        // Card border
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x, y, cardWidth, cardHeight);
-        
-        // Upgrade name
-        ctx.fillStyle = "yellow";
-        ctx.font = "16px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText(upgrade.name, x + cardWidth/2, y + 30);
-        
-        // Current level
-        ctx.fillStyle = "white";
-        ctx.font = "14px Arial";
-        ctx.fillText("Nível: " + player.upgrades[upgradeType] + "/" + upgrade.max_level, x + cardWidth/2, y + 50);
-        
-        // Description
-        ctx.fillStyle = "lightgray";
-        ctx.font = "12px Arial";
-        var words = upgrade.description.split(' ');
-        var line = '';
-        var lineY = y + 70;
-        for(var j = 0; j < words.length; j++) {
-            var testLine = line + words[j] + ' ';
-            var metrics = ctx.measureText(testLine);
-            if(metrics.width > cardWidth - 10 && j > 0) {
-                ctx.fillText(line, x + cardWidth/2, lineY);
-                line = words[j] + ' ';
-                lineY += 15;
-            } else {
-                line = testLine;
-            }
-        }
-        ctx.fillText(line, x + cardWidth/2, lineY);
-        
-        // Key number
-        ctx.fillStyle = "lime";
-        ctx.font = "20px Arial";
-        ctx.fillText((i + 1).toString(), x + cardWidth/2, y + cardHeight - 10);
-    }
+    var questionText = document.createElement('h2');
+    questionText.textContent = currentQuizQuestion.question;
+    questionText.style.cssText = 'margin-bottom: 20px; font-size: 1.5em;';
+    questionDiv.appendChild(questionText);
     
-    // Instructions
-    ctx.fillStyle = "white";
-    ctx.font = "18px Arial";
-    ctx.fillText("Pressione 1, 2 ou 3 para escolher", WIDTH / 2, HEIGHT - 50);
+    // Opções de resposta
+    var optionsDiv = document.createElement('div');
+    optionsDiv.style.cssText = 'display: flex; flex-direction: column; gap: 10px;';
     
-    ctx.textAlign = "left";
+    currentQuizQuestion.options.forEach((option, index) => {
+        var optionButton = document.createElement('button');
+        optionButton.textContent = `${String.fromCharCode(65 + index)}) ${option}`;
+        optionButton.style.cssText = `
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid #ff6b6b;
+            padding: 15px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        `;
+        
+        optionButton.addEventListener('mouseenter', function() {
+            this.style.background = 'rgba(255, 107, 107, 0.3)';
+            this.style.transform = 'scale(1.05)';
+        });
+        
+        optionButton.addEventListener('mouseleave', function() {
+            this.style.background = 'rgba(255, 255, 255, 0.1)';
+            this.style.transform = 'scale(1)';
+        });
+        
+        optionButton.addEventListener('click', function() {
+            selectAnswer(index);
+        });
+        
+        optionsDiv.appendChild(optionButton);
+    });
+    
+    questionDiv.appendChild(optionsDiv);
+    upgradeDiv.appendChild(questionDiv);
+    
+    // Instruções
+    var instructions = document.createElement('p');
+    instructions.textContent = 'Responda corretamente para ganhar um upgrade especial!';
+    instructions.style.cssText = 'font-size: 1.2em; color: #ccc; margin-top: 20px;';
+    upgradeDiv.appendChild(instructions);
+    
+    document.body.appendChild(upgradeDiv);
 }
 
-// Função para verificar se interface está visível
-function isUpgradeInterfaceVisible() {
-    return upgrade_interface_visible;
+// Função para selecionar resposta
+function selectAnswer(selectedIndex) {
+    var isCorrect = selectedIndex === currentQuizQuestion.correct;
+    var upgradeType = currentQuizQuestion.upgrade;
+    
+    // Remover interface atual
+    var upgradeInterface = document.getElementById('upgradeInterface');
+    if (upgradeInterface) {
+        upgradeInterface.remove();
+    }
+    
+    // Mostrar resultado
+    showUpgradeResult(isCorrect, upgradeType);
+}
+
+// Função para mostrar resultado do upgrade
+function showUpgradeResult(isCorrect, upgradeType) {
+    var resultDiv = document.createElement('div');
+    resultDiv.id = 'upgradeResult';
+    resultDiv.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        color: white;
+        font-family: 'Arial', sans-serif;
+    `;
+    
+    if (isCorrect) {
+        var upgrade = availableUpgrades[upgradeType];
+        
+        // Aplicar upgrade
+        upgrade.effect();
+        
+        // Título de sucesso
+        var title = document.createElement('h1');
+        title.textContent = '✅ RESPOSTA CORRETA! ✅';
+        title.style.cssText = 'color: #4CAF50; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
+        resultDiv.appendChild(title);
+        
+        // Informações do upgrade
+        var upgradeInfo = document.createElement('div');
+        upgradeInfo.style.cssText = 'background: rgba(76, 175, 80, 0.2); padding: 30px; border-radius: 15px; text-align: center; max-width: 500px;';
+        
+        var upgradeName = document.createElement('h2');
+        upgradeName.textContent = upgrade.name;
+        upgradeName.style.cssText = 'color: #FFD700; font-size: 2em; margin-bottom: 15px;';
+        upgradeInfo.appendChild(upgradeName);
+        
+        var upgradeDesc = document.createElement('p');
+        upgradeDesc.textContent = upgrade.description;
+        upgradeDesc.style.cssText = 'font-size: 1.3em; margin-bottom: 20px;';
+        upgradeInfo.appendChild(upgradeDesc);
+        
+        resultDiv.appendChild(upgradeInfo);
+        
+    } else {
+        // Título de erro
+        var title = document.createElement('h1');
+        title.textContent = '❌ RESPOSTA INCORRETA ❌';
+        title.style.cssText = 'color: #f44336; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
+        resultDiv.appendChild(title);
+        
+        // Resposta correta
+        var correctAnswer = document.createElement('div');
+        correctAnswer.style.cssText = 'background: rgba(244, 67, 54, 0.2); padding: 20px; border-radius: 10px; text-align: center; max-width: 500px;';
+        
+        var correctText = document.createElement('p');
+        correctText.textContent = `Resposta correta: ${currentQuizQuestion.options[currentQuizQuestion.correct]}`;
+        correctText.style.cssText = 'font-size: 1.3em; margin-bottom: 15px;';
+        correctAnswer.appendChild(correctText);
+        
+        var explanation = document.createElement('p');
+        explanation.textContent = 'Você ainda ganha um upgrade básico!';
+        explanation.style.cssText = 'font-size: 1.1em; color: #FFD700;';
+        correctAnswer.appendChild(explanation);
+        
+        resultDiv.appendChild(correctAnswer);
+        
+        // Aplicar upgrade básico
+        applyBasicUpgrade();
+    }
+    
+    // Botão para continuar
+    var continueButton = document.createElement('button');
+    continueButton.textContent = 'CONTINUAR JOGO';
+    continueButton.style.cssText = `
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.2em;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-top: 30px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+    `;
+    
+    continueButton.addEventListener('mouseenter', function() {
+        this.style.background = '#ff5252';
+        this.style.transform = 'scale(1.05)';
+    });
+    
+    continueButton.addEventListener('mouseleave', function() {
+        this.style.background = '#ff6b6b';
+        this.style.transform = 'scale(1)';
+    });
+    
+    continueButton.addEventListener('click', function() {
+        closeUpgradeScreen();
+    });
+    
+    resultDiv.appendChild(continueButton);
+    document.body.appendChild(resultDiv);
+}
+
+// Função para aplicar upgrade básico
+function applyBasicUpgrade() {
+    var basicUpgrades = ['health_boost', 'damage_boost', 'speed_boost'];
+    var randomUpgrade = basicUpgrades[Math.floor(Math.random() * basicUpgrades.length)];
+    availableUpgrades[randomUpgrade].effect();
+}
+
+// Função para fechar tela de upgrade
+function closeUpgradeScreen() {
+    var resultDiv = document.getElementById('upgradeResult');
+    if (resultDiv) {
+        resultDiv.remove();
+    }
+    
+    upgradeScreenVisible = false;
+    gamePaused = false;
+}
+
+// Modificar a função levelUp no game_objects.js para usar o sistema de upgrade
+function triggerUpgradeScreen() {
+    showUpgradeScreen();
 }

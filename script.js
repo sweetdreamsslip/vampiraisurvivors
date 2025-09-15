@@ -1,14 +1,3 @@
-/**
- * SCRIPT PRINCIPAL - VERSÃO SIMPLIFICADA PARA TRABALHO EM EQUIPE
- * 
- * Este arquivo agora é apenas um fallback. O jogo principal está em:
- * - main.js (coordenador)
- * - Módulos específicos (upgrade_system.js, quiz_system.js, etc.)
- * 
- * Para trabalhar em equipe, use os arquivos modulares específicos.
- */
-
-// Configuração básica (fallback)
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 var lastUpdateTime;
@@ -18,27 +7,34 @@ var HEIGHT = window.innerHeight-20;
 canvas.width = WIDTH;
 canvas.height = HEIGHT;
 
-// Configurações base
-var player_status = {
-    speed: 0.4,
-    max_health: 100,
-    projectile_speed: 1,
-    time_between_projectiles: 5,
-    damage: 10,
-    invincibility_time: 1000,
-}
+// fetch player status configuration
+var player_status = Object.assign({}, player_status_configurations[selected_player_status_configuration]);
+var enemy_spawn = Object.assign({}, enemy_spawn_configurations[selected_enemy_spawn_configuration]);
 
-// Variáveis globais
+// global variables
 var angle_between_player_and_mouse = 0;
 var time_since_last_projectile = 0;
 var time_since_last_enemy_spawn = 0;
+var gamePaused = false;
+var gameStarted = false;
+var experienceMultiplier = 1; // Para o upgrade de experiência duplicada
 
-// Objetos do jogo
+// game objects
 var player;
 var enemies_list = [];
 var projectiles_list = [];
+var particles_list = [];
+var experience_orbs_list = [];
 
-// Controles
+// sprites
+var playerSprite = new Image();
+var projectileSprite = new Image();
+var enemySprite = new Image();
+
+// controller support
+var is_gamepad_connected = false;
+
+// control variables
 var mouse = {
     x: 0,
     y: 0,
@@ -46,143 +42,18 @@ var mouse = {
 };
 var keys_down = [];
 
-// Player object (versão simplificada)
-var player = {
-    x: 400,
-    y: 400,
-    radius: 10,
-    invincibility_time: 0,
-    health: player_status.max_health,
-    take_damage: function(damage){
-        if(this.invincibility_time <= 0){
-            this.health -= damage;
-            if(this.health <= 0){
-                this.health = 0;
-            }
-            this.invincibility_time = player_status.invincibility_time;
-        }
-    },
-    render: function(ctx){
-        ctx.save();
-        if(this.invincibility_time > 0){
-            ctx.fillStyle = "red";
-        }else{
-            ctx.fillStyle = "blue";
-        }
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.restore();
-    },
-    update: function(dt){
-        //movement
-        if(this.invincibility_time > 0){
-            this.invincibility_time -= dt;
-        }
-        if(keys_down.includes("w")){
-            this.y -= player_status.speed * dt;
-        }
-        if(keys_down.includes("s")){
-            this.y += player_status.speed * dt;
-        }
-        if(keys_down.includes("a")){
-            this.x -= player_status.speed * dt;
-        }
-        if(keys_down.includes("d")){
-            this.x += player_status.speed * dt;
-        }
-        //boundary check (so player doesn't go off the screen)
-        if(this.x < 0){
-            this.x = 0;
-        }
-        if(this.x > WIDTH){
-            this.x = WIDTH;
-        }
-        if(this.y < 0){
-            this.y = 0;
-        }
-        if(this.y > HEIGHT){
-            this.y = HEIGHT;
-        }
-    }
-}; 
 
-// Enemy object (versão simplificada)
-var enemy = function(x, y, health, max_health, radius, color){
-    return {
-        x: x,
-        y: y,
-        health: health,
-        max_health: max_health,
-        radius: radius,
-        collision: false,
-        color: color,
-        base_speed: 0.1,
-        base_damage: 10,
-        take_damage: function(damage){
-            this.health -= damage;
-        },
-        render: function(ctx){
-            ctx.save();
-            // enemy
-            ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-            ctx.fill();
-            // health bar
-            ctx.fillStyle = "red";
-            ctx.fillRect(this.x - this.radius, this.y - this.radius - 15, this.radius * 2, 10);
-            ctx.fillStyle = "green";
-            ctx.fillRect(this.x - this.radius, this.y - this.radius - 15, (this.health / this.max_health) * this.radius * 2, 10);
-            ctx.restore();
-        },
-        update: function(dt){
-        // Move enemy towards player by its base_speed * dt
-        var dx = player.x - this.x;
-        var dy = player.y - this.y;
-        var distancesq = distSquared(this.x, this.y, player.x, player.y);
-        if (distancesq > 0) {
-            var moveDist = this.base_speed * dt;
-            var angle = angleBetweenPoints(this.x, this.y, player.x, player.y);
-            this.x += Math.cos(angle) * moveDist;
-            this.y += Math.sin(angle) * moveDist;
-        }
-        },
-        respawn: function(){
-            this.x = randomIntBetween(0, WIDTH);
-            this.y = randomIntBetween(0, HEIGHT);
-            this.health = this.max_health;
-        }
-    }
-};
-
-// Projectile object (versão simplificada)
-var projectile = function(x, y, initial_angle) {
-    return {
-        x: x,
-        y: y,
-        radius: 5,
-        initial_angle: initial_angle,
-        exists: true,
-        render: function(ctx){
-            ctx.save();
-            ctx.fillStyle = "green";
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-            ctx.fill();
-            ctx.restore();
-        },
-        update: function(dt){
-            this.x += Math.cos(this.initial_angle) * player_status.projectile_speed * dt;
-            this.y += Math.sin(this.initial_angle) * player_status.projectile_speed * dt;
-            if(outOfBounds(this.x, this.y, WIDTH, HEIGHT)){
-                this.exists = false;
-            }
-        },
+function createParticleExplosion(x, y, color, count) {
+    for (var i = 0; i < count; i++) {
+        var angle = Math.random() * 2 * Math.PI;
+        var speed = (Math.random() * 0.2) + 0.05; // random speed
+        var lifespan = randomIntBetween(400, 700); // random lifespan
+        particles_list.push(new ParticleObject(x, y, color, speed, angle, lifespan));
     }
 }
 
-// Event listeners básicos
+
+// event listeners
 canvas.addEventListener("mousemove", function(e) {
     var rect = canvas.getBoundingClientRect();
     mouse.x = e.clientX - rect.left;
@@ -196,22 +67,53 @@ canvas.addEventListener("mouseup", function(e) {
 });
 window.addEventListener("keydown", function(e) {
     keys_down.push(e.key);
+    
+    // Controles especiais
+    if (e.key === ' ' || e.key === 'Escape') { // Espaço ou ESC para pausar
+        if (gameStarted) {
+            togglePause();
+        }
+    }
+    if (e.key === 'Enter' && !gameStarted) { // Enter para iniciar
+        startGame();
+    }
 });
 window.addEventListener("keyup", function(e) {
     keys_down = keys_down.filter(function(key) {
         return key !== e.key;
     });
 });
+// gamepad connection
+window.addEventListener("gamepadconnected", function(e) {
+    console.log("Controle conectado no índice %d: %s.", e.gamepad.index, e.gamepad.id);
+    is_gamepad_connected = true;
+});
+window.addEventListener("gamepaddisconnected", function(e) {
+    console.log("Controle desconectado do índice %d: %s", e.gamepad.index, e.gamepad.id);
+    is_gamepad_connected = false;
+});
 
-// Update function (versão simplificada)
+
+
+// update function
 function update(dt) {
-    angle_between_player_and_mouse = angleBetweenPoints(player.x, player.y, mouse.x, mouse.y);
-    player.update(dt);
+    if (!gameStarted || gamePaused) return;
+    
+    time_since_last_enemy_spawn += dt;
+    const gamepadState = pollGamepad();
+
+    // Define o ângulo de mira: prioriza o controle, senão usa o mouse
+    if (gamepadState.aimAngle !== null) {
+        angle_between_player_and_mouse = gamepadState.aimAngle;
+    } else {
+        angle_between_player_and_mouse = angleBetweenPoints(player.x, player.y, mouse.x, mouse.y);
+    }
+    player.update(dt, gamepadState.moveVector);
 
     //projectile firing
     time_since_last_projectile += dt;
-    if (mouse.mouseDown && time_since_last_projectile >= player_status.time_between_projectiles) {
-        projectiles_list.push(new projectile(player.x, player.y, angle_between_player_and_mouse));
+    if ((mouse.mouseDown || gamepadState.isShooting) && time_since_last_projectile >= player_status.time_between_projectiles) {
+        projectiles_list.push(new ProjectileObject(projectileSprite, player.x, player.y, angle_between_player_and_mouse));
         time_since_last_projectile = 0;
     }
     
@@ -232,11 +134,9 @@ function update(dt) {
     for(var i = 0; i < projectiles_list.length; i++){
         for(var j = 0; j < enemies_list.length; j++){
             if(aabbCircleCollision(projectiles_list[i], enemies_list[j])){
+                createParticleExplosion(enemies_list[j].x, enemies_list[j].y, "#8A2BE2", randomIntBetween(10, 20)); // Cor roxa para explosão do livro
                 projectiles_list[i].exists = false;	
                 enemies_list[j].take_damage(player_status.damage);
-                if(enemies_list[j].health <= 0){
-                    enemies_list[j].respawn();
-                }
             }
         }
     }
@@ -244,56 +144,172 @@ function update(dt) {
     // enemy updating
     enemies_list.forEach(function(enemy) {
         enemy.update(dt);
+        if(!enemy.alive) {
+            experience_orbs_list.push(new ExperienceOrbObject(enemy.x, enemy.y, 5, "orange", randomIntBetween(1, 10)));
+        }
     });
 
+    // update particles
+    particles_list.forEach(function(p) {
+        p.update(dt);
+    });
+
+    // update experience orbs
+    experience_orbs_list.forEach(function(orb) {
+        orb.update(dt, player.x, player.y);
+        if(aabbCircleCollision(orb, player)){
+            player.gain_experience(orb.experience_value * experienceMultiplier);
+            orb.exists = false;
+        }
+    });
+
+    // remove enemies that are no longer exists
+    enemies_list = enemies_list.filter(function(enemy) {
+        return enemy.alive;
+    });
     // remove projectiles that are no longer exists
     projectiles_list = projectiles_list.filter(function(projectile) {
         return projectile.exists;
     });
+    // remove dead particles
+    particles_list = particles_list.filter(function(p) {
+        return p.lifespan > 0;
+    });
+    // remove experience orbs that are no longer exists
+    experience_orbs_list = experience_orbs_list.filter(function(orb) {
+        return orb.exists;
+    });
+
+    // enemy spawning
+    if(time_since_last_enemy_spawn >= enemy_spawn.time_between_enemy_spawn){
+        // Aumentar dificuldade com o tempo
+        var difficultyMultiplier = Math.min(1 + (player.level * 0.1), 3); // Máximo 3x mais difícil
+        var enemyHealth = Math.floor(30 * difficultyMultiplier);
+        var enemyDamage = Math.floor(10 * difficultyMultiplier);
+        
+        var enemy = new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), enemyHealth, enemyHealth);
+        enemy.base_damage = enemyDamage;
+        enemies_list.push(enemy);
+        time_since_last_enemy_spawn -= enemy_spawn.time_between_enemy_spawn;
+    }
+
 }
 
-// Render function (versão simplificada)
+// render function
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //enemy rendering
-    enemies_list.forEach(function(enemy) {
-        enemy.render(ctx);
-    });
-    //player rendering
-    player.render(ctx);
-    //projectile rendering
-    projectiles_list.forEach(function(projectile) {
-        projectile.render(ctx);
-    });
-    //debug text
-    ctx.fillStyle = "red";
-    ctx.font = "24px Arial";
-    ctx.fillText("Mouse: x=" + mouse.x + " y=" + mouse.y, 20, 40);
-    ctx.fillText("Angle: " + angle_between_player_and_mouse, 20, 60);
-    ctx.fillText("Projectiles: " + projectiles_list.length, 20, 80);
-    ctx.fillText("Player Health: " + player.health, 20, 100);
+    
+    if (gameStarted && !gamePaused) {
+        //enemy rendering
+        experience_orbs_list.forEach(function(orb) {
+            orb.render(ctx);
+        });
+        enemies_list.forEach(function(enemy) {
+            enemy.render(ctx);
+        });
+        //player rendering
+        player.render(ctx);
+        //projectile rendering
+        projectiles_list.forEach(function(projectile) {
+            projectile.render(ctx);
+        });
+        // particle rendering
+        particles_list.forEach(function(p) {
+            p.render(ctx);
+        });
+        
+        // Atualizar HUD
+        updateHUD();
+        
+        // Verificar se o jogador morreu
+        if (player.health <= 0) {
+            showGameOver();
+        }
+    } else if (gamePaused) {
+        // Tela de pausa
+        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.font = "48px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("PAUSADO", canvas.width / 2, canvas.height / 2);
+        ctx.font = "24px Arial";
+        ctx.fillText("Pressione Espaço ou ESC para continuar", canvas.width / 2, canvas.height / 2 + 50);
+        ctx.textAlign = "left";
+    }
 }
 
-// Run function
+function updateHUD() {
+    document.getElementById('healthDisplay').textContent = Math.max(0, player.health);
+    document.getElementById('expDisplay').textContent = player.experience;
+    document.getElementById('levelDisplay').textContent = player.level;
+    document.getElementById('projectilesDisplay').textContent = projectiles_list.length;
+}
+
+function showGameOver() {
+    document.getElementById('finalLevel').textContent = player.level;
+    document.getElementById('gameOverScreen').style.display = 'flex';
+    gameStarted = false;
+}
+
+function startGame() {
+    gameStarted = true;
+    gamePaused = false;
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('gameInterface').style.display = 'block';
+}
+
+function togglePause() {
+    gamePaused = !gamePaused;
+    if (gamePaused) {
+        // Mostrar tela de pausa
+        console.log("Jogo pausado - Pressione Espaço ou ESC para continuar");
+    } else {
+        console.log("Jogo despausado");
+    }
+}
+
+// run function
 function run() {
     var now = performance.now();
-    var dt = (now - lastUpdateTime);
+    var dt = (now - lastUpdateTime); // dt is in milliseconds
     lastUpdateTime = now;
     update(dt);
     render();
     requestAnimationFrame(run);
 }
 
-// Initialize function
 function initialize() {
+    //initialize player
+    player = PlayerObject(playerSprite);
     //initialize enemies
     for(var i = 0; i < 10; i++){
-        enemies_list.push(new enemy(randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 100, 100, 20, "blue"));
+        enemies_list.push(new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 30, 30));
     }
+
+    //initialize experience orbs
+    /*
+    for(var i = 0; i < 160; i++){
+        experience_orbs_list.push(new ExperienceOrbObject(randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 5, "orange", randomIntBetween(1, 10)));
+    }
+    */
     //initialize last update time
     lastUpdateTime = performance.now();
     run();
 }
 
-// Inicializar automaticamente
-initialize();
+let imagesToLoad = 3;
+function onImageLoaded() {
+    imagesToLoad--;
+    if (imagesToLoad === 0) {
+        initialize();
+    }
+}
+
+playerSprite.onload = onImageLoaded;
+projectileSprite.onload = onImageLoaded;
+enemySprite.onload = onImageLoaded;
+
+playerSprite.src = "estudante.png";
+projectileSprite.src = "lapis2.png";
+enemySprite.src = "livro ptbr.png";

@@ -8,17 +8,6 @@ var PlayerObject = function(spriteSheet){
     health: player_status.max_health,
     experience: 0,
     level: 1,
-    experience_to_next_level: 100,
-    
-    // Sistema de upgrades
-    upgrades: {
-        piercing_shot: 0,
-        double_shot: 0,
-        damage_boost: 0,
-        fire_rate: 0,
-        projectile_speed: 0,
-        explosion_damage: 0
-    },
 
     // Propriedades do Sprite
     sprite: spriteSheet,
@@ -43,16 +32,29 @@ var PlayerObject = function(spriteSheet){
     },
     gain_experience: function(experience){
         this.experience += experience;
-        
-        // Verifica se o jogador subiu de nível
-        while(this.experience >= this.experience_to_next_level) {
-            this.experience -= this.experience_to_next_level;
+        this.checkLevelUp();
+    },
+    checkLevelUp: function(){
+        var expNeeded = this.level * 100; // Experiência necessária para subir de nível
+        if(this.experience >= expNeeded){
             this.level++;
-            this.experience_to_next_level = Math.floor(this.experience_to_next_level * 1.2); // Aumenta exponencialmente
-            
-            // Sempre mostra quiz primeiro, depois upgrade se acertar
-            showQuizInterface();
+            this.experience -= expNeeded;
+            this.levelUp();
         }
+    },
+    levelUp: function(){
+        // Melhorias básicas automáticas ao subir de nível
+        player_status.max_health += 20;
+        this.health = player_status.max_health; // Cura completamente
+        
+        // Criar efeito visual de level up
+        createParticleExplosion(this.x, this.y, "#FFD700", 30);
+        
+        // Mostrar notificação de level up
+        console.log("Level Up! Agora você está no nível " + this.level);
+        
+        // Mostrar tela de upgrade com quiz
+        triggerUpgradeScreen();
     },
     render: function(ctx){
         ctx.save();
@@ -224,7 +226,7 @@ var EnemyObject = function(spriteSheet, x, y, health, max_health){
 };
 
 // projectile object
-var ProjectileObject = function(spriteSheet, x, y, initial_angle, isPiercing = false) {
+var ProjectileObject = function(spriteSheet, x, y, initial_angle) {
     const scale = 2.3;
     return {
         x: x,
@@ -232,8 +234,6 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, isPiercing = f
         radius: 16 * scale, 
         initial_angle: initial_angle,
         exists: true,
-        isPiercing: isPiercing,
-        enemiesHit: [], // Lista de inimigos já atingidos (para tiro perfurante)
 
         // Propriedades do Sprite
         sprite: spriteSheet,
@@ -257,8 +257,8 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, isPiercing = f
             ctx.restore();
         },
         update: function(dt){
-            this.x += Math.cos(this.initial_angle) * getProjectileSpeed() * dt;
-            this.y += Math.sin(this.initial_angle) * getProjectileSpeed() * dt;
+            this.x += Math.cos(this.initial_angle) * player_status.projectile_speed * dt;
+            this.y += Math.sin(this.initial_angle) * player_status.projectile_speed * dt;
             if(outOfBounds(this.x, this.y, WIDTH, HEIGHT)){
                 this.exists = false;
             }

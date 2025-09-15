@@ -7,11 +7,60 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body style="background: url('umaruchan.jpg') no-repeat center center fixed; background-size: cover;">
-    <div style="display: flex; justify-content: center;">
-        <canvas id="canvas"></canvas>
+    <!-- Tela de início -->
+    <div id="startScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000;">
+        <h1 style="color: #ff6b6b; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">VAMPIRAÍ SURVIVORS</h1>
+        <p style="color: white; font-size: 1.2em; margin-bottom: 30px; text-align: center;">Sobreviva aos livros vampiros e colete experiência!</p>
+        <button id="startButton" style="background: #ff6b6b; color: white; border: none; padding: 15px 30px; font-size: 1.2em; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">INICIAR JOGO</button>
+        
+        <!-- Controles -->
+        <div style="margin-top: 40px; color: white; text-align: center;">
+            <h3>Controles:</h3>
+            <p><strong>Teclado:</strong> WASD para mover, Mouse para mirar e atirar</p>
+            <p><strong>Controle:</strong> Analógico esquerdo para mover, direito para mirar e atirar</p>
+        </div>
     </div>
+
+    <!-- Interface do jogo -->
+    <div id="gameInterface" style="display: none;">
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+            <canvas id="canvas"></canvas>
+        </div>
+        
+        <!-- HUD do jogo -->
+        <div style="position: fixed; top: 20px; left: 20px; color: white; font-family: 'Courier New', monospace; z-index: 100;">
+            <div style="background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; border: 2px solid #ff6b6b;">
+                <div style="font-size: 18px; margin-bottom: 10px;">❤️ Vida: <span id="healthDisplay">100</span></div>
+                <div style="font-size: 18px; margin-bottom: 10px;">⭐ Experiência: <span id="expDisplay">0</span></div>
+                <div style="font-size: 18px; margin-bottom: 10px;">📈 Nível: <span id="levelDisplay">1</span></div>
+                <div style="font-size: 18px;">🎯 Projéteis: <span id="projectilesDisplay">0</span></div>
+            </div>
+        </div>
+
+        <!-- Tela de Game Over -->
+        <div id="gameOverScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000;">
+            <h1 style="color: #ff6b6b; font-size: 3em; margin-bottom: 20px;">GAME OVER</h1>
+            <p style="color: white; font-size: 1.5em; margin-bottom: 30px;">Você sobreviveu até o nível <span id="finalLevel">1</span>!</p>
+            <button id="restartButton" style="background: #ff6b6b; color: white; border: none; padding: 15px 30px; font-size: 1.2em; border-radius: 10px; cursor: pointer;">JOGAR NOVAMENTE</button>
+        </div>
+    </div>
+
     <script src="utils.js"></script>
+    <script src="gamepad_utils.js"></script>
+    <script src="game_objects.js"></script>
+    <script src="config.js"></script>
+    <script src="upgrade_system.js"></script>
     <script src="script.js"></script>
-    <!-- Criado por Érick e Kaique-->
+    
+    <script>
+        // Controle da interface
+        document.getElementById('startButton').addEventListener('click', startGame);
+
+        document.getElementById('restartButton').addEventListener('click', function() {
+            location.reload();
+        });
+    </script>
+    
+    <!-- Criado por Érick, Kaiq e Ian-->
 </body>
 </html>
