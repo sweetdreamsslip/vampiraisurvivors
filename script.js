@@ -18,6 +18,8 @@ var time_since_last_enemy_spawn = 0;
 var gamePaused = false;
 var gameStarted = false;
 var experienceMultiplier = 1; // Para o upgrade de experiência duplicada
+const HEALTH_PER_HEART = 20; // Vida representada por cada coração no HUD
+var lastPlayerHealthForHUD = -1; // Otimização para o HUD
 
 // game objects
 var player;
@@ -30,6 +32,8 @@ var experience_orbs_list = [];
 var playerSprite = new Image();
 var projectileSprite = new Image();
 var enemySprite = new Image();
+var xpSprite = new Image();
+var heartSprite = new Image();
 
 // controller support
 var is_gamepad_connected = false;
@@ -145,7 +149,7 @@ function update(dt) {
     enemies_list.forEach(function(enemy) {
         enemy.update(dt);
         if(!enemy.alive) {
-            experience_orbs_list.push(new ExperienceOrbObject(enemy.x, enemy.y, 5, "orange", randomIntBetween(1, 10)));
+            experience_orbs_list.push(new ExperienceOrbObject(xpSprite, enemy.x, enemy.y, randomIntBetween(1, 10)));
         }
     });
 
@@ -239,8 +243,44 @@ function render() {
     }
 }
 
-function updateHUD() {
-    document.getElementById('healthDisplay').textContent = Math.max(0, player.health);
+function updateHUD() {    
+    // Otimização: Só redesenha os corações se a vida ou a vida máxima mudou.
+    const healthContainer = document.getElementById('healthDisplayContainer');
+    const expectedHearts = Math.ceil(player_status.max_health / HEALTH_PER_HEART);
+
+    if (player.health !== lastPlayerHealthForHUD || healthContainer.children.length !== expectedHearts) {
+        lastPlayerHealthForHUD = player.health;
+        healthContainer.innerHTML = ''; // Limpa corações anteriores
+
+        const currentHealth = Math.max(0, player.health);
+
+        for (let i = 0; i < expectedHearts; i++) {
+            const heartCanvas = document.createElement('canvas');
+            const heartSize = 24; // Tamanho do coração no HUD
+            heartCanvas.width = heartSize;
+            heartCanvas.height = heartSize;
+            heartCanvas.style.marginRight = '2px';
+            const htx = heartCanvas.getContext('2d');
+
+            const healthStart = i * HEALTH_PER_HEART;
+
+            // Desenha o coração de fundo (vazio) com baixa opacidade
+            htx.globalAlpha = 0.3;
+            htx.drawImage(heartSprite, 0, 0, heartSize, heartSize);
+            htx.globalAlpha = 1.0;
+
+            if (currentHealth > healthStart) {
+                // Calcula a porcentagem de preenchimento para este coração
+                const fillPercentage = Math.min(1, (currentHealth - healthStart) / HEALTH_PER_HEART);
+                
+                // Desenha a parte preenchida do coração por cima
+                htx.drawImage(heartSprite, 0, 0, 32 * fillPercentage, 32, 0, 0, heartSize * fillPercentage, heartSize);
+            }
+            healthContainer.appendChild(heartCanvas);
+        }
+    }
+
+    // Atualiza outras informações do HUD
     document.getElementById('expDisplay').textContent = player.experience;
     document.getElementById('levelDisplay').textContent = player.level;
     document.getElementById('projectilesDisplay').textContent = projectiles_list.length;
@@ -298,7 +338,7 @@ function initialize() {
     run();
 }
 
-let imagesToLoad = 3;
+let imagesToLoad = 5;
 function onImageLoaded() {
     imagesToLoad--;
     if (imagesToLoad === 0) {
@@ -309,7 +349,11 @@ function onImageLoaded() {
 playerSprite.onload = onImageLoaded;
 projectileSprite.onload = onImageLoaded;
 enemySprite.onload = onImageLoaded;
+xpSprite.onload = onImageLoaded;
+heartSprite.onload = onImageLoaded;
 
 playerSprite.src = "estudante.png";
 projectileSprite.src = "lapis2.png";
 enemySprite.src = "livro ptbr.png";
+xpSprite.src = "xp.png";
+heartSprite.src = "heart.png";
