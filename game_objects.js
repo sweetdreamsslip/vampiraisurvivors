@@ -32,6 +32,29 @@ var PlayerObject = function(spriteSheet){
     },
     gain_experience: function(experience){
         this.experience += experience;
+        this.checkLevelUp();
+    },
+    checkLevelUp: function(){
+        var expNeeded = this.level * 100; // Experiência necessária para subir de nível
+        if(this.experience >= expNeeded){
+            this.level++;
+            this.experience -= expNeeded;
+            this.levelUp();
+        }
+    },
+    levelUp: function(){
+        // Melhorias básicas automáticas ao subir de nível
+        player_status.max_health += 20;
+        this.health = player_status.max_health; // Cura completamente
+        
+        // Criar efeito visual de level up
+        createParticleExplosion(this.x, this.y, "#FFD700", 30);
+        
+        // Mostrar notificação de level up
+        console.log("Level Up! Agora você está no nível " + this.level);
+        
+        // Mostrar tela de upgrade com quiz
+        triggerUpgradeScreen();
     },
     render: function(ctx){
         ctx.save();

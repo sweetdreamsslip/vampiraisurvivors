@@ -15,6 +15,9 @@ var enemy_spawn = Object.assign({}, enemy_spawn_configurations[selected_enemy_sp
 var angle_between_player_and_mouse = 0;
 var time_since_last_projectile = 0;
 var time_since_last_enemy_spawn = 0;
+var gamePaused = false;
+var gameStarted = false;
+var experienceMultiplier = 1; // Para o upgrade de experiência duplicada
 
 // game objects
 var player;
@@ -64,6 +67,16 @@ canvas.addEventListener("mouseup", function(e) {
 });
 window.addEventListener("keydown", function(e) {
     keys_down.push(e.key);
+    
+    // Controles especiais
+    if (e.key === ' ' || e.key === 'Escape') { // Espaço ou ESC para pausar
+        if (gameStarted) {
+            togglePause();
+        }
+    }
+    if (e.key === 'Enter' && !gameStarted) { // Enter para iniciar
+        startGame();
+    }
 });
 window.addEventListener("keyup", function(e) {
     keys_down = keys_down.filter(function(key) {
@@ -84,6 +97,8 @@ window.addEventListener("gamepaddisconnected", function(e) {
 
 // update function
 function update(dt) {
+    if (!gameStarted || gamePaused) return;
+    
     time_since_last_enemy_spawn += dt;
     const gamepadState = pollGamepad();
 
@@ -143,7 +158,7 @@ function update(dt) {
     experience_orbs_list.forEach(function(orb) {
         orb.update(dt, player.x, player.y);
         if(aabbCircleCollision(orb, player)){
-            player.gain_experience(orb.experience_value);
+            player.gain_experience(orb.experience_value * experienceMultiplier);
             orb.exists = false;
         }
     });
@@ -167,7 +182,14 @@ function update(dt) {
 
     // enemy spawning
     if(time_since_last_enemy_spawn >= enemy_spawn.time_between_enemy_spawn){
-        enemies_list.push(new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 30, 30));
+        // Aumentar dificuldade com o tempo
+        var difficultyMultiplier = Math.min(1 + (player.level * 0.1), 3); // Máximo 3x mais difícil
+        var enemyHealth = Math.floor(30 * difficultyMultiplier);
+        var enemyDamage = Math.floor(10 * difficultyMultiplier);
+        
+        var enemy = new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), enemyHealth, enemyHealth);
+        enemy.base_damage = enemyDamage;
+        enemies_list.push(enemy);
         time_since_last_enemy_spawn -= enemy_spawn.time_between_enemy_spawn;
     }
 
@@ -176,33 +198,75 @@ function update(dt) {
 // render function
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    //enemy rendering
-    experience_orbs_list.forEach(function(orb) {
-        orb.render(ctx);
-    });
-    enemies_list.forEach(function(enemy) {
-        enemy.render(ctx);
-    });
-    //player rendering
-    player.render(ctx);
-    //projectile rendering
-    projectiles_list.forEach(function(projectile) {
-        projectile.render(ctx);
-    });
-    // particle rendering
-    particles_list.forEach(function(p) {
-        p.render(ctx);
-    });
-    //debug text
-    ctx.fillStyle = "red";
-    ctx.font = "24px Arial";
-    ctx.fillText("Mouse: x=" + mouse.x + " y=" + mouse.y, 20, 40);
-    ctx.fillText("Angle: " + angle_between_player_and_mouse, 20, 60);
-    ctx.fillText("Projectiles: " + projectiles_list.length, 20, 80);
-    ctx.fillText("Player Health: " + player.health, 20, 100);
-    ctx.fillText("Particles: " + particles_list.length, 20, 120);
-    ctx.fillText("Experience: " + player.experience, 20, 140);
-    ctx.fillText("Level: " + player.level, 20, 160);
+    
+    if (gameStarted && !gamePaused) {
+        //enemy rendering
+        experience_orbs_list.forEach(function(orb) {
+            orb.render(ctx);
+        });
+        enemies_list.forEach(function(enemy) {
+            enemy.render(ctx);
+        });
+        //player rendering
+        player.render(ctx);
+        //projectile rendering
+        projectiles_list.forEach(function(projectile) {
+            projectile.render(ctx);
+        });
+        // particle rendering
+        particles_list.forEach(function(p) {
+            p.render(ctx);
+        });
+        
+        // Atualizar HUD
+        updateHUD();
+        
+        // Verificar se o jogador morreu
+        if (player.health <= 0) {
+            showGameOver();
+        }
+    } else if (gamePaused) {
+        // Tela de pausa
+        ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.font = "48px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("PAUSADO", canvas.width / 2, canvas.height / 2);
+        ctx.font = "24px Arial";
+        ctx.fillText("Pressione Espaço ou ESC para continuar", canvas.width / 2, canvas.height / 2 + 50);
+        ctx.textAlign = "left";
+    }
+}
+
+function updateHUD() {
+    document.getElementById('healthDisplay').textContent = Math.max(0, player.health);
+    document.getElementById('expDisplay').textContent = player.experience;
+    document.getElementById('levelDisplay').textContent = player.level;
+    document.getElementById('projectilesDisplay').textContent = projectiles_list.length;
+}
+
+function showGameOver() {
+    document.getElementById('finalLevel').textContent = player.level;
+    document.getElementById('gameOverScreen').style.display = 'flex';
+    gameStarted = false;
+}
+
+function startGame() {
+    gameStarted = true;
+    gamePaused = false;
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('gameInterface').style.display = 'block';
+}
+
+function togglePause() {
+    gamePaused = !gamePaused;
+    if (gamePaused) {
+        // Mostrar tela de pausa
+        console.log("Jogo pausado - Pressione Espaço ou ESC para continuar");
+    } else {
+        console.log("Jogo despausado");
+    }
 }
 
 // run function

@@ -1,0 +1,79 @@
+/* Estilos para o jogo Vampiraí Survivors */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    overflow: hidden;
+    user-select: none;
+}
+
+#canvas {
+    border: 3px solid #ff6b6b;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+/* Estilo para o texto de debug */
+canvas {
+    font-family: 'Courier New', monospace;
+}
+
+/* Animações */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Efeitos visuais */
+.particle-effect {
+    position: absolute;
+    pointer-events: none;
+    animation: fadeIn 0.1s ease-in;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    #canvas {
+        width: 95vw;
+        height: 95vh;
+        max-width: 500px;
+        max-height: 500px;
+    }
+}
+
+/* Estilo para controles */
+.controls-info {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    z-index: 1000;
+}
+
+/* Efeito de partículas de fundo */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 80%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(107, 107, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
