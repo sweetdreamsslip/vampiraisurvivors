@@ -25,6 +25,7 @@ var enemies_list = [];
 var projectiles_list = [];
 var particles_list = [];
 var experience_orbs_list = [];
+var damage_zones_list = []; // Zonas de dano
 
 // sprites
 var playerSprite = new Image();
@@ -99,6 +100,7 @@ window.addEventListener("gamepaddisconnected", function(e) {
 function update(dt) {
     if (!gameStarted || gamePaused) return;
     
+    time_since_last_projectile += dt;
     time_since_last_enemy_spawn += dt;
     const gamepadState = pollGamepad();
 
@@ -113,7 +115,7 @@ function update(dt) {
     //projectile firing
     time_since_last_projectile += dt;
     if ((mouse.mouseDown || gamepadState.isShooting) && time_since_last_projectile >= player_status.time_between_projectiles) {
-        projectiles_list.push(new ProjectileObject(projectileSprite, player.x, player.y, angle_between_player_and_mouse));
+        player.attack(angle_between_player_and_mouse);
         time_since_last_projectile = 0;
     }
     
@@ -121,12 +123,16 @@ function update(dt) {
     projectiles_list.forEach(function(projectile) {
         projectile.update(dt);
     });
-    
 
     //player collision
     for(var i = 0; i < enemies_list.length; i++){
         if(aabbCircleCollision(player, enemies_list[i])){
-            player.take_damage(enemies_list[i].base_damage);
+            var damage = enemies_list[i].base_damage;
+            // Aplicar redução de dano se tiver o upgrade
+            if (player.damage_reduction > 0) {
+                damage = Math.max(1, damage - player.damage_reduction);
+            }
+            player.take_damage(damage);
         }
     }
 
@@ -135,7 +141,12 @@ function update(dt) {
         for(var j = 0; j < enemies_list.length; j++){
             if(aabbCircleCollision(projectiles_list[i], enemies_list[j])){
                 createParticleExplosion(enemies_list[j].x, enemies_list[j].y, "#8A2BE2", randomIntBetween(10, 20)); // Cor roxa para explosão do livro
-                projectiles_list[i].exists = false;	
+                
+                // Tiro perfurante - não remove o projétil
+                if (!player.piercing_shot) {
+                    projectiles_list[i].exists = false;
+                }
+                
                 enemies_list[j].take_damage(player_status.damage);
             }
         }
@@ -145,7 +156,15 @@ function update(dt) {
     enemies_list.forEach(function(enemy) {
         enemy.update(dt);
         if(!enemy.alive) {
+<<<<<<< Updated upstream
             experience_orbs_list.push(new ExperienceOrbObject(enemy.x, enemy.y, 5, "orange", randomIntBetween(1, 10)));
+=======
+            // Experiência baseada no nível do inimigo (mais difícil = mais XP)
+            var baseExp = 3;
+            var levelBonus = Math.floor(enemy.max_health / 25); // Bonus baseado na vida máxima
+            var totalExp = baseExp + levelBonus;
+            experience_orbs_list.push(new ExperienceOrbObject(xpSprite, enemy.x, enemy.y, totalExp));
+>>>>>>> Stashed changes
         }
     });
 
@@ -161,6 +180,11 @@ function update(dt) {
             player.gain_experience(orb.experience_value * experienceMultiplier);
             orb.exists = false;
         }
+    });
+
+    // update damage zones
+    damage_zones_list.forEach(function(zone) {
+        zone.update(dt);
     });
 
     // remove enemies that are no longer exists
@@ -179,18 +203,36 @@ function update(dt) {
     experience_orbs_list = experience_orbs_list.filter(function(orb) {
         return orb.exists;
     });
+    // remove damage zones that are no longer exists
+    damage_zones_list = damage_zones_list.filter(function(zone) {
+        return zone.exists;
+    });
 
     // enemy spawning
     if(time_since_last_enemy_spawn >= enemy_spawn.time_between_enemy_spawn){
-        // Aumentar dificuldade com o tempo
-        var difficultyMultiplier = Math.min(1 + (player.level * 0.1), 3); // Máximo 3x mais difícil
-        var enemyHealth = Math.floor(30 * difficultyMultiplier);
-        var enemyDamage = Math.floor(10 * difficultyMultiplier);
+        // Dificuldade gradual - começa fácil e aumenta suavemente
+        var level = player.level;
+        var difficultyMultiplier = 1 + (level * 0.1); // Crescimento mais suave
+        var spawnRateMultiplier = Math.max(0.3, 1 - (level * 0.05)); // Spawn fica mais rápido gradualmente
+        
+        // Stats base mais baixas no início
+        var baseHealth = 25;
+        var baseDamage = 8;
+        var baseSpeed = 0.08;
+        
+        // Aumento gradual das stats
+        var enemyHealth = Math.floor(baseHealth * difficultyMultiplier);
+        var enemyDamage = Math.floor(baseDamage * difficultyMultiplier);
+        var enemySpeed = baseSpeed + (level * 0.005); // Velocidade aumenta muito gradualmente
+        
+        // Ajustar tempo de spawn baseado no nível
+        var currentSpawnTime = enemy_spawn.time_between_enemy_spawn * spawnRateMultiplier;
         
         var enemy = new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), enemyHealth, enemyHealth);
         enemy.base_damage = enemyDamage;
+        enemy.base_speed = enemySpeed;
         enemies_list.push(enemy);
-        time_since_last_enemy_spawn -= enemy_spawn.time_between_enemy_spawn;
+        time_since_last_enemy_spawn -= currentSpawnTime;
     }
 
 }
@@ -206,6 +248,10 @@ function render() {
         });
         enemies_list.forEach(function(enemy) {
             enemy.render(ctx);
+        });
+        //damage zones rendering
+        damage_zones_list.forEach(function(zone) {
+            zone.render(ctx);
         });
         //player rendering
         player.render(ctx);
@@ -243,7 +289,6 @@ function updateHUD() {
     document.getElementById('healthDisplay').textContent = Math.max(0, player.health);
     document.getElementById('expDisplay').textContent = player.experience;
     document.getElementById('levelDisplay').textContent = player.level;
-    document.getElementById('projectilesDisplay').textContent = projectiles_list.length;
 }
 
 function showGameOver() {
@@ -282,9 +327,9 @@ function run() {
 function initialize() {
     //initialize player
     player = PlayerObject(playerSprite);
-    //initialize enemies
-    for(var i = 0; i < 10; i++){
-        enemies_list.push(new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 30, 30));
+    //initialize enemies - começar com menos inimigos
+    for(var i = 0; i < 5; i++){
+        enemies_list.push(new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 25, 25));
     }
 
     //initialize experience orbs

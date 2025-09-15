@@ -8,6 +8,12 @@ var PlayerObject = function(spriteSheet){
     health: player_status.max_health,
     experience: 0,
     level: 1,
+    
+    // Novos upgrades
+    piercing_shot: false,
+    double_shot: false,
+    damage_reduction: 0,
+    damage_zones: false,
 
     // Propriedades do Sprite
     sprite: spriteSheet,
@@ -34,8 +40,30 @@ var PlayerObject = function(spriteSheet){
         this.experience += experience;
         this.checkLevelUp();
     },
+    attack: function(angle) {
+        // Criar projétil normal
+        projectiles_list.push(new ProjectileObject(projectileSprite, this.x, this.y, angle));
+        
+        // Tiro duplo - atira duas vezes
+        if (this.double_shot) {
+            setTimeout(() => {
+                projectiles_list.push(new ProjectileObject(projectileSprite, this.x, this.y, angle));
+            }, 50); // Pequeno delay entre os tiros
+        }
+        
+        // Zonas de dano
+        if (this.damage_zones) {
+            this.createDamageZone();
+        }
+    },
+    createDamageZone: function() {
+        // Cria uma zona de dano ao redor do jogador
+        var zone = new DamageZoneObject(this.x, this.y, 100, 2000); // 100px de raio, 2 segundos de duração
+        damage_zones_list.push(zone);
+    },
     checkLevelUp: function(){
-        var expNeeded = this.level * 100; // Experiência necessária para subir de nível
+        // Experiência necessária aumenta gradualmente
+        var expNeeded = Math.floor(50 + (this.level * 75)); // Começa com 50, aumenta 75 por nível
         if(this.experience >= expNeeded){
             this.level++;
             this.experience -= expNeeded;
@@ -334,5 +362,70 @@ var GunDroneObject = function(x, y, distance_to_player) {
         y: y,
         distance_to_player: distance_to_player,
         exists: true,
+    }
+};
+
+// Zona de dano
+var DamageZoneObject = function(x, y, radius, duration) {
+    return {
+        x: x,
+        y: y,
+        radius: radius,
+        max_radius: radius,
+        duration: duration,
+        max_duration: duration,
+        exists: true,
+        damage_timer: 0,
+        
+        render: function(ctx) {
+            ctx.save();
+            
+            // Efeito visual pulsante
+            var alpha = Math.sin(Date.now() * 0.01) * 0.3 + 0.4;
+            var currentRadius = this.radius * (this.duration / this.max_duration);
+            
+            // Gradiente circular
+            var gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, currentRadius);
+            gradient.addColorStop(0, `rgba(255, 0, 0, ${alpha})`);
+            gradient.addColorStop(0.7, `rgba(255, 100, 0, ${alpha * 0.5})`);
+            gradient.addColorStop(1, `rgba(255, 0, 0, 0)`);
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, currentRadius, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Borda
+            ctx.strokeStyle = `rgba(255, 0, 0, ${alpha + 0.3})`;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            
+            ctx.restore();
+        },
+        
+        update: function(dt) {
+            this.duration -= dt;
+            this.damage_timer += dt;
+            
+            // Aplica dano a inimigos próximos a cada 200ms
+            if (this.damage_timer >= 200) {
+                this.damage_timer = 0;
+                
+                for (var i = 0; i < enemies_list.length; i++) {
+                    var enemy = enemies_list[i];
+                    var distance = distSquared(this.x, this.y, enemy.x, enemy.y);
+                    var currentRadius = this.radius * (this.duration / this.max_duration);
+                    
+                    if (distance <= currentRadius * currentRadius) {
+                        enemy.take_damage(5); // Dano baixo mas constante
+                        createParticleExplosion(enemy.x, enemy.y, "#FF4500", 3);
+                    }
+                }
+            }
+            
+            if (this.duration <= 0) {
+                this.exists = false;
+            }
+        }
     }
 };
