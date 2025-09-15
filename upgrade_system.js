@@ -222,18 +222,21 @@ function createUpgradeInterface() {
         align-items: center;
         z-index: 2000;
         color: white;
-        font-family: 'Arial', sans-serif;
     `;
     
     // Título
     var title = document.createElement('h1');
-    title.textContent = '🎉 LEVEL UP! 🎉';
-    title.style.cssText = 'color: #FFD700; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
+    title.style.cssText = 'color: #FFD700; font-size: 2.25em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; gap: 20px;';
+    title.innerHTML = `
+        <img src="lvl.png" alt="Ícone de Level Up" style="height: 1em; image-rendering: pixelated;">
+        LEVEL UP!
+        <img src="lvl.png" alt="Ícone de Level Up" style="height: 1em; image-rendering: pixelated;">
+    `;
     upgradeDiv.appendChild(title);
     
     // Pergunta do quiz
     var questionDiv = document.createElement('div');
-    questionDiv.style.cssText = 'background: rgba(255, 107, 107, 0.2); padding: 20px; border-radius: 10px; margin-bottom: 30px; max-width: 600px; text-align: center;';
+    questionDiv.style.cssText = 'background: #faf3e0; color: #000000; border: 6px solid #e4a83a; border-radius: 15px; box-shadow: 0 0 0 3px #402c1a; padding: 20px; margin-bottom: 30px; max-width: 600px; text-align: center;';
     
     var questionText = document.createElement('h2');
     questionText.textContent = currentQuizQuestion.question;
@@ -248,23 +251,27 @@ function createUpgradeInterface() {
         var optionButton = document.createElement('button');
         optionButton.textContent = `${String.fromCharCode(65 + index)}) ${option}`;
         optionButton.style.cssText = `
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 2px solid #ff6b6b;
-            padding: 15px 20px;
+            background: transparent;
+            color: #000000;
+            font-weight: bold;
+            border: 3px solid #402c1a;
             border-radius: 8px;
+            padding: 12px 20px;
             cursor: pointer;
             font-size: 1.1em;
-            transition: all 0.3s ease;
+            text-align: left;
+            transition: all 0.2s ease;
         `;
         
         optionButton.addEventListener('mouseenter', function() {
-            this.style.background = 'rgba(255, 107, 107, 0.3)';
-            this.style.transform = 'scale(1.05)';
+            this.style.background = '#402c1a';
+            this.style.color = '#faf3e0';
+            this.style.transform = 'scale(1.02)';
         });
         
         optionButton.addEventListener('mouseleave', function() {
-            this.style.background = 'rgba(255, 255, 255, 0.1)';
+            this.style.background = 'transparent';
+            this.style.color = '#000000';
             this.style.transform = 'scale(1)';
         });
         
@@ -319,7 +326,6 @@ function showUpgradeResult(isCorrect, upgradeType) {
         align-items: center;
         z-index: 2000;
         color: white;
-        font-family: 'Arial', sans-serif;
     `;
     
     if (isCorrect) {

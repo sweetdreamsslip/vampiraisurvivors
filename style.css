@@ -3,7 +3,7 @@
 body {
     margin: 0;
     padding: 0;
-    font-family: 'Arial', sans-serif;
+    font-family: "Pixelify Sans", sans-serif;
     background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
     overflow: hidden;
     user-select: none;
@@ -19,7 +19,7 @@ body {
 
 /* Estilo para o texto de debug */
 canvas {
-    font-family: 'Courier New', monospace;
+    font-family: "Pixelify Sans", sans-serif;
 }
 
 /* Animações */

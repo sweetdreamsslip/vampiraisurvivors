@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vampiraí Survivors</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
 </head>
-<body style="background: url('images/umaruchan.jpg') no-repeat center center fixed; background-size: cover;">
+<body style="background: url('umaruchan.jpg') no-repeat center center fixed; background-size: cover;">
     <!-- Tela de início -->
     <div id="startScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000;">
         <h1 style="color: #ff6b6b; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">VAMPIRAÍ SURVIVORS</h1>
@@ -28,7 +31,7 @@
         </div>
         
         <!-- HUD do jogo -->
-        <div style="position: fixed; top: 20px; left: 20px; color: white; font-family: 'Courier New', monospace; z-index: 100;">
+        <div style="position: fixed; top: 20px; left: 20px; color: white; z-index: 100;">
             <div style="background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; border: 2px solid #ff6b6b;">
                 <div style="font-size: 18px; margin-bottom: 10px; display: flex; align-items: center;">&nbsp;<div id="healthDisplayContainer" style="display: flex;"></div></div>
                 <div style="font-size: 18px; margin-bottom: 10px; display: flex; align-items: center;"><img src="lvl.png" alt="Ícone de Nível" width="24" height="24" style="margin-right: 8px; image-rendering: pixelated;">Nível: <span id="levelDisplay">1</span></div>
@@ -48,16 +51,7 @@
 
     <script src="utils.js"></script>
     <script src="gamepad_utils.js"></script>
-
-    <!-- Game Objects -->
-    <script src="GameObjects/EnemyObject.js"></script>
-    <script src="GameObjects/ExperienceOrbObject.js"></script>
-    <script src="GameObjects/GunDroneObject.js"></script>
-    <script src="GameObjects/ParticleObject.js"></script>
-    <script src="GameObjects/PlayerObject.js"></script>
-    <script src="GameObjects/ProjectileObject.js"></script>
-
-    <!-- Configurações -->
+    <script src="game_objects.js"></script>
     <script src="config.js"></script>
     <script src="upgrade_system.js"></script>
     <script src="script.js"></script>
@@ -65,6 +59,7 @@
     <script>
         // Controle da interface
         document.getElementById('startButton').addEventListener('click', startGame);
+
         document.getElementById('restartButton').addEventListener('click', function() {
             location.reload();
         });

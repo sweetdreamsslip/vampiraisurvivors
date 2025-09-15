@@ -27,18 +27,19 @@ var enemies_list = [];
 var projectiles_list = [];
 var particles_list = [];
 var experience_orbs_list = [];
-var gun_drones_list = [];
 
 // sprites
 var playerSprite = new Image();
 var projectileSprite = new Image();
 var enemySprite = new Image();
+var playerShootingSprite = new Image();
+var playerShootingAndMovingSprite = new Image();
 var xpSprite = new Image();
 var heartSprite = new Image();
 
-
 // controller support
 var is_gamepad_connected = false;
+
 // control variables
 var mouse = {
     x: 0,
@@ -46,7 +47,6 @@ var mouse = {
     mouseDown: false,
 };
 var keys_down = [];
-
 
 
 function createParticleExplosion(x, y, color, count) {
@@ -57,7 +57,6 @@ function createParticleExplosion(x, y, color, count) {
         particles_list.push(new ParticleObject(x, y, color, speed, angle, lifespan));
     }
 }
-
 
 
 // event listeners
@@ -121,13 +120,10 @@ function update(dt) {
     time_since_last_projectile += dt;
     if ((mouse.mouseDown || gamepadState.isShooting) && time_since_last_projectile >= player_status.time_between_projectiles) {
         projectiles_list.push(new ProjectileObject(projectileSprite, player.x, player.y, angle_between_player_and_mouse));
+        player.triggerShootingAnimation();
         time_since_last_projectile = 0;
     }
-    //gun drone updating
-    gun_drones_list.forEach(function(gun_drone) {
-        gun_drone.update(dt);
-    });
-
+    
     //projectile updating
     projectiles_list.forEach(function(projectile) {
         projectile.update(dt);
@@ -218,20 +214,12 @@ function render() {
         enemies_list.forEach(function(enemy) {
             enemy.render(ctx);
         });
-
         //player rendering
         player.render(ctx);
-
-        //gun drone rendering
-        gun_drones_list.forEach(function(gun_drone) {
-            gun_drone.render(ctx);
-        });
-
         //projectile rendering
         projectiles_list.forEach(function(projectile) {
             projectile.render(ctx);
         });
-
         // particle rendering
         particles_list.forEach(function(p) {
             p.render(ctx);
@@ -249,10 +237,10 @@ function render() {
         ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "white";
-        ctx.font = "48px Arial";
+        ctx.font = "48px 'Pixelify Sans', sans-serif";
         ctx.textAlign = "center";
         ctx.fillText("PAUSADO", canvas.width / 2, canvas.height / 2);
-        ctx.font = "24px Arial";
+        ctx.font = "24px 'Pixelify Sans', sans-serif";
         ctx.fillText("Pressione Espaço ou ESC para continuar", canvas.width / 2, canvas.height / 2 + 50);
         ctx.textAlign = "left";
     }
@@ -336,11 +324,7 @@ function run() {
 
 function initialize() {
     //initialize player
-    player = PlayerObject(playerSprite);
-    //initialize gun drones
-    for(var i = 0; i < 1; i++){
-        gun_drones_list.push(new GunDroneObject(player.x + 60, player.y, 60));
-    }
+    player = PlayerObject(playerSprite, playerShootingSprite, playerShootingAndMovingSprite);
     //initialize enemies
     for(var i = 0; i < 10; i++){
         enemies_list.push(new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 30, 30));
@@ -357,7 +341,7 @@ function initialize() {
     run();
 }
 
-let imagesToLoad = 5;
+let imagesToLoad = 7;
 function onImageLoaded() {
     imagesToLoad--;
     if (imagesToLoad === 0) {
@@ -368,11 +352,15 @@ function onImageLoaded() {
 playerSprite.onload = onImageLoaded;
 projectileSprite.onload = onImageLoaded;
 enemySprite.onload = onImageLoaded;
+playerShootingSprite.onload = onImageLoaded;
+playerShootingAndMovingSprite.onload = onImageLoaded;
 xpSprite.onload = onImageLoaded;
 heartSprite.onload = onImageLoaded;
 
-playerSprite.src = "images/estudante.png";
-projectileSprite.src = "images/lapis2.png";
-enemySprite.src = "images/livro ptbr.png";
-xpSprite.src = "images/xp.png";
-heartSprite.src = "images/heart.png";
+playerSprite.src = "estudante.png";
+projectileSprite.src = "lapis2.png";
+enemySprite.src = "livro ptbr.png";
+playerShootingSprite.src = "estudanteatirando.png";
+playerShootingAndMovingSprite.src = "atirandoecorrendo.png";
+xpSprite.src = "xp.png";
+heartSprite.src = "heart.png";
