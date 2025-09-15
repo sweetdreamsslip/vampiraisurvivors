@@ -6,7 +6,7 @@
     <title>Vampiraí Survivors</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body style="background: url('umaruchan.jpg') no-repeat center center fixed; background-size: cover;">
+<body style="background: url('images/umaruchan.jpg') no-repeat center center fixed; background-size: cover;">
     <!-- Tela de início -->
     <div id="startScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000;">
         <h1 style="color: #ff6b6b; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">VAMPIRAÍ SURVIVORS</h1>
@@ -48,7 +48,16 @@
 
     <script src="utils.js"></script>
     <script src="gamepad_utils.js"></script>
-    <script src="game_objects.js"></script>
+
+    <!-- Game Objects -->
+    <script src="GameObjects/EnemyObject.js"></script>
+    <script src="GameObjects/ExperienceOrbObject.js"></script>
+    <script src="GameObjects/GunDroneObject.js"></script>
+    <script src="GameObjects/ParticleObject.js"></script>
+    <script src="GameObjects/PlayerObject.js"></script>
+    <script src="GameObjects/ProjectileObject.js"></script>
+
+    <!-- Configurações -->
     <script src="config.js"></script>
     <script src="upgrade_system.js"></script>
     <script src="script.js"></script>
@@ -56,7 +65,6 @@
     <script>
         // Controle da interface
         document.getElementById('startButton').addEventListener('click', startGame);
-
         document.getElementById('restartButton').addEventListener('click', function() {
             location.reload();
         });

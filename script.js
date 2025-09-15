@@ -27,6 +27,7 @@ var enemies_list = [];
 var projectiles_list = [];
 var particles_list = [];
 var experience_orbs_list = [];
+var gun_drones_list = [];
 
 // sprites
 var playerSprite = new Image();
@@ -35,9 +36,9 @@ var enemySprite = new Image();
 var xpSprite = new Image();
 var heartSprite = new Image();
 
+
 // controller support
 var is_gamepad_connected = false;
-
 // control variables
 var mouse = {
     x: 0,
@@ -45,6 +46,7 @@ var mouse = {
     mouseDown: false,
 };
 var keys_down = [];
+
 
 
 function createParticleExplosion(x, y, color, count) {
@@ -55,6 +57,7 @@ function createParticleExplosion(x, y, color, count) {
         particles_list.push(new ParticleObject(x, y, color, speed, angle, lifespan));
     }
 }
+
 
 
 // event listeners
@@ -120,7 +123,11 @@ function update(dt) {
         projectiles_list.push(new ProjectileObject(projectileSprite, player.x, player.y, angle_between_player_and_mouse));
         time_since_last_projectile = 0;
     }
-    
+    //gun drone updating
+    gun_drones_list.forEach(function(gun_drone) {
+        gun_drone.update(dt);
+    });
+
     //projectile updating
     projectiles_list.forEach(function(projectile) {
         projectile.update(dt);
@@ -211,12 +218,20 @@ function render() {
         enemies_list.forEach(function(enemy) {
             enemy.render(ctx);
         });
+
         //player rendering
         player.render(ctx);
+
+        //gun drone rendering
+        gun_drones_list.forEach(function(gun_drone) {
+            gun_drone.render(ctx);
+        });
+
         //projectile rendering
         projectiles_list.forEach(function(projectile) {
             projectile.render(ctx);
         });
+
         // particle rendering
         particles_list.forEach(function(p) {
             p.render(ctx);
@@ -322,6 +337,10 @@ function run() {
 function initialize() {
     //initialize player
     player = PlayerObject(playerSprite);
+    //initialize gun drones
+    for(var i = 0; i < 1; i++){
+        gun_drones_list.push(new GunDroneObject(player.x + 60, player.y, 60));
+    }
     //initialize enemies
     for(var i = 0; i < 10; i++){
         enemies_list.push(new EnemyObject(enemySprite, randomIntBetween(0, WIDTH), randomIntBetween(0, HEIGHT), 30, 30));
@@ -352,8 +371,8 @@ enemySprite.onload = onImageLoaded;
 xpSprite.onload = onImageLoaded;
 heartSprite.onload = onImageLoaded;
 
-playerSprite.src = "estudante.png";
-projectileSprite.src = "lapis2.png";
-enemySprite.src = "livro ptbr.png";
-xpSprite.src = "xp.png";
-heartSprite.src = "heart.png";
+playerSprite.src = "images/estudante.png";
+projectileSprite.src = "images/lapis2.png";
+enemySprite.src = "images/livro ptbr.png";
+xpSprite.src = "images/xp.png";
+heartSprite.src = "images/heart.png";

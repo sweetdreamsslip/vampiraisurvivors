@@ -1,0 +1,40 @@
+var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
+    const scale = 2.3;
+    return {
+        x: x,
+        y: y,
+        radius: 16 * scale, 
+        initial_angle: initial_angle,
+        exists: true,
+        damage: damage,
+
+        // Propriedades do Sprite
+        sprite: spriteSheet,
+        frameWidth: 32,
+        frameHeight: 32,
+        scale: scale,
+
+        render: function(ctx){
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.initial_angle + Math.PI);
+
+            const renderWidth = this.frameWidth * this.scale;
+            const renderHeight = this.frameHeight * this.scale;
+
+            ctx.drawImage(
+                this.sprite,
+                -renderWidth / 2, -renderHeight / 2, // Centraliza o sprite no destino
+                renderWidth, renderHeight
+            );
+            ctx.restore();
+        },
+        update: function(dt){
+            this.x += Math.cos(this.initial_angle) * player_status.projectile_speed * dt;
+            this.y += Math.sin(this.initial_angle) * player_status.projectile_speed * dt;
+            if(outOfBounds(this.x, this.y, WIDTH, HEIGHT)){
+                this.exists = false;
+            }
+        },
+    }
+};
