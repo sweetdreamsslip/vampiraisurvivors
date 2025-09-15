@@ -3,7 +3,7 @@ var player_status_configurations = {
         speed: 0.4, // Velocidade inicial boa
         max_health: 100, // Vida inicial adequada
         projectile_speed: 0.6, // Projéteis com velocidade boa
-        time_between_projectiles: 650, // Disparo razoável
+        time_between_projectiles: 150, // Disparo razoável
         damage: 10, // Dano inicial adequado
         invincibility_time: 1000, // Tempo de invencibilidade bom
         magnet_max_distance: 200, // Alcance de magnet adequado

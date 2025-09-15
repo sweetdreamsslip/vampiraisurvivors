@@ -156,15 +156,11 @@ function update(dt) {
     enemies_list.forEach(function(enemy) {
         enemy.update(dt);
         if(!enemy.alive) {
-<<<<<<< Updated upstream
-            experience_orbs_list.push(new ExperienceOrbObject(enemy.x, enemy.y, 5, "orange", randomIntBetween(1, 10)));
-=======
             // Experiência baseada no nível do inimigo (mais difícil = mais XP)
             var baseExp = 3;
             var levelBonus = Math.floor(enemy.max_health / 25); // Bonus baseado na vida máxima
             var totalExp = baseExp + levelBonus;
-            experience_orbs_list.push(new ExperienceOrbObject(xpSprite, enemy.x, enemy.y, totalExp));
->>>>>>> Stashed changes
+            experience_orbs_list.push(new ExperienceOrbObject(enemy.x, enemy.y, 8, "orange", totalExp));
         }
     });
 
@@ -286,9 +282,11 @@ function render() {
 }
 
 function updateHUD() {
+    // Atualiza informações do HUD
     document.getElementById('healthDisplay').textContent = Math.max(0, player.health);
     document.getElementById('expDisplay').textContent = player.experience;
     document.getElementById('levelDisplay').textContent = player.level;
+    document.getElementById('projectilesDisplay').textContent = projectiles_list.length;
 }
 
 function showGameOver() {
@@ -298,6 +296,7 @@ function showGameOver() {
 }
 
 function startGame() {
+    console.log("startGame chamada!");
     gameStarted = true;
     gamePaused = false;
     document.getElementById('startScreen').style.display = 'none';
@@ -325,6 +324,7 @@ function run() {
 }
 
 function initialize() {
+    console.log("Inicializando jogo...");
     //initialize player
     player = PlayerObject(playerSprite);
     //initialize enemies - começar com menos inimigos
@@ -346,7 +346,9 @@ function initialize() {
 let imagesToLoad = 3;
 function onImageLoaded() {
     imagesToLoad--;
+    console.log("Imagem carregada! Restam:", imagesToLoad);
     if (imagesToLoad === 0) {
+        console.log("Todas as imagens carregadas, inicializando...");
         initialize();
     }
 }
