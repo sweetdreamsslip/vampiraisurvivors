@@ -872,7 +872,11 @@ function getUnusedQuestion(difficulty) {
         usedQuestions[difficulty].push(originalIndex);
     }
     
-    return selectedQuestion;
+    // ========================================
+    // MUDANÇA PRINCIPAL: EMBARALHAMENTO DE RESPOSTAS
+    // ========================================
+    // Aplicar embaralhamento para evitar que jogador decore posições
+    return QuizSystem.shuffleOptions(selectedQuestion);
 }
 
 // Função para mostrar estatísticas de perguntas (debug)
