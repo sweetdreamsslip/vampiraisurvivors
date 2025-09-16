@@ -109,7 +109,114 @@ var availableUpgrades = [
     }
 ];
 
-// Função para mostrar interface de seleção de upgrade
+// Variáveis do sistema de upgrade
+var upgradeScreenVisible = false;
+var currentQuizQuestion = null;
+var selectedUpgrade = null;
+
+// Função para mostrar tela de upgrade
+function showUpgradeScreen() {
+    upgradeScreenVisible = true;
+    gamePaused = true;
+    
+    // Usar o sistema completo de perguntas
+    var difficulty = 'normal'; // Usar dificuldade normal como padrão
+    currentQuizQuestion = getUnusedQuestion(difficulty);
+    
+    // Criar interface de upgrade
+    createUpgradeInterface();
+}
+
+// Função para criar interface de upgrade
+function createUpgradeInterface() {
+    // Remover interface anterior se existir
+    var existingInterface = document.getElementById('upgradeInterface');
+    if (existingInterface) {
+        existingInterface.remove();
+    }
+    
+    // Criar div da interface
+    var upgradeDiv = document.createElement('div');
+    upgradeDiv.id = 'upgradeInterface';
+    upgradeDiv.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        color: white;
+        font-family: 'Arial', sans-serif;
+    `;
+    
+    // Título
+    var title = document.createElement('h1');
+    title.textContent = '🎉 LEVEL UP! 🎉';
+    title.style.cssText = 'color: #FFD700; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
+    upgradeDiv.appendChild(title);
+    
+    // Pergunta do quiz
+    var questionDiv = document.createElement('div');
+    questionDiv.style.cssText = 'background: rgba(255, 107, 107, 0.2); padding: 20px; border-radius: 10px; margin-bottom: 30px; max-width: 600px; text-align: center;';
+    
+    var questionText = document.createElement('h2');
+    questionText.textContent = currentQuizQuestion.question;
+    questionText.style.cssText = 'margin-bottom: 20px; font-size: 1.5em;';
+    questionDiv.appendChild(questionText);
+    
+    // Opções de resposta
+    var optionsDiv = document.createElement('div');
+    optionsDiv.style.cssText = 'display: flex; flex-direction: column; gap: 10px;';
+    
+    currentQuizQuestion.options.forEach((option, index) => {
+        var optionButton = document.createElement('button');
+        optionButton.textContent = `${String.fromCharCode(65 + index)}) ${option}`;
+        optionButton.style.cssText = `
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid #ff6b6b;
+            padding: 15px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        `;
+        
+        optionButton.addEventListener('mouseenter', function() {
+            this.style.background = 'rgba(255, 107, 107, 0.3)';
+            this.style.transform = 'scale(1.05)';
+        });
+        
+        optionButton.addEventListener('mouseleave', function() {
+            this.style.background = 'rgba(255, 255, 255, 0.1)';
+            this.style.transform = 'scale(1)';
+        });
+        
+        optionButton.addEventListener('click', function() {
+            selectAnswer(index);
+        });
+        
+        optionsDiv.appendChild(optionButton);
+    });
+    
+    questionDiv.appendChild(optionsDiv);
+    upgradeDiv.appendChild(questionDiv);
+    
+    // Instruções
+    var instructions = document.createElement('p');
+    instructions.textContent = 'Responda corretamente para ganhar um upgrade especial!';
+    instructions.style.cssText = 'font-size: 1.2em; color: #ccc; margin-top: 20px;';
+    upgradeDiv.appendChild(instructions);
+    
+    document.body.appendChild(upgradeDiv);
+}
+
+// Função para criar interface de seleção de upgrades
 function createUpgradeSelectionInterface() {
     // Pausar jogo
     gamePaused = true;
@@ -123,6 +230,41 @@ function createUpgradeSelectionInterface() {
         selectedUpgrades.push(available[randomIndex]);
         available.splice(randomIndex, 1);
     }
+    
+    // Criar div da interface
+    var upgradeDiv = document.createElement('div');
+    upgradeDiv.id = 'upgradeInterface';
+    upgradeDiv.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        color: white;
+        font-family: 'Arial', sans-serif;
+    `;
+    
+    // Título
+    var title = document.createElement('h1');
+    title.textContent = '🎉 LEVEL UP! 🎉';
+    title.style.cssText = 'color: #FFD700; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
+    upgradeDiv.appendChild(title);
+    
+    // Instruções
+    var instructions = document.createElement('p');
+    instructions.textContent = 'Escolha um upgrade para continuar:';
+    instructions.style.cssText = 'font-size: 1.5em; margin-bottom: 30px; color: #ccc;';
+    upgradeDiv.appendChild(instructions);
+    
+    // Container dos upgrades
+    var upgradesContainer = document.createElement('div');
+    upgradesContainer.style.cssText = 'display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 900px;';
     
     // Criar interface
     var upgradeDiv = document.createElement('div');
@@ -177,24 +319,9 @@ function createUpgradeSelectionInterface() {
             selectUpgrade(upgradeType);
         });
     });
-}
-
-// Função para selecionar upgrade
-function selectUpgrade(upgradeType) {
-    // Aplicar upgrade
-    applyUpgrade(upgradeType);
     
-    // Remover interface
-    var upgradeDiv = document.getElementById('upgradeSelection');
-    if (upgradeDiv) {
-        upgradeDiv.remove();
-    }
-    
-    // Despausar jogo
-    gamePaused = false;
-    
-    // Mostrar resultado
-    showUpgradeResult(true, upgradeType);
+    upgradeDiv.appendChild(upgradesContainer);
+    document.body.appendChild(upgradeDiv);
 }
 
 // Função para aplicar upgrade
@@ -257,6 +384,43 @@ function applyUpgrade(upgradeType) {
     }
 }
 
+// Função para selecionar upgrade
+function selectUpgrade(upgradeType) {
+    // Aplicar upgrade
+    applyUpgrade(upgradeType);
+    
+    // Remover interface
+    var upgradeDiv = document.getElementById('upgradeSelection');
+    if (upgradeDiv) {
+        upgradeDiv.remove();
+    }
+    
+    // Despausar jogo
+    gamePaused = false;
+    
+    // Mostrar resultado
+    showUpgradeResult(true, upgradeType);
+}
+
+// Função para selecionar resposta
+function selectAnswer(selectedIndex) {
+    var isCorrect = selectedIndex === currentQuizQuestion.correct;
+    
+    // Remover interface atual
+    var upgradeInterface = document.getElementById('upgradeInterface');
+    if (upgradeInterface) {
+        upgradeInterface.remove();
+    }
+    
+    if (isCorrect) {
+        // Se acertou, mostrar seleção de 3 upgrades
+        createUpgradeSelectionInterface();
+    } else {
+        // Se errou, mostrar resultado e upgrade básico
+        showUpgradeResult(false, null);
+    }
+}
+
 // Função para mostrar resultado do upgrade
 function showUpgradeResult(correct, upgradeType) {
     var resultDiv = document.createElement('div');
@@ -296,4 +460,27 @@ function showUpgradeResult(correct, upgradeType) {
     setTimeout(() => {
         resultDiv.remove();
     }, 3000);
+}
+
+// Função para aplicar upgrade básico
+function applyBasicUpgrade() {
+    var basicUpgrades = ['health_boost', 'damage_boost', 'speed_boost'];
+    var randomUpgrade = basicUpgrades[Math.floor(Math.random() * basicUpgrades.length)];
+    applyUpgrade(randomUpgrade);
+}
+
+// Função para fechar tela de upgrade
+function closeUpgradeScreen() {
+    var resultDiv = document.getElementById('upgradeResult');
+    if (resultDiv) {
+        resultDiv.remove();
+    }
+    
+    upgradeScreenVisible = false;
+    gamePaused = false;
+}
+
+// Modificar a função levelUp no game_objects.js para usar o sistema de upgrade
+function triggerUpgradeScreen() {
+    showUpgradeScreen();
 }

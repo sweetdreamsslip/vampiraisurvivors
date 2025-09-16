@@ -622,7 +622,6 @@ var CompleteQuizSystem = {
         // Encontrar a nova posição da resposta correta
         shuffledQuestion.correct = shuffledQuestion.options.indexOf(correctAnswer);
         
-        
         return shuffledQuestion;
     }
 };
