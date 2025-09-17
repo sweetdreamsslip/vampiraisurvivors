@@ -1,22 +1,8 @@
 // ========================================
-// SISTEMA COMPLETO DE PERGUNTAS
-// ========================================
-// 
-// Este arquivo contém:
-// - 89 perguntas integradas do arquivo perguntas_jogo_novas.json
-// - Sistema de embaralhamento de respostas (anti-decorar)
-// - Categorização por dificuldade: easy, normal, hard
-// - 4 categorias: Matemática, Ciência, Tecnologia, Piraí
-//
-// MUDANÇAS PRINCIPAIS:
-// 1. Integração de 80 perguntas do JSON original
-// 2. Sistema de embaralhamento Fisher-Yates implementado
-// 3. Função shuffleOptions() para randomizar posições das respostas
-// 4. Compatibilidade com sistema existente mantida
-//
+// SISTEMA DE PERGUNTAS COMPLETO
 // ========================================
 
-var QuestionPoolObject = {
+var CompleteQuizSystem = {
     questions: {
         easy: [
             // MATEMÁTICA - FÁCIL (competência 1)
@@ -80,7 +66,7 @@ var QuestionPoolObject = {
                 correct: 0,
                 category: "Matemática"
             },
-            
+
             // CIÊNCIA - FÁCIL (competência 1)
             {
                 question: "Qual planeta é conhecido como \"Planeta Vermelho\"?",
@@ -142,7 +128,7 @@ var QuestionPoolObject = {
                 correct: 0,
                 category: "Ciência"
             },
-            
+
             // TECNOLOGIA - FÁCIL (competência 1)
             {
                 question: "O que é um teclado?",
@@ -204,8 +190,8 @@ var QuestionPoolObject = {
                 correct: 0,
                 category: "Tecnologia"
             },
-            
-            // PIRAI - FÁCIL (competência 1)
+
+            // PIRAÍ - FÁCIL (competência 1)
             {
                 question: "Piraí está em qual região do estado do Rio de Janeiro?",
                 options: ["Sul Fluminense", "Região dos Lagos", "Norte Fluminense", "Metropolitana"],
@@ -267,7 +253,7 @@ var QuestionPoolObject = {
                 category: "Piraí"
             }
         ],
-        
+
         normal: [
             // MATEMÁTICA - NORMAL (competência 2)
             {
@@ -330,7 +316,7 @@ var QuestionPoolObject = {
                 correct: 0,
                 category: "Matemática"
             },
-            
+
             // CIÊNCIA - NORMAL (competência 2)
             {
                 question: "O que é a camada de ozônio?",
@@ -392,7 +378,7 @@ var QuestionPoolObject = {
                 correct: 0,
                 category: "Ciência"
             },
-            
+
             // TECNOLOGIA - NORMAL (competência 2)
             {
                 question: "O que é uma planilha eletrônica?",
@@ -454,23 +440,23 @@ var QuestionPoolObject = {
                 correct: 0,
                 category: "Tecnologia"
             },
-            
-            // PIRAI - NORMAL (competência 2)
+
+            // PIRAÍ - NORMAL (competência 2)
             {
-                question: "Qual é o distrito de Piraí famoso pela represa?",
-                options: ["Santana", "Jaqueira", "Arrozal", "Varjão"],
+                question: "Qual distrito de Piraí é conhecido pela represa?",
+                options: ["Ribeirão das Lajes", "Jaqueira", "Arrozal", "Varjão"],
                 correct: 0,
                 category: "Piraí"
             },
             {
-                question: "Qual município vizinho tem forte indústria siderúrgica?",
+                question: "Qual município vizinho possui forte indústria siderúrgica?",
                 options: ["Volta Redonda", "Miguel Pereira", "Itatiaia", "Vassouras"],
                 correct: 0,
                 category: "Piraí"
             },
             {
                 question: "Em que ano Piraí foi elevada à categoria de cidade?",
-                options: ["1837", "1850", "1822", "1900"],
+                options: ["1874", "1850", "1822", "1900"],
                 correct: 0,
                 category: "Piraí"
             },
@@ -487,18 +473,6 @@ var QuestionPoolObject = {
                 category: "Piraí"
             },
             {
-                question: "Qual é o nome do distrito de Piraí famoso pela produção rural?",
-                options: ["Varjão", "Centro", "Cacaria", "Santanésia"],
-                correct: 0,
-                category: "Piraí"
-            },
-            {
-                question: "Qual é o nome da ponte histórica de Piraí?",
-                options: ["Ponte dos Arcos", "Ponte da Amizade", "Ponte Nova", "Ponte Antiga"],
-                correct: 0,
-                category: "Piraí"
-            },
-            {
                 question: "Qual é a população aproximada de Piraí?",
                 options: ["30 mil habitantes", "50 mil habitantes", "20 mil habitantes", "80 mil habitantes"],
                 correct: 0,
@@ -506,124 +480,184 @@ var QuestionPoolObject = {
             },
             {
                 question: "Qual é a principal praça do Centro de Piraí?",
-                options: ["Praça Getúlio Vargas", "Praça São João", "Praça Tiradentes", "Praça 15"],
+                options: ["Praça da Preguiça", "Praça São João", "Praça Tiradentes", "Praça 15"],
                 correct: 0,
                 category: "Piraí"
             },
             {
-                question: "Qual é o nome do bairro próximo ao lago do Funil?",
-                options: ["Santanésia", "Arrozal", "Jaqueira", "Cacaria"],
+                question: "Qual é o nome da área de preservação ambiental localizada no centro de Piraí-RJ, conhecida por suas trilhas e contato com a natureza?",
+                options: ["Parque da Mata do Amador", "Parque Lage", "Parque Nacional de Itatiaia", "Parque Barão de Mauá"],
                 correct: 0,
                 category: "Piraí"
             }
         ],
-        
+
         hard: [
-            // Nota: As perguntas do JSON não incluem nível 3 (difícil)
-            // Mantendo algumas perguntas originais como exemplo
-            {
-                question: "Qual é o apelido popular da Praça São Sebastião em Piraí?",
-                options: ["Praça da Preguiça", "Praça da Liberdade", "Praça Central", "Praça da Matriz"],
-                correct: 0,
-                category: "Piraí"
-            },
-            {
-                question: "Em que mês geralmente acontece a Piraí Fest?",
-                options: ["Setembro", "Agosto", "Outubro", "Novembro"],
-                correct: 2,
-                category: "Piraí"
-            },
-            {
-                question: "Qual o nome da igreja famosa dedicada a uma santa em Piraí?",
-                options: ["Paróquia Senhora Sant'Ana.", "Igreja São Sebastião", "Igreja Nossa Senhora da Conceição", "Igreja São Benedito"],
-                correct: 0,
-                category: "Piraí"
-            },
-            
             // MATEMÁTICA - DIFÍCIL (competência 3)
             {
-                question: "Quanto é (8 + 2) × 3?",
-                options: ["30", "24", "28", "32"],
+                question: "Qual é a raiz quadrada de 144?",
+                options: ["12", "11", "13", "10"],
                 correct: 0,
                 category: "Matemática"
             },
             {
-                question: "Um produto custa R$ 200 e está com 10% de desconto. Qual é o valor final?",
-                options: ["180", "190", "175", "185"],
+                question: "Quanto é 15% de 200?",
+                options: ["30", "25", "35", "20"],
                 correct: 0,
                 category: "Matemática"
             },
             {
-                question: "Se um trem sai às 14h e chega às 16h30, quanto tempo durou a viagem?",
-                options: ["2h30min", "2h", "3h", "2h15min"],
+                question: "Qual é o valor de x na equação 2x + 5 = 17?",
+                options: ["6", "5", "7", "4"],
                 correct: 0,
                 category: "Matemática"
             },
-            
-            // TECNOLOGIA - DIFÍCIL (competência 3)
             {
-                question: "O que é programação?",
-                options: ["Dar instruções para o computador executar tarefas", "Montar peças de hardware", "Instalar cabos de rede", "Criar senhas fortes"],
+                question: "Qual é a área de um círculo com raio 7 cm? (π ≈ 3,14)",
+                options: ["153,86 cm²", "154 cm²", "152 cm²", "155 cm²"],
                 correct: 0,
-                category: "Tecnologia"
+                category: "Matemática"
             },
             {
-                question: "O que significa IA?",
-                options: ["Inteligência Artificial", "Interface Analógica", "Internet Automática", "Inovação Avançada"],
+                question: "Quanto é 8² + 6²?",
+                options: ["100", "98", "102", "96"],
                 correct: 0,
-                category: "Tecnologia"
+                category: "Matemática"
             },
-            
+
             // CIÊNCIA - DIFÍCIL (competência 3)
             {
-                question: "O que é um eclipse solar?",
-                options: ["Quando a Lua passa entre a Terra e o Sol", "Quando a Terra passa entre o Sol e a Lua", "Quando o Sol se apaga temporariamente", "Quando a Lua desaparece no céu"],
+                question: "Qual é a velocidade da luz no vácuo?",
+                options: ["300.000 km/s", "150.000 km/s", "450.000 km/s", "600.000 km/s"],
                 correct: 0,
                 category: "Ciência"
+            },
+            {
+                question: "Qual é o processo pelo qual as plantas produzem seu próprio alimento?",
+                options: ["Fotossíntese", "Respiração", "Digestão", "Fermentação"],
+                correct: 0,
+                category: "Ciência"
+            },
+            {
+                question: "Qual é a unidade básica da vida?",
+                options: ["Célula", "Átomo", "Molécula", "Órgão"],
+                correct: 0,
+                category: "Ciência"
+            },
+            {
+                question: "Qual é o gás mais abundante na atmosfera terrestre?",
+                options: ["Nitrogênio", "Oxigênio", "Dióxido de carbono", "Argônio"],
+                correct: 0,
+                category: "Ciência"
+            },
+            {
+                question: "Qual é o processo de divisão celular que produz células idênticas?",
+                options: ["Mitose", "Meiose", "Fotossíntese", "Respiração"],
+                correct: 0,
+                category: "Ciência"
+            },
+
+            // TECNOLOGIA - DIFÍCIL (competência 3)
+            {
+                question: "O que significa HTML?",
+                options: ["HyperText Markup Language", "High Tech Modern Language", "Home Tool Markup Language", "Hyperlink Text Management Language"],
+                correct: 0,
+                category: "Tecnologia"
+            },
+            {
+                question: "Qual é a função de um firewall?",
+                options: ["Proteger contra acessos não autorizados", "Acelerar a internet", "Armazenar arquivos", "Reproduzir vídeos"],
+                correct: 0,
+                category: "Tecnologia"
+            },
+            {
+                question: "O que é um algoritmo?",
+                options: ["Sequência de passos para resolver um problema", "Tipo de hardware", "Programa de computador", "Dispositivo de armazenamento"],
+                correct: 0,
+                category: "Tecnologia"
+            },
+            {
+                question: "Qual é a diferença entre RAM e ROM?",
+                options: ["RAM é volátil, ROM é permanente", "RAM é permanente, ROM é volátil", "Não há diferença", "RAM é mais rápida que ROM"],
+                correct: 0,
+                category: "Tecnologia"
+            },
+            {
+                question: "O que significa CPU?",
+                options: ["Central Processing Unit", "Computer Processing Unit", "Central Program Unit", "Computer Program Unit"],
+                correct: 0,
+                category: "Tecnologia"
+            },
+
+            // PIRAÍ - DIFÍCIL (competência 3)
+            {
+                question: "Qual é o nome do distrito de Piraí que abriga a Usina Hidrelétrica de Lajes?",
+                options: ["Ribeirão das Lajes", "Jaqueira", "Arrozal", "Varjão"],
+                correct: 0,
+                category: "Piraí"
+            },
+            {
+                question: "Qual é o nome da principal rodovia federal que corta Piraí?",
+                options: ["BR-116 (Rodovia Presidente Dutra)", "BR-101", "BR-040", "BR-393"],
+                correct: 0,
+                category: "Piraí"
+            },
+            {
+                question: "Qual é o nome do rio que dá nome à cidade de Piraí?",
+                options: ["Rio Piraí", "Rio Grande", "Rio Guandu", "Rio Preto"],
+                correct: 0,
+                category: "Piraí"
+            },
+            {
+                question: "Qual é o nome da principal festa popular de Piraí?",
+                options: ["Festa do Peixe", "Festa da Banana", "Festa do Milho", "Festa da Cana"],
+                correct: 0,
+                category: "Piraí"
+            },
+            {
+                question: "Qual é o nome do distrito de Piraí que possui uma estação ferroviária?",
+                options: ["Arrozal", "Jaqueira", "Varjão", "Ribeirão das Lajes"],
+                correct: 0,
+                category: "Piraí"
             }
         ]
     },
-    
-    // ========================================
-    // FUNÇÃO PRINCIPAL: OBTER PERGUNTA ALEATÓRIA
-    // ========================================
+
     getRandomQuestion: function(difficulty) {
-        var questions = this.questions[difficulty] || this.questions['normal'];
-        var question = questions[Math.floor(Math.random() * questions.length)];
-        
-        // Embaralhar as opções para evitar que o jogador decore as posições
-        return this.shuffleOptions(question);
+        var questions = this.questions[difficulty];
+        if (!questions || questions.length === 0) {
+            return null;
+        }
+        return questions[Math.floor(Math.random() * questions.length)];
     },
-    
-    // ========================================
-    // SISTEMA DE EMBARALHAMENTO FISHER-YATES
-    // ========================================
-    // Função que embaralha as opções de resposta para evitar memorização
+
     shuffleOptions: function(question) {
-        // Criar uma cópia da pergunta para não modificar a original
-        var shuffledQuestion = {
-            question: question.question,
-            options: question.options.slice(), // Copiar array de opções de forma compatível
-            correct: question.correct,
-            category: question.category
-        };
+        if (!question || !question.options) return question;
         
-        // Obter a resposta correta antes de embaralhar
-        var correctAnswer = shuffledQuestion.options[shuffledQuestion.correct];
+        var shuffled = question.options.slice();
+        var correctAnswer = shuffled[question.correct];
         
-        // Embaralhar as opções usando algoritmo Fisher-Yates
-        for (var i = shuffledQuestion.options.length - 1; i > 0; i--) {
+        // Embaralha as opções
+        for (var i = shuffled.length - 1; i > 0; i--) {
             var j = Math.floor(Math.random() * (i + 1));
-            var temp = shuffledQuestion.options[i];
-            shuffledQuestion.options[i] = shuffledQuestion.options[j];
-            shuffledQuestion.options[j] = temp;
+            var temp = shuffled[i];
+            shuffled[i] = shuffled[j];
+            shuffled[j] = temp;
         }
         
-        // Encontrar a nova posição da resposta correta
-        shuffledQuestion.correct = shuffledQuestion.options.indexOf(correctAnswer);
+        // Encontra a nova posição da resposta correta
+        var newCorrect = shuffled.indexOf(correctAnswer);
         
-        return shuffledQuestion;
+        return {
+            question: question.question,
+            options: shuffled,
+            correct: newCorrect,
+            category: question.category
+        };
     }
 };
 
-console.log('Sistema completo de perguntas carregado!');
+// Função para obter pergunta não usada (compatibilidade)
+function getUnusedQuestion(difficulty) {
+    return CompleteQuizSystem.getRandomQuestion(difficulty);
+}
