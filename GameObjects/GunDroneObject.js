@@ -17,7 +17,7 @@ var GunDroneObject = function(x, y, distance_to_player) {
         animationSpeed: 150, // ms por frame
         currentFrame: 0,
         frameCount: 6, // 6 frames no total
-        numColumns: 3, // 3 colunas na spritesheet
+        numColumns: 2, // 3 colunas na spritesheet
 
         update: function(dt){
             // Define a posição do drone para ser fixa em relação ao jogador,
