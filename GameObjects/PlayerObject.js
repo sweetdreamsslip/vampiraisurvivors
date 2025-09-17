@@ -79,6 +79,11 @@ var PlayerObject = function(idleWalkSpriteSheet, shootingSpriteSheet, shootingAn
         this.shootingStateTimer = this.shootingStateDuration;
     },
 
+    attack: function(angle = 0){
+        console.log("Termina de implementar isso aqui faz favor");
+        this.triggerShootingAnimation();
+    },
+
 
 
 
