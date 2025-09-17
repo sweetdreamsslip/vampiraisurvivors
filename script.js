@@ -8,8 +8,8 @@ canvas.width = WIDTH;
 canvas.height = HEIGHT;
 
 var scenario = {
-    width: 4450,
-    height: 2230,
+    width: 1920,
+    height: 1080,
 }
 
 // fetch player status configuration
@@ -48,6 +48,7 @@ var playerShootingAndMovingSprite = new Image();
 var xpSprite = new Image();
 var heartSprite = new Image();
 var backgroundSprite = new Image();
+var gunDroneSprite = new Image();
 
 
 var camera = new CameraObject(scenario.width, scenario.height, WIDTH, HEIGHT);
@@ -239,6 +240,10 @@ function update(dt) {
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(backgroundSprite, -WIDTH/2 - camera.x, -HEIGHT/2 - camera.y, 3*WIDTH, 3*HEIGHT);
+
+    // Desenha o fundo do cenário, movendo-o de acordo com a câmera para criar o efeito de scroll.
+    // A imagem de fundo tem o mesmo tamanho do cenário.
+    ctx.drawImage(backgroundSprite, -camera.x, -camera.y, scenario.width, scenario.height);
     if (gameStarted && !gamePaused) {
         //enemy rendering
         experience_orbs_list.forEach(function(orb) {
@@ -370,7 +375,7 @@ function run() {
 
 
 
-let imagesToLoad = 7;
+let imagesToLoad = 9; // Aumentado para incluir a nova imagem
 function onImageLoaded() {
     imagesToLoad--;
     if (imagesToLoad === 0) {
@@ -386,6 +391,7 @@ playerShootingAndMovingSprite.onload = onImageLoaded;
 xpSprite.onload = onImageLoaded;
 heartSprite.onload = onImageLoaded;
 backgroundSprite.onload = onImageLoaded;
+gunDroneSprite.onload = onImageLoaded;
 
 playerSprite.src = "images/estudante.png";
 projectileSprite.src = "images/lapis2.png";
@@ -394,4 +400,5 @@ playerShootingSprite.src = "images/estudanteatirando.png";
 playerShootingAndMovingSprite.src = "images/atirandoecorrendo.png";
 xpSprite.src = "images/xp.png";
 heartSprite.src = "images/heart.png";
-backgroundSprite.src = "images/forest.jpg";
+backgroundSprite.src = "images/bg.png";
+gunDroneSprite.src = "images/Dogpet.png";
