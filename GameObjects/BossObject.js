@@ -137,11 +137,12 @@ BossObject.prototype.render = function(ctx, camera) {
     // Draw boss sprite with animation (same logic as EnemyObject)
     ctx.globalAlpha = 1.0;
     ctx.translate(-camera.x, -camera.y);
-    // Turn sprite to face player
+    // Turn sprite to face player (disabled for boss to prevent text mirroring)
     ctx.translate(this.x, this.y);
-    if (player.x < this.x) {
-        ctx.scale(-1, 1);
-    }
+    // Boss always faces the same direction to keep text readable
+    // if (player.x < this.x) {
+    //     ctx.scale(-1, 1);
+    // }
 
     // Calculate animation frame
     const frameX = (this.currentFrame % this.numColumns) * this.frameWidth;
