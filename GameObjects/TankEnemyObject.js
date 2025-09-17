@@ -13,13 +13,20 @@ var TankEnemyObject = function(sprite, x, y, health, damage) {
         speed: 0.4, // Muito mais lento
         alive: true,
         sprite: sprite,
-        frameWidth: 32,
-        frameHeight: 32,
+        frameWidth: 42,
+        frameHeight: 42,
         scale: scale,
         invincibility_time: 0,
         isBoss: false,
         enemyType: 'tank', // Identificador do tipo
         
+        // Propriedades de animação
+        animationTimer: 0,
+        animationSpeed: 250, // ms por frame, mais lento para um inimigo pesado
+        currentFrame: 0,
+        frameCount: 4,
+        numColumns: 2,
+
         // Propriedades específicas do TankEnemy
         charge_timer: 0,
         charge_cooldown: 5000, // 5 segundos entre cargas
@@ -57,9 +64,11 @@ var TankEnemyObject = function(sprite, x, y, health, damage) {
             
             // Sprite do inimigo
             if (this.sprite && this.sprite.complete) {
+                const frameX = (this.currentFrame % this.numColumns) * this.frameWidth;
+                const frameY = Math.floor(this.currentFrame / this.numColumns) * this.frameHeight;
                 ctx.drawImage(
                     this.sprite,
-                    0, 0, this.frameWidth, this.frameHeight,
+                    frameX, frameY, this.frameWidth, this.frameHeight,
                     this.x - this.radius, this.y - this.radius,
                     this.radius * 2, this.radius * 2
                 );
@@ -98,6 +107,13 @@ var TankEnemyObject = function(sprite, x, y, health, damage) {
         update: function(dt) {
             if (!this.alive) return;
             
+            // Atualiza a animação
+            this.animationTimer += dt;
+            if (this.animationTimer > this.animationSpeed) {
+                this.currentFrame = (this.currentFrame + 1) % this.frameCount;
+                this.animationTimer = 0;
+            }
+
             // Atualizar timer de invencibilidade
             if (this.invincibility_time > 0) {
                 this.invincibility_time -= dt;

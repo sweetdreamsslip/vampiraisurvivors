@@ -53,7 +53,7 @@ var FlyingEnemy = function(x, y){
 
 var TankEnemy = function(x, y){
     let enemy = new TankEnemyObject(
-        enemySprite, 
+        tankSprite, 
         x, 
         y, 
         enemy_status.base_health, 

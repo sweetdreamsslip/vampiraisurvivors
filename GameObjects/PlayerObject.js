@@ -182,6 +182,23 @@ var PlayerObject = function(idleWalkSpriteSheet, shootingSpriteSheet, shootingAn
             }
         }
 
+        // Colisão com o chefe para evitar que o jogador entre nele
+        for (let i = 0; i < enemies_list.length; i++) {
+            const enemy = enemies_list[i];
+            // Verifica se é o chefe e se há colisão
+            if (enemy.isBoss && aabbCircleCollision(this, enemy)) {
+                // Calcula o ângulo do centro do chefe para o centro do jogador
+                const angle = angleBetweenPoints(enemy.x, enemy.y, this.x, this.y);
+                // Calcula a sobreposição dos raios
+                const overlap = (this.radius + enemy.radius) - dist(this.x, this.y, enemy.x, enemy.y);
+                
+                // Empurra o jogador para fora da hitbox do chefe na direção do ângulo de colisão
+                // Adiciona um pequeno buffer (1 pixel) para evitar que fiquem "presos"
+                this.x += Math.cos(angle) * (overlap + 1);
+                this.y += Math.sin(angle) * (overlap + 1);
+            }
+        }
+
         this.isMoving = (this.x !== oldX || this.y !== oldY);
 
         // Atualização da animação

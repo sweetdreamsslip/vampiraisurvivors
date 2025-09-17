@@ -8,8 +8,14 @@ var BossObject = function(sprite, x, y) {
     
     // Make boss sprite twice as big
     this.scale = this.scale * 2; // Double the inherited scale (2.5 * 2 = 5.0)
-    this.radius = 16 * this.scale; // Update collision radius to match new scale
 
+    // Override sprite properties for the boss
+    this.frameWidth = 128;
+    this.frameHeight = 128;
+    this.frameCount = 6;
+    this.numColumns = 2;
+
+    this.radius = (this.frameWidth / 2) * this.scale; // Update collision radius to match new scale and frame size
     this.max_health = enemy_status.base_health * 10;
     this.health = this.max_health;
     

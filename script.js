@@ -49,7 +49,9 @@ var xpSprite = new Image();
 var heartSprite = new Image();
 var backgroundSprite = new Image();
 var gunDroneSprite = new Image();
-
+var gunDroneProjectileSprite = new Image();
+var tankSprite = new Image();
+var bossSprite = new Image();
 
 var camera = new CameraObject(scenario.width, scenario.height, WIDTH, HEIGHT);
 var is_gamepad_connected = false;
@@ -70,7 +72,6 @@ function createParticleExplosion(x, y, color, count) {
         particles_list.push(new ParticleObject(x, y, color, speed, angle, lifespan));
     }
 }
-
 
 
 // event listeners
@@ -239,7 +240,6 @@ function update(dt) {
 // render function
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(backgroundSprite, -WIDTH/2 - camera.x, -HEIGHT/2 - camera.y, 3*WIDTH, 3*HEIGHT);
 
     // Desenha o fundo do cenário, movendo-o de acordo com a câmera para criar o efeito de scroll.
     // A imagem de fundo tem o mesmo tamanho do cenário.
@@ -375,7 +375,7 @@ function run() {
 
 
 
-let imagesToLoad = 9; // Aumentado para incluir a nova imagem
+let imagesToLoad = 11;
 function onImageLoaded() {
     imagesToLoad--;
     if (imagesToLoad === 0) {
@@ -392,6 +392,9 @@ xpSprite.onload = onImageLoaded;
 heartSprite.onload = onImageLoaded;
 backgroundSprite.onload = onImageLoaded;
 gunDroneSprite.onload = onImageLoaded;
+gunDroneProjectileSprite.onload = onImageLoaded;
+tankSprite.onload = onImageLoaded;
+bossSprite.onload = onImageLoaded;
 
 playerSprite.src = "images/estudante.png";
 projectileSprite.src = "images/lapis2.png";
@@ -402,3 +405,6 @@ xpSprite.src = "images/xp.png";
 heartSprite.src = "images/heart.png";
 backgroundSprite.src = "images/bg.png";
 gunDroneSprite.src = "images/Dogpet.png";
+gunDroneProjectileSprite.src = "images/petprojectile.png";
+tankSprite.src = "images/tank.png";
+bossSprite.src = "images/bossmath.png";

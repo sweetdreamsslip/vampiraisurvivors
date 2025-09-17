@@ -16,7 +16,7 @@ var GunDroneObject = function(x, y, distance_to_player) {
         animationTimer: 0,
         animationSpeed: 150, // ms por frame
         currentFrame: 0,
-        frameCount: 5, // 5 frames no total
+        frameCount: 6, // 6 frames no total
         numColumns: 3, // 3 colunas na spritesheet
 
         update: function(dt){
@@ -38,7 +38,7 @@ var GunDroneObject = function(x, y, distance_to_player) {
             this.time_since_last_projectile += dt;
             if(this.time_since_last_projectile >= player_status.time_between_gun_drone_projectiles){
                 // O drone atira na direção da mira do jogador, não na sua própria direção orbital
-                projectiles_list.push(new ProjectileObject(projectileSprite, this.x, this.y, angle_between_player_and_mouse, player_status.gun_drone_damage));
+                projectiles_list.push(new GrowingProjectileObject(gunDroneProjectileSprite, this.x, this.y, angle_between_player_and_mouse, player_status.gun_drone_damage));
                 this.time_since_last_projectile = 0;
             }
 

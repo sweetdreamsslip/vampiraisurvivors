@@ -118,7 +118,7 @@ function spawnBoss() {
         var x = WIDTH / 2;
         var y = HEIGHT / 2;
         
-        var boss = new BossObject(enemySprite, x, y, bossHealth, bossHealth);
+        var boss = new BossObject(bossSprite, x, y, bossHealth, bossHealth);
         boss.base_damage = bossDamage;
         boss.base_speed = 0.1; // Mais rápido
         enemies_list.push(boss);

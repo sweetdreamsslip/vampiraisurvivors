@@ -6,7 +6,7 @@ function initialize() {
         gun_drones_list.push(new GunDroneObject(player.x + 60, player.y, 60));
     }
 
-    enemies_list.push(new BossObject(enemySprite, WIDTH / 2, HEIGHT / 2, 100));
+    enemies_list.push(new BossObject(bossSprite, WIDTH / 2, HEIGHT / 2, 100));
     console.log(enemies_list[0]);
     //initialize experience orbs
     /*

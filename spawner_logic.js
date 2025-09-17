@@ -34,6 +34,6 @@ var SpawnerObject = function(){
     },
 
     this.spawnBoss = function(){
-        enemies_list.push(new BossObject(enemySprite, randomIntBetween(0, scenario.width), randomIntBetween(0, scenario.height), 100));
+        enemies_list.push(new BossObject(bossSprite, randomIntBetween(0, scenario.width), randomIntBetween(0, scenario.height), 100));
     }
 }
