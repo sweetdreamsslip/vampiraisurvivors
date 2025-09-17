@@ -1,114 +1,7 @@
 // Sistema de Upgrades e Quiz para Vampiraí Survivors
 
-// Banco de perguntas sobre Piraí e Tecnologia
-var quizQuestions = {
-    "pirai": [
-        {
-            question: "Qual é a principal atividade econômica de Piraí?",
-            options: ["Agricultura", "Pecuária", "Indústria", "Tecnologia"],
-            correct: 3,
-            upgrade: "tech_boost"
-        },
-        {
-            question: "Piraí é conhecida como a 'Capital da Tecnologia' de qual estado?",
-            options: ["São Paulo", "Rio de Janeiro", "Minas Gerais", "Bahia"],
-            correct: 1,
-            upgrade: "speed_boost"
-        },
-        {
-            question: "Qual empresa de tecnologia tem sede em Piraí?",
-            options: ["Microsoft", "Google", "IBM", "Nenhuma das anteriores"],
-            correct: 3,
-            upgrade: "health_boost"
-        },
-        {
-            question: "Piraí fica na região do Vale do Paraíba?",
-            options: ["Sim", "Não", "Parcialmente", "Depende da estação"],
-            correct: 0,
-            upgrade: "damage_boost"
-        },
-        {
-            question: "Qual é o nome do parque tecnológico de Piraí?",
-            options: ["Tech Valley", "Piraí Tech Park", "Vale do Silício Brasileiro", "Não possui"],
-            correct: 3,
-            upgrade: "projectile_speed"
-        },
-        {
-            question: "Piraí é considerada uma cidade inteligente?",
-            options: ["Sim, totalmente", "Parcialmente", "Não", "Apenas no futuro"],
-            correct: 0,
-            upgrade: "fire_rate"
-        },
-        {
-            question: "Qual curso de tecnologia é oferecido em Piraí?",
-            options: ["Ciência da Computação", "Engenharia de Software", "Sistemas de Informação", "Todos os anteriores"],
-            correct: 3,
-            upgrade: "magnet_range"
-        }
-    ],
-    "tecnologia": [
-        {
-            question: "Qual linguagem de programação é mais usada para desenvolvimento web?",
-            options: ["Python", "JavaScript", "C++", "Assembly"],
-            correct: 1,
-            upgrade: "projectile_speed"
-        },
-        {
-            question: "O que significa HTML?",
-            options: ["HyperText Markup Language", "High Tech Modern Language", "Home Tool Markup Language", "Hyperlink Text Management Language"],
-            correct: 0,
-            upgrade: "fire_rate"
-        },
-        {
-            question: "Qual protocolo é usado para comunicação segura na web?",
-            options: ["HTTP", "FTP", "HTTPS", "SMTP"],
-            correct: 2,
-            upgrade: "magnet_range"
-        },
-        {
-            question: "O que é um algoritmo?",
-            options: ["Um tipo de hardware", "Uma sequência de passos para resolver um problema", "Uma linguagem de programação", "Um sistema operacional"],
-            correct: 1,
-            upgrade: "invincibility_time"
-        },
-        {
-            question: "Qual é a diferença entre RAM e ROM?",
-            options: ["Não há diferença", "RAM é volátil, ROM é permanente", "ROM é volátil, RAM é permanente", "Ambas são voláteis"],
-            correct: 1,
-            upgrade: "experience_boost"
-        },
-        {
-            question: "O que significa CSS?",
-            options: ["Computer Style Sheets", "Cascading Style Sheets", "Creative Style System", "Central Style Service"],
-            correct: 1,
-            upgrade: "tech_boost"
-        },
-        {
-            question: "Qual é o principal objetivo do Git?",
-            options: ["Editar código", "Controlar versões", "Executar programas", "Criar interfaces"],
-            correct: 1,
-            upgrade: "speed_boost"
-        },
-        {
-            question: "O que é uma API?",
-            options: ["Um tipo de banco de dados", "Interface de programação de aplicações", "Linguagem de programação", "Sistema operacional"],
-            correct: 1,
-            upgrade: "health_boost"
-        },
-        {
-            question: "Qual é a diferença entre frontend e backend?",
-            options: ["Não há diferença", "Frontend é visual, backend é servidor", "Backend é visual, frontend é servidor", "Ambos são iguais"],
-            correct: 1,
-            upgrade: "damage_boost"
-        },
-        {
-            question: "O que é um framework?",
-            options: ["Um tipo de hardware", "Estrutura de desenvolvimento de software", "Linguagem de programação", "Sistema operacional"],
-            correct: 1,
-            upgrade: "projectile_speed"
-        }
-    ]
-};
+
+// usar global QuestionPoolObject
 
 // Sistema de upgrades disponíveis
 var availableUpgrades = {
@@ -188,11 +81,7 @@ function showUpgradeScreen() {
     upgradeScreenVisible = true;
     gamePaused = true;
     
-    // Escolher categoria aleatória
-    var categories = Object.keys(quizQuestions);
-    var randomCategory = categories[Math.floor(Math.random() * categories.length)];
-    var questions = quizQuestions[randomCategory];
-    currentQuizQuestion = questions[Math.floor(Math.random() * questions.length)];
+    currentQuizQuestion = QuestionPoolObject.shuffleOptions(QuestionPoolObject.getRandomQuestion(quiz_difficulty));
     
     // Criar interface de upgrade
     createUpgradeInterface();
@@ -228,9 +117,9 @@ function createUpgradeInterface() {
     var title = document.createElement('h1');
     title.style.cssText = 'color: #FFD700; font-size: 2.25em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; gap: 20px;';
     title.innerHTML = `
-        <img src="lvl.png" alt="Ícone de Level Up" style="height: 1em; image-rendering: pixelated;">
+        <img src="images/lvl.png" alt="Ícone de Level Up" style="height: 1em; image-rendering: pixelated;">
         LEVEL UP!
-        <img src="lvl.png" alt="Ícone de Level Up" style="height: 1em; image-rendering: pixelated;">
+        <img src="images/lvl.png" alt="Ícone de Level Up" style="height: 1em; image-rendering: pixelated;">
     `;
     upgradeDiv.appendChild(title);
     
@@ -297,7 +186,6 @@ function createUpgradeInterface() {
 // Função para selecionar resposta
 function selectAnswer(selectedIndex) {
     var isCorrect = selectedIndex === currentQuizQuestion.correct;
-    var upgradeType = currentQuizQuestion.upgrade;
     
     // Remover interface atual
     var upgradeInterface = document.getElementById('upgradeInterface');
@@ -306,11 +194,11 @@ function selectAnswer(selectedIndex) {
     }
     
     // Mostrar resultado
-    showUpgradeResult(isCorrect, upgradeType);
+    showUpgradeResult(isCorrect);
 }
 
 // Função para mostrar resultado do upgrade
-function showUpgradeResult(isCorrect, upgradeType) {
+function showUpgradeResult(isCorrect) {
     var resultDiv = document.createElement('div');
     resultDiv.id = 'upgradeResult';
     resultDiv.style.cssText = `
@@ -328,12 +216,15 @@ function showUpgradeResult(isCorrect, upgradeType) {
         color: white;
     `;
     
+    // Selecionar upgrade aleatório
+    var upgradeKeys = Object.keys(availableUpgrades);
+    var randomUpgradeKey = upgradeKeys[Math.floor(Math.random() * upgradeKeys.length)];
+    var upgrade = availableUpgrades[randomUpgradeKey];
+    
+    // Aplicar upgrade
+    upgrade.effect();
+    
     if (isCorrect) {
-        var upgrade = availableUpgrades[upgradeType];
-        
-        // Aplicar upgrade
-        upgrade.effect();
-        
         // Título de sucesso
         var title = document.createElement('h1');
         title.textContent = '✅ RESPOSTA CORRETA! ✅';
@@ -373,14 +264,27 @@ function showUpgradeResult(isCorrect, upgradeType) {
         correctAnswer.appendChild(correctText);
         
         var explanation = document.createElement('p');
-        explanation.textContent = 'Você ainda ganha um upgrade básico!';
+        explanation.textContent = 'Você ainda ganha um upgrade!';
         explanation.style.cssText = 'font-size: 1.1em; color: #FFD700;';
         correctAnswer.appendChild(explanation);
         
         resultDiv.appendChild(correctAnswer);
         
-        // Aplicar upgrade básico
-        applyBasicUpgrade();
+        // Informações do upgrade (mesmo para resposta incorreta)
+        var upgradeInfo = document.createElement('div');
+        upgradeInfo.style.cssText = 'background: rgba(76, 175, 80, 0.2); padding: 30px; border-radius: 15px; text-align: center; max-width: 500px; margin-top: 20px;';
+        
+        var upgradeName = document.createElement('h2');
+        upgradeName.textContent = upgrade.name;
+        upgradeName.style.cssText = 'color: #FFD700; font-size: 2em; margin-bottom: 15px;';
+        upgradeInfo.appendChild(upgradeName);
+        
+        var upgradeDesc = document.createElement('p');
+        upgradeDesc.textContent = upgrade.description;
+        upgradeDesc.style.cssText = 'font-size: 1.3em; margin-bottom: 20px;';
+        upgradeInfo.appendChild(upgradeDesc);
+        
+        resultDiv.appendChild(upgradeInfo);
     }
     
     // Botão para continuar
@@ -417,12 +321,6 @@ function showUpgradeResult(isCorrect, upgradeType) {
     document.body.appendChild(resultDiv);
 }
 
-// Função para aplicar upgrade básico
-function applyBasicUpgrade() {
-    var basicUpgrades = ['health_boost', 'damage_boost', 'speed_boost'];
-    var randomUpgrade = basicUpgrades[Math.floor(Math.random() * basicUpgrades.length)];
-    availableUpgrades[randomUpgrade].effect();
-}
 
 // Função para fechar tela de upgrade
 function closeUpgradeScreen() {

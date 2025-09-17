@@ -16,9 +16,10 @@ var ParticleObject = function(x, y, color, speed, angle, lifespan) {
             this.vx *= 0.98;
             this.vy *= 0.98;
         },
-        render: function(ctx) {
+        render: function(ctx, camera) {
             if (this.lifespan <= 0) return;
             ctx.save();
+            ctx.translate(-camera.x, -camera.y);
             // Fade out effect
             ctx.globalAlpha = Math.max(0, this.lifespan / this.initial_lifespan);
             ctx.fillStyle = this.color;

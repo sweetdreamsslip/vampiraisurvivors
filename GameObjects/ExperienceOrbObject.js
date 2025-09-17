@@ -14,8 +14,9 @@ var ExperienceOrbObject = function(spriteSheet, x, y, experience_value) {
         frameHeight: 32,
         scale: scale,
 
-        render: function(ctx){
+        render: function(ctx, camera){
             ctx.save();
+            ctx.translate(-camera.x, -camera.y);
             ctx.translate(this.x, this.y);
 
             const renderWidth = this.frameWidth * this.scale;

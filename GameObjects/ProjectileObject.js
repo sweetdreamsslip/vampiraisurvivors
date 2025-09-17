@@ -14,8 +14,9 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
         frameHeight: 32,
         scale: scale,
 
-        render: function(ctx){
+        render: function(ctx, camera){
             ctx.save();
+            ctx.translate(-camera.x, -camera.y);
             ctx.translate(this.x, this.y);
             ctx.rotate(this.initial_angle + Math.PI);
 
@@ -32,7 +33,7 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
         update: function(dt){
             this.x += Math.cos(this.initial_angle) * player_status.projectile_speed * dt;
             this.y += Math.sin(this.initial_angle) * player_status.projectile_speed * dt;
-            if(outOfBounds(this.x, this.y, WIDTH, HEIGHT)){
+            if(outOfBounds(this.x, this.y, scenario.width, scenario.height)){
                 this.exists = false;
             }
         },

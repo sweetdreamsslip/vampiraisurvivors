@@ -1,4 +1,4 @@
-var PlayerObject = function(spriteSheet){
+var PlayerObject = function(idleWalkSpriteSheet, shootingSpriteSheet, shootingAndMovingSpriteSheet){
     const scale = 3;
     return {
     x: 400,
@@ -10,7 +10,7 @@ var PlayerObject = function(spriteSheet){
     level: 1,
 
     // Propriedades do Sprite
-    sprite: spriteSheet,
+    sprite: idleWalkSpriteSheet,
     frameWidth: 32,
     frameHeight: 32,
     scale: scale,
@@ -21,6 +21,23 @@ var PlayerObject = function(spriteSheet){
     currentFrame: 0,
     frameCount: 2, // 2 colunas para a animação
     isMoving: false,
+    currentState: 'idle', // 'idle', 'moving', 'shooting', 'shooting_moving'
+
+    // Propriedades da Animação de Tiro
+    shootingSprite: shootingSpriteSheet,
+    isShooting: false,
+    shootingFrameCount: 6, // 2 colunas, 3 linhas
+    shootingNumColumns: 2,
+    shootingAnimationSpeed: 50, // ms por frame
+    shootingStateTimer: 0,
+    shootingStateDuration: 300, // 6 frames * 50ms
+
+    // Propriedades da Animação de Tiro e Corrida
+    shootingAndMovingSprite: shootingAndMovingSpriteSheet,
+    shootingAndMovingFrameCount: 10,
+    shootingAndMovingNumColumns: 3,
+    shootingAndMovingAnimationSpeed: 60,
+
     take_damage: function(damage){
         if(this.invincibility_time <= 0){
             this.health -= damage;
@@ -56,8 +73,23 @@ var PlayerObject = function(spriteSheet){
         // Mostrar tela de upgrade com quiz
         triggerUpgradeScreen();
     },
-    render: function(ctx){
+
+    triggerShootingAnimation: function() {
+        this.isShooting = true;
+        this.shootingStateTimer = this.shootingStateDuration;
+    },
+
+
+
+
+
+
+
+
+
+    render: function(ctx, camera){
         ctx.save();
+
         // Efeito de piscar quando invencível
         if(this.invincibility_time > 0){
             if (Math.floor(this.invincibility_time / 100) % 2 === 0) {
@@ -65,29 +97,63 @@ var PlayerObject = function(spriteSheet){
             }
         }
 
-        ctx.translate(this.x, this.y);
+        // Aplicar offset da câmera (mesmo padrão dos outros objetos)
+        ctx.translate(-camera.x, -camera.y);
+
         // Vira o sprite com base na direção da mira
+        ctx.translate(this.x, this.y);
         if (angle_between_player_and_mouse < Math.PI / 2 || angle_between_player_and_mouse > 3 * Math.PI / 2) {
             ctx.scale(-1, 1);
         }
 
-        // Calcula qual frame desenhar (usando a primeira linha do spritesheet)
-        let frameX = this.currentFrame * this.frameWidth;
-        let frameY = 0;
+        let spriteToUse, frameX, frameY;
+        if (this.currentState === 'shooting_moving') {
+            spriteToUse = this.shootingAndMovingSprite;
+            frameX = (this.currentFrame % this.shootingAndMovingNumColumns) * this.frameWidth;
+            frameY = Math.floor(this.currentFrame / this.shootingAndMovingNumColumns) * this.frameHeight;
+        } else if (this.currentState === 'shooting') {
+            spriteToUse = this.shootingSprite;
+            frameX = (this.currentFrame % this.shootingNumColumns) * this.frameWidth;
+            frameY = Math.floor(this.currentFrame / this.shootingNumColumns) * this.frameHeight;
+        } else {
+            spriteToUse = this.sprite; // 'moving' ou 'idle'
+            frameX = this.currentFrame * this.frameWidth;
+            frameY = 0;
+        }
 
         const renderWidth = this.frameWidth * this.scale;
         const renderHeight = this.frameHeight * this.scale;
 
+        // Desenha o círculo de colisão do player
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        ctx.arc(0, 0, this.radius, 0, 2 * Math.PI);
+        ctx.globalAlpha = 0.2;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+
+        // Desenha o sprite do player centralizado
         ctx.drawImage(
-            this.sprite,
+            spriteToUse,
             frameX, frameY, // origem x, y
             this.frameWidth, this.frameHeight, // origem largura, altura
-            -renderWidth / 2, -renderHeight / 2, // destino x, y (centralizado na origem)
-            renderWidth, renderHeight // destino largura, altura
+            -renderWidth / 2, // desenha centralizado
+            -renderHeight / 2,
+            renderWidth, renderHeight
         );
 
         ctx.restore();
     },
+
+
+
+
+
+
+
+
+
+
     update: function(dt, moveVector = {x: 0, y: 0}){
         //movement
         let oldX = this.x;
@@ -119,28 +185,71 @@ var PlayerObject = function(spriteSheet){
         this.isMoving = (this.x !== oldX || this.y !== oldY);
 
         // Atualização da animação
-        if (this.isMoving) {
-            this.animationTimer += dt;
-            if (this.animationTimer > this.animationSpeed) {
-                this.currentFrame = (this.currentFrame + 1) % this.frameCount;
-                this.animationTimer = 0;
+        // Atualiza o temporizador de estado de tiro
+        if (this.isShooting) {
+            this.shootingStateTimer -= dt;
+            if (this.shootingStateTimer <= 0) {
+                this.isShooting = false;
             }
+        }
+
+        // Determina o novo estado
+        let newState;
+        if (this.isShooting && this.isMoving) {
+            newState = 'shooting_moving';
+        } else if (this.isShooting) {
+            newState = 'shooting';
+        } else if (this.isMoving) {
+            newState = 'moving';
         } else {
-            this.currentFrame = 0; // Frame de repouso
+            newState = 'idle';
+        }
+
+        // Se o estado mudou, reseta a animação
+        if (newState !== this.currentState) {
+            this.currentState = newState;
+            this.currentFrame = 0;
+            this.animationTimer = 0;
+        }
+
+        // Atualiza a animação com base no estado atual
+        this.animationTimer += dt;
+        switch (this.currentState) {
+            case 'shooting_moving':
+                if (this.animationTimer > this.shootingAndMovingAnimationSpeed) {
+                    this.currentFrame = (this.currentFrame + 1) % this.shootingAndMovingFrameCount;
+                    this.animationTimer = 0;
+                }
+                break;
+            case 'shooting':
+                if (this.animationTimer > this.shootingAnimationSpeed) {
+                    this.currentFrame = (this.currentFrame + 1) % this.shootingFrameCount;
+                    this.animationTimer = 0;
+                }
+                break;
+            case 'moving':
+                if (this.animationTimer > this.animationSpeed) {
+                    this.currentFrame = (this.currentFrame + 1) % this.frameCount;
+                    this.animationTimer = 0;
+                }
+                break;
+            case 'idle':
+                this.currentFrame = 0;
+                break;
         }
 
         //boundary check (so player doesn't go off the screen)
         if(this.x < 0){
             this.x = 0;
         }
-        if(this.x > WIDTH){
-            this.x = WIDTH;
+        if(this.x > scenario.width){
+            this.x = scenario.width;
         }
         if(this.y < 0){
             this.y = 0;
         }
-        if(this.y > HEIGHT){
-            this.y = HEIGHT;
+        if(this.y > scenario.height){
+            this.y = scenario.height;
         }
     }
 }
