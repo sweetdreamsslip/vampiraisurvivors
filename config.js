@@ -8,6 +8,8 @@ var player_status_configurations = {
         damage: 10,
         invincibility_time: 1000,
         magnet_max_distance: 200,
+        piercing_strength: 0,
+        freezing_effect: 0,
     },
     "debug": {
         speed: 1,
@@ -18,6 +20,8 @@ var player_status_configurations = {
         damage: 10,
         invincibility_time: 1000,
         magnet_max_distance: 100,
+        piercing_strength: 0,
+        freezing_effect: 0,
     },
     "custom": {
         speed: 0.5,
@@ -28,6 +32,8 @@ var player_status_configurations = {
         damage: 10,
         invincibility_time: 1000,
         magnet_max_distance: 100,
+        piercing_strength: 0,
+        freezing_effect: 0,
     }
 }
 

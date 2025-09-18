@@ -7,6 +7,9 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
         initial_angle: initial_angle,
         exists: true,
         damage: damage,
+        piercing_strength: 0,
+        current_pierce_strength: 0,
+        freezing_effect: 0,
 
         // Propriedades do Sprite
         sprite: spriteSheet,
@@ -34,6 +37,8 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
             this.x += Math.cos(this.initial_angle) * player_status.projectile_speed * dt;
             this.y += Math.sin(this.initial_angle) * player_status.projectile_speed * dt;
             if(outOfBounds(this.x, this.y, scenario.width, scenario.height)){
+                this.exists = false;
+            }else if(this.current_pierce_strength >= this.piercing_strength){
                 this.exists = false;
             }
         },

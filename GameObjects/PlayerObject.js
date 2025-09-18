@@ -80,7 +80,7 @@ var PlayerObject = function(idleWalkSpriteSheet, shootingSpriteSheet, shootingAn
     },
 
     attack: function(angle = 0){
-        console.log("Termina de implementar isso aqui faz favor");
+        projectiles_list.push(new ProjectileObject(projectileSprite, this.x, this.y, angle, player_status.damage));
         this.triggerShootingAnimation();
     },
 

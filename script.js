@@ -11,7 +11,7 @@ var scenario = {
     width: 1920,
     height: 1080,
 }
-var camera = new CameraObject(0, 0, WIDTH, HEIGHT);
+var camera = new CameraObject(scenario.width, scenario.height, WIDTH, HEIGHT);
 
 // fetch player status configuration - usar valores padrão inicialmente
 var player_status = Object.assign({}, player_status_configurations[selected_player_status_configuration]);
@@ -156,7 +156,6 @@ window.addEventListener("gamepaddisconnected", function(e) {
 // update function
 function update(dt) {
     if (!gameStarted || gamePaused) return;
-
     camera.update(dt);
     spawner.update(dt);
     time_since_last_projectile += dt;
@@ -176,6 +175,10 @@ function update(dt) {
         player.attack(angle_between_player_and_mouse);
         time_since_last_projectile = 0;
     }
+    //gun drone updating
+    gun_drones_list.forEach(function(gun_drone) {
+        gun_drone.update(dt);
+    });
 
     
     //projectile updating
