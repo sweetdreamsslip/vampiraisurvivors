@@ -6,7 +6,7 @@ var EnemyObject = function(spriteSheet, x, y, max_health, move_speed, base_damag
     this.y = y;
     this.health = max_health;
     this.max_health = max_health;
-    this.radius = 16 * scale; // Raio de colisão
+    this.radius = 10* scale; // Raio de colisão
     this.speed = move_speed;
     this.base_damage = base_damage;
     this.alive = true;
@@ -43,6 +43,13 @@ EnemyObject.prototype.render = function(ctx, camera){
     if (player.x < this.x) {
         ctx.scale(-1, 1);
     }
+
+    ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
+    ctx.beginPath();
+    ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+
+
 
     // Calcula o frame da animação
     const frameX = (this.currentFrame % this.numColumns) * this.frameWidth;

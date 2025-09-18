@@ -3,7 +3,7 @@ var PlayerObject = function(idleWalkSpriteSheet, shootingSpriteSheet, shootingAn
     return {
     x: 400,
     y: 400,
-    radius: 16 * scale, // Raio de colisão, ajustado pela escala
+    radius: 12 * scale, // Raio de colisão, ajustado pela escala
     invincibility_time: 0,
     health: player_status.max_health,
     experience: 0,
@@ -84,7 +84,15 @@ var PlayerObject = function(idleWalkSpriteSheet, shootingSpriteSheet, shootingAn
 
 
 
-
+    renderHitbox(ctx, x, y, radius){
+        // Desenha o círculo de colisão do player
+        ctx.fillStyle = "red";
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        ctx.globalAlpha = 0.2;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    },
 
 
 
@@ -101,6 +109,8 @@ var PlayerObject = function(idleWalkSpriteSheet, shootingSpriteSheet, shootingAn
         // Aplicar offset da câmera (mesmo padrão dos outros objetos)
         ctx.translate(-camera.x, -camera.y);
 
+        this.renderHitbox(ctx, this.x, this.y, this.radius);
+        
         // Vira o sprite com base na direção da mira
         ctx.translate(this.x, this.y);
         if (angle_between_player_and_mouse < Math.PI / 2 || angle_between_player_and_mouse > 3 * Math.PI / 2) {
@@ -125,13 +135,6 @@ var PlayerObject = function(idleWalkSpriteSheet, shootingSpriteSheet, shootingAn
         const renderWidth = this.frameWidth * this.scale;
         const renderHeight = this.frameHeight * this.scale;
 
-        // Desenha o círculo de colisão do player
-        ctx.fillStyle = "red";
-        ctx.beginPath();
-        ctx.arc(0, 0, this.radius, 0, 2 * Math.PI);
-        ctx.globalAlpha = 0.2;
-        ctx.fill();
-        ctx.globalAlpha = 1;
 
         // Desenha o sprite do player centralizado
         ctx.drawImage(
