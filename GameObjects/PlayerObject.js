@@ -60,10 +60,6 @@ var PlayerObject = function(idleWalkSpriteSheet, shootingSpriteSheet, shootingAn
         }
     },
     levelUp: function(){
-        // Melhorias básicas automáticas ao subir de nível
-        player_status.max_health += 20;
-        this.health = player_status.max_health; // Cura completamente
-        
         // Criar efeito visual de level up
         createParticleExplosion(this.x, this.y, "#FFD700", 30);
         

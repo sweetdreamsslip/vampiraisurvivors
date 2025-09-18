@@ -4,7 +4,7 @@ var SpawnerObject = function(){
     this.BOSS_SPAWN_INTERVAL = 60000; // 20 segundos
     this.bossActive = false;
 
-    this.enemy_classes = [NormalBook];
+    this.enemy_classes = [NormalBook, FastBook, DashEnemy, FlyingEnemy, TankEnemy];
     this.time_since_last_spawn = 0;
     this.time_between_spawns = enemy_spawn.time_between_enemy_spawn;
 

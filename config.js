@@ -3,7 +3,7 @@ var player_status_configurations = {
         speed: 0.4,
         max_health: 100,
         projectile_speed: 0.7,
-        time_between_projectiles: 150,
+        time_between_projectiles: 800,
         time_between_gun_drone_projectiles: 2000,
         damage: 10,
         invincibility_time: 1000,
@@ -40,7 +40,7 @@ var player_status_configurations = {
 
 var enemy_spawn_configurations = {
     "default": {
-        time_between_enemy_spawn: 500,
+        time_between_enemy_spawn: 1200,
         initial_amount_of_enemies: 1,
     },
     "debug": {
@@ -53,8 +53,8 @@ var enemy_spawn_configurations = {
 var enemy_status_configurations = {
     "default": {
         base_speed: 0.1,
-        base_damage: 10,
-        base_health: 20,
+        base_damage: 25,
+        base_health: 35,
         base_health_multiplier: 1,
         base_damage_multiplier: 1,
         base_speed_multiplier: 1,
