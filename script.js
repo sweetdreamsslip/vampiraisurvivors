@@ -99,6 +99,10 @@ var mouse = {
 };
 var keys_down = [];
 
+// menu navigation with gamepad
+var menuFocusIndex = 0;
+var lastMenuElement = null;
+
 
 
 function createParticleExplosion(x, y, color, count) {
@@ -155,11 +159,12 @@ window.addEventListener("gamepaddisconnected", function(e) {
 
 // update function
 function update(dt) {
+    const gamepadState = pollGamepad();
+    handleGamepadMenuInput(gamepadState);
+
     if (!gameStarted || gamePaused) return;
     camera.update(dt);
     spawner.update(dt);
-    time_since_last_projectile += dt;
-    const gamepadState = pollGamepad();
 
     // Define o ângulo de mira: prioriza o controle, senão usa o mouse
     if (gamepadState.aimAngle !== null) {
@@ -523,6 +528,72 @@ function togglePause() {
     }
 }
 
+function handleGamepadMenuInput(gamepadState) {
+    // Botão Start (ou Options) sempre pausa/despausa o jogo se já começou
+    if (gamepadState.justPressed.start && gameStarted) {
+        togglePause();
+    }
+
+    // Ações do botão 'A' (confirmar)
+    if (gamepadState.justPressed.a) {
+        // 1. Tela de Início: Clica em "INICIAR JOGO"
+        if (!gameStarted && document.getElementById('startScreen').style.display !== 'none') {
+            document.getElementById('startButton').click();
+            return;
+        }
+
+        // 2. Tela de Game Over: Clica em "JOGAR NOVAMENTE"
+        if (document.getElementById('gameOverScreen').style.display !== 'none') {
+            document.getElementById('restartButton').click();
+            return;
+        }
+
+        // 3. Menus de Quiz ou Upgrade: Clica no botão focado
+        const activeMenu = document.getElementById('powerUpQuiz') || document.getElementById('upgradeInterface') || document.getElementById('upgradeResult');
+        if (activeMenu) {
+            const focusableButtons = activeMenu.querySelectorAll('button');
+            if (focusableButtons.length > 0 && focusableButtons[menuFocusIndex]) {
+                focusableButtons[menuFocusIndex].click();
+                return;
+            }
+        }
+    }
+
+    // Navegação com D-pad (Cima/Baixo) nos menus
+    const activeMenu = document.getElementById('powerUpQuiz') || document.getElementById('upgradeInterface') || document.getElementById('upgradeResult');
+    if (activeMenu) {
+        const focusableButtons = Array.from(activeMenu.querySelectorAll('button'));
+
+        if (lastMenuElement !== activeMenu) {
+            if (lastMenuElement) {
+                lastMenuElement.querySelectorAll('button').forEach(b => b.classList.remove('gamepad-focus'));
+            }
+            menuFocusIndex = 0;
+            lastMenuElement = activeMenu;
+        }
+
+        if (focusableButtons.length > 0) {
+            let newIndex = menuFocusIndex;
+            if (gamepadState.justPressed.down) {
+                newIndex = (menuFocusIndex + 1) % focusableButtons.length;
+            }
+            if (gamepadState.justPressed.up) {
+                newIndex = (menuFocusIndex - 1 + focusableButtons.length) % focusableButtons.length;
+            }
+
+            if (newIndex !== menuFocusIndex || !focusableButtons.some(b => b.classList.contains('gamepad-focus'))) {
+                focusableButtons.forEach(b => b.classList.remove('gamepad-focus'));
+                menuFocusIndex = newIndex;
+                focusableButtons[menuFocusIndex].classList.add('gamepad-focus');
+            }
+        }
+    } else if (lastMenuElement) {
+        lastMenuElement.querySelectorAll('button').forEach(b => b.classList.remove('gamepad-focus'));
+        lastMenuElement = null;
+        menuFocusIndex = 0;
+    }
+}
+
 // run function
 function run() {
     var now = performance.now();
@@ -847,7 +918,7 @@ function spawnBoss() {
     }, 3000); // 3 segundos de aviso
 }
 
-/*
+
 // Função para criar onda de choque
 function createShockwave(x, y, radius, damage) {
     // Efeito visual
@@ -886,4 +957,3 @@ function useProxyTeleport() {
         delete activePowerUps.proxy;
     }
 }
-*/
