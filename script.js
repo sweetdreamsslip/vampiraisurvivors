@@ -431,12 +431,10 @@ function UpdateDebugHUD() {
 }
 
 function updateXPProgressBar() {
-    // Calcular XP necessário para próximo nível
+    // Calcular XP necessário para próximo nível (usando a mesma fórmula do PlayerObject)
     var currentLevel = player.level;
-    var xpForCurrentLevel = Math.floor(50 + (currentLevel * 75));
-    var xpForNextLevel = Math.floor(50 + ((currentLevel + 1) * 75));
-    var xpNeeded = xpForNextLevel - xpForCurrentLevel;
-    var xpProgress = player.experience - xpForCurrentLevel;
+    var xpNeeded = currentLevel * 100; // XP necessário para o próximo nível
+    var xpProgress = player.experience; // XP atual do jogador
     var progressPercentage = Math.max(0, Math.min(100, (xpProgress / xpNeeded) * 100));
     
     // Criar ou atualizar barra de progressão
