@@ -83,7 +83,7 @@ function DashEnemyObject(sprite, x, y, max_health, base_speed, base_damage) {
         }
         else {
             this.moveTowardsPlayer(dt, this.speed);
-            if (this.dash_timer >= this.dash_cooldown) {
+            if (this.dash_timer >= this.dash_cooldown && this.distanceToPoint(player.x, player.y) <= (this.dash_duration * this.dash_speed_multiplier * this.speed)) {
                 this.startRev();
             }
         }
