@@ -847,7 +847,7 @@ function spawnBoss() {
     }, 3000); // 3 segundos de aviso
 }
 
-
+/*
 // Função para criar onda de choque
 function createShockwave(x, y, radius, damage) {
     // Efeito visual
@@ -886,3 +886,4 @@ function useProxyTeleport() {
         delete activePowerUps.proxy;
     }
 }
+*/
