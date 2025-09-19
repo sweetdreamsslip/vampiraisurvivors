@@ -22,6 +22,7 @@ var current_difficulty = "normal";
 // global variables
 var angle_between_player_and_mouse = 0;
 var time_since_last_projectile = 0;
+var survivalTime = 0;
 var time_since_last_enemy_spawn = 0;
 var gamePaused = false;
 var gameStarted = false;
@@ -162,7 +163,8 @@ function update(dt) {
     const gamepadState = pollGamepad();
     handleGamepadMenuInput(gamepadState);
 
-    if (!gameStarted || gamePaused) return;
+    if (!gameStarted || gamePaused) return;    
+    survivalTime += dt;
     camera.update(dt);
     spawner.update(dt);
 
@@ -423,16 +425,21 @@ function updateHUD() {
 
 function UpdateDebugHUD() {
     // Atualiza informações do HUD
-    document.getElementById('expDisplay').textContent = player.experience;
     document.getElementById('levelDisplay').textContent = player.level;
-    document.getElementById('projectilesDisplay').textContent = projectiles_list.length;
+    
+    // Atualizar tempo de sobrevivência
+    const totalSeconds = Math.floor(survivalTime / 1000);
+    const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+    document.getElementById('timeDisplay').textContent = `${minutes}:${seconds}`;
+
     // Atualizar barra de progressão de XP
     updateXPProgressBar();
 }
 
 function updateXPProgressBar() {
     // Calcular XP necessário para próximo nível (usando a mesma fórmula do PlayerObject)
-    var currentLevel = player.level;
+    var currentLevel = player ? player.level : 1;
     var xpNeeded = currentLevel * 100; // XP necessário para o próximo nível
     var xpProgress = player.experience; // XP atual do jogador
     var progressPercentage = Math.max(0, Math.min(100, (xpProgress / xpNeeded) * 100));
@@ -448,7 +455,6 @@ function updateXPProgressBar() {
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid #FFD700;
             border-radius: 10px;
-            margin-top: 5px;
             overflow: hidden;
         `;
         
@@ -464,8 +470,8 @@ function updateXPProgressBar() {
         progressContainer.appendChild(progressBar);
         
         // Adicionar ao HUD
-        var expDisplay = document.getElementById('expDisplay').parentElement;
-        expDisplay.appendChild(progressContainer);
+        var barParent = document.getElementById('xpBarContainer');
+        barParent.appendChild(progressContainer);
     }
     
     // Atualizar largura da barra
@@ -474,27 +480,76 @@ function updateXPProgressBar() {
         progressBar.style.width = progressPercentage + '%';
     }
     
-    // Atualizar texto de progressão
-    var progressText = document.getElementById('xpProgressText');
-    if (!progressText) {
-        progressText = document.createElement('div');
-        progressText.id = 'xpProgressText';
-        progressText.style.cssText = `
-            color: #FFD700;
-            font-size: 12px;
-            text-align: center;
-            margin-top: 2px;
-        `;
-        progressContainer.appendChild(progressText);
-    }
-    
-    progressText.textContent = `${xpProgress}/${xpNeeded} XP para próximo nível`;
 }
 
 function showGameOver() {
     document.getElementById('finalLevel').textContent = player.level;
+
+    // Calcular pontuação
+    const timeInSeconds = Math.floor(survivalTime / 1000);
+    const score = player.experience + (timeInSeconds * 10); // Fórmula: XP + 10 pontos por segundo
+    document.getElementById('finalScore').textContent = score;
+
+    // Salvar e carregar ranking
+    updateRanking(score);
+
     document.getElementById('gameOverScreen').style.display = 'flex';
     gameStarted = false;
+}
+
+function updateRanking(newScore) {
+    const MAX_RANKING_ENTRIES = 5;
+    let rankings = [];
+
+    // Tenta carregar o ranking do localStorage
+    try {
+        const storedRankings = localStorage.getItem('vampiraiSurvivorsRanking');
+        if (storedRankings) {
+            rankings = JSON.parse(storedRankings);
+        }
+    } catch (e) {
+        console.error("Não foi possível carregar o ranking:", e);
+        rankings = [];
+    }
+
+    // Adiciona a nova pontuação
+    rankings.push(newScore);
+
+    // Ordena em ordem decrescente
+    rankings.sort((a, b) => b - a);
+
+    // Mantém apenas os top 5 scores
+    rankings = rankings.slice(0, MAX_RANKING_ENTRIES);
+
+    // Salva o ranking atualizado
+    try {
+        localStorage.setItem('vampiraiSurvivorsRanking', JSON.stringify(rankings));
+    } catch (e) {
+        console.error("Não foi possível salvar o ranking:", e);
+    }
+
+    // Exibe o ranking na tela
+    displayRanking(rankings);
+}
+
+function displayRanking(rankings) {
+    const rankingListElement = document.getElementById('rankingList');
+    rankingListElement.innerHTML = ''; // Limpa a lista anterior
+
+    if (rankings.length === 0) {
+        rankingListElement.innerHTML = '<p style="text-align: center;">Nenhuma pontuação registrada.</p>';
+        return;
+    }
+
+    const ol = document.createElement('ol');
+    ol.style.paddingLeft = '40px'; // Espaçamento para os números da lista
+    rankings.forEach((score) => {
+        const li = document.createElement('li');
+        li.textContent = `${score} pontos`;
+        li.style.marginBottom = '8px';
+        ol.appendChild(li);
+    });
+    rankingListElement.appendChild(ol);
 }
 
 function startGame() {
@@ -507,7 +562,8 @@ function startGame() {
         hard: []
     };
     enemy_projectiles_list = [];
-
+    
+    survivalTime = 0;
     
     gameStarted = true;
     gamePaused = false;

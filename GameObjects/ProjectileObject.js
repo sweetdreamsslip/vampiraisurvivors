@@ -9,6 +9,7 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
         damage: damage,
         piercing_strength: 0,
         current_pierce_strength: 0,
+        attackSound: new Audio('sounds/attacksound.mp4'),
         freezing_effect: 0,
 
         // Propriedades do Sprite
@@ -17,6 +18,9 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
         frameHeight: 32,
         scale: scale,
 
+        playSound: function() {
+            this.attackSound.play();
+        },
         render: function(ctx, camera){
             ctx.save();
             ctx.translate(-camera.x, -camera.y);
@@ -37,8 +41,10 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
             this.x += Math.cos(this.initial_angle) * player_status.projectile_speed * dt;
             this.y += Math.sin(this.initial_angle) * player_status.projectile_speed * dt;
             if(outOfBounds(this.x, this.y, scenario.width, scenario.height)){
+                
                 this.exists = false;
             }else if(this.current_pierce_strength < this.piercing_strength){
+                this.playSound();
                 this.exists = false;
             }
         },

@@ -32,16 +32,21 @@
             <div style="background: rgba(0,0,0,0.7); padding: 15px; border-radius: 10px; border: 2px solid #ff6b6b;">
                 <div style="font-size: 18px; margin-bottom: 10px; display: flex; align-items: center;">&nbsp;<div id="healthDisplayContainer" style="display: flex;"></div></div>
                 <div style="font-size: 18px; margin-bottom: 10px; display: flex; align-items: center;"><img src="images/lvl.png" alt="Ícone de Nível" width="24" height="24" style="margin-right: 8px; image-rendering: pixelated;">Nível: <span id="levelDisplay">1</span></div>
-                <div style="font-size: 18px; margin-bottom: 10px; display: flex; align-items: center;"><img src="images/xp.png" alt="Ícone de Experiência" width="24" height="24" style="margin-right: 8px; image-rendering: pixelated;">Experiência: <span id="expDisplay">0</span></div>
-                
-                <div style="font-size: 18px;">🎯 Projéteis: <span id="projectilesDisplay">0</span></div>
+                <div id="xpBarContainer" style="font-size: 18px; margin-bottom: 10px; display: flex; align-items: center;">
+                </div>
+                <div style="font-size: 18px; display: flex; align-items: center;">🕒 Tempo: <span id="timeDisplay">00:00</span></div>
             </div>
         </div>
 
         <!-- Tela de Game Over -->
         <div id="gameOverScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000;">
             <h1 style="color: #ff6b6b; font-size: 3em; margin-bottom: 20px;">GAME OVER</h1>
-            <p style="color: white; font-size: 1.5em; margin-bottom: 30px;">Você sobreviveu até o nível <span id="finalLevel">1</span>!</p>
+            <p style="color: white; font-size: 1.5em; margin-bottom: 10px;">Você sobreviveu até o nível <span id="finalLevel">1</span>!</p>
+            <p style="color: #FFD700; font-size: 1.8em; margin-bottom: 20px;">Pontuação Final: <span id="finalScore">0</span></p>
+
+            <h2 style="color: white; font-size: 2em; margin-bottom: 15px; border-bottom: 2px solid #ff6b6b; padding-bottom: 5px;">Ranking</h2>
+            <div id="rankingList" style="color: white; font-size: 1.2em; width: 350px; text-align: left; margin-bottom: 30px; max-height: 200px; overflow-y: auto;"></div>
+
             <button id="restartButton" style="background: #ff6b6b; color: white; border: none; padding: 15px 30px; font-size: 1.2em; border-radius: 10px; cursor: pointer;">JOGAR NOVAMENTE</button>
         </div>
     </div>
