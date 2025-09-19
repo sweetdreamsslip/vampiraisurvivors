@@ -1,16 +1,3 @@
-// ========================================
-// SISTEMA DE BOSS
-// ========================================
-// 
-// Este arquivo contém:
-// - Sistema de spawn de boss a cada 60 segundos
-// - Aviso visual antes do spawn
-// - Efeitos visuais dramáticos
-// - Stats balanceados por dificuldade
-// - Limpeza da tela antes do boss
-//
-// ========================================
-
 // Sistema de Boss
 var bossSpawnTimer = 0;
 var BOSS_SPAWN_INTERVAL = 20000; // 60 segundos
@@ -71,74 +58,7 @@ BossProjectileObject.prototype.render = function(ctx, camera) {
 // ========================================
 // SISTEMA DE BOSS
 // ========================================
-function updateBossSystem(dt) {
-    // Spawn do boss
-    if (!bossActive) {
-        bossSpawnTimer += dt;
-        if (bossSpawnTimer >= BOSS_SPAWN_INTERVAL) {
-            spawnBoss();
-            bossSpawnTimer = 0;
-            bossActive = true;
-        }
-    }
-    
-    // Verificar se boss morreu
-    var bossExists = enemies_list.some(function(enemy) {
-        return enemy.isBoss && enemy.alive;
-    });
-    
-    if (!bossExists && bossActive) {
-        bossActive = false;
-        bossSpawnTimer = 0; // Reset timer
-    }
-}
 
-function spawnBoss() {
-    // Mostrar aviso de boss chegando
-    showBossWarning();
-    
-    // Limpar todos os inimigos da tela
-    enemies_list = enemies_list.filter(function(enemy) {
-        if (enemy.isBoss) return true; // Manter bosses existentes
-        return false; // Remover todos os outros inimigos
-    });
-    
-    // Limpar projéteis de inimigos
-    enemy_projectiles_list = [];
-    
-    // Aguardar 3 segundos (tempo do aviso) antes de spawnar o boss
-    setTimeout(function() {
-        var level = player.level;
-        
-        // Stats do boss MUITO mais fortes (usando valores padrão)
-        var bossHealth = Math.floor(500 * (1 + level * 0.5));
-        var bossDamage = Math.floor(40);
-        
-        // Spawnar no centro da tela para máximo impacto
-        var x = WIDTH / 2;
-        var y = HEIGHT / 2;
-        
-        var boss = new BossObject(bossSprite, x, y, bossHealth, bossHealth);
-        boss.base_damage = bossDamage;
-        boss.base_speed = 0.1; // Mais rápido
-        enemies_list.push(boss);
-        
-        // Efeito visual de spawn dramático
-        createParticleExplosion(x, y, "#FF0000", 50);
-        
-        // Efeito de "wave" - múltiplas explosões
-        for (var i = 0; i < 5; i++) {
-            setTimeout(function() {
-                var waveX = x + (Math.random() - 0.5) * 200;
-                var waveY = y + (Math.random() - 0.5) * 200;
-                createParticleExplosion(waveX, waveY, "#FFD700", 20);
-            }, i * 200);
-        }
-        
-        bossActive = true;
-        console.log("BOSS SPAWNADO! Nível:", level, "Vida:", bossHealth);
-    }, 3000); // 3 segundos de aviso
-}
 
 function showBossWarning() {
     // Criar aviso visual
@@ -233,5 +153,3 @@ function createParticleExplosion(x, y, color, count) {
         particles_list.push(new ParticleObject(x, y, color, speed, angle, lifespan));
     }
 }
-
-console.log('Sistema de boss carregado!');
