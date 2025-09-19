@@ -27,6 +27,18 @@ var time_since_last_enemy_spawn = 0;
 var gamePaused = false;
 var gameStarted = false;
 
+// Animação do ícone de tempo
+var clockAnimation = {
+    timer: 0,
+    speed: 100, // ms por frame
+    currentFrame: 0,
+    frameCount: 14,
+    frameWidth: 20, // 80px / 4 cols
+    frameHeight: 20, // 80px / 4 rows
+    numColumns: 4
+};
+
+
 // Lista de projéteis de inimigos
 
 // sprites
@@ -88,6 +100,7 @@ var backgroundSprite = new Image();
 var gunDroneSprite = new Image();
 var gunDroneProjectileSprite = new Image();
 var tankSprite = new Image();
+var clockSprite = new Image(); // Adicionado para o ícone de tempo animado
 var bossSprite = new Image();
 // controller support
 var is_gamepad_connected = false;
@@ -160,6 +173,13 @@ window.addEventListener("gamepaddisconnected", function(e) {
 
 // update function
 function update(dt) {
+    // Atualiza a animação do ícone de relógio, independente do estado do jogo
+    clockAnimation.timer += dt;
+    if (clockAnimation.timer >= clockAnimation.speed) {
+        clockAnimation.currentFrame = (clockAnimation.currentFrame + 1) % clockAnimation.frameCount;
+        clockAnimation.timer = 0;
+    }
+
     const gamepadState = pollGamepad();
     handleGamepadMenuInput(gamepadState);
 
@@ -433,6 +453,27 @@ function UpdateDebugHUD() {
     const seconds = (totalSeconds % 60).toString().padStart(2, '0');
     document.getElementById('timeDisplay').textContent = `${minutes}:${seconds}`;
 
+    // Renderiza a animação do ícone de relógio
+    const clockCanvas = document.getElementById('clockIconCanvas');
+    if (clockCanvas && clockSprite.complete) {
+        const cctx = clockCanvas.getContext('2d');
+        cctx.clearRect(0, 0, clockCanvas.width, clockCanvas.height);
+
+        const frameX = (clockAnimation.currentFrame % clockAnimation.numColumns) * clockAnimation.frameWidth;
+        const frameY = Math.floor(clockAnimation.currentFrame / clockAnimation.numColumns) * clockAnimation.frameHeight;
+
+        // Desativa o anti-aliasing para manter o estilo pixelado
+        cctx.imageSmoothingEnabled = false;
+
+        cctx.drawImage(
+            clockSprite,
+            frameX, frameY,
+            clockAnimation.frameWidth, clockAnimation.frameHeight,
+            0, 0,
+            clockCanvas.width, clockCanvas.height
+        );
+    }
+
     // Atualizar barra de progressão de XP
     updateXPProgressBar();
 }
@@ -660,7 +701,7 @@ function run() {
 
 
 
-let imagesToLoad = 11;
+let imagesToLoad = 12;
 function onImageLoaded() {
     imagesToLoad--;
     if (imagesToLoad === 0) {
@@ -679,6 +720,7 @@ backgroundSprite.onload = onImageLoaded;
 gunDroneSprite.onload = onImageLoaded;
 gunDroneProjectileSprite.onload = onImageLoaded;
 tankSprite.onload = onImageLoaded;
+clockSprite.onload = onImageLoaded;
 bossSprite.onload = onImageLoaded;
 
 playerSprite.src = "images/estudante.png";
@@ -692,6 +734,7 @@ backgroundSprite.src = "images/bg.png";
 gunDroneSprite.src = "images/Dogpet.png";
 gunDroneProjectileSprite.src = "images/petprojectile.png";
 tankSprite.src = "images/tank.png";
+clockSprite.src = "images/clock.png";
 bossSprite.src = "images/bossmath.png";
 
 // Função para obter pergunta aleatória não utilizada
