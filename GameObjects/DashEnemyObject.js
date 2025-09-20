@@ -18,6 +18,8 @@ function DashEnemyObject(sprite, x, y, max_health, base_speed, base_damage) {
     // Propriedades específicas do DashEnemy
     base.invincibility_time = 0;
     base.enemyType = 'dash';
+    base.frozen = false;
+    base.freeze_timer = 0;
 
     
     base.is_dashing = false;
@@ -54,6 +56,15 @@ function DashEnemyObject(sprite, x, y, max_health, base_speed, base_damage) {
 
     // Sobrescreve o método update para incluir lógica de dash
     base.update = function(dt) {
+
+        // Lógica de congelamento
+        if (this.frozen) {
+            this.freeze_timer -= dt;
+            if (this.freeze_timer <= 0) {
+                this.frozen = false;
+            }
+            return; // Pula o resto da atualização se estiver congelado
+        }
 
         // Atualiza a animação (básico, pois não usamos herança clássica aqui)
         this.animationTimer += dt;
@@ -100,6 +111,17 @@ function DashEnemyObject(sprite, x, y, max_health, base_speed, base_damage) {
 
         ctx.save();
         ctx.translate(-camera.x, -camera.y);
+
+        // Efeito visual de congelamento
+        if (this.frozen) {
+            ctx.globalAlpha = 0.8;
+            ctx.fillStyle = '#ADD8E6'; // Azul claro
+            ctx.beginPath();
+            // Desenha um "bloco de gelo" em volta
+            ctx.rect(this.x - this.radius - 2, this.y - this.radius - 2, (this.radius + 2) * 2, (this.radius + 2) * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+        }
 
         // Efeito visual do dash
         if (this.is_dashing) {

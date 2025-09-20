@@ -8,14 +8,16 @@ canvas.width = WIDTH;
 canvas.height = HEIGHT;
 
 var scenario = {
-    width: 1920,
-    height: 1080,
+    width: 3840, // Dobrado de 1920
+    height: 2160, // Dobrado de 1080
 }
 var camera = new CameraObject(scenario.width, scenario.height, WIDTH, HEIGHT);
 
 // fetch player status configuration - usar valores padrão inicialmente
 var player_status = Object.assign({}, player_status_configurations[selected_player_status_configuration]);
+player_status.damage *= 2; // Dobra o dano base do jogador
 var enemy_spawn = Object.assign({}, enemy_spawn_configurations[selected_enemy_spawn_configuration]);
+enemy_spawn.time_between_enemy_spawn /= 0.75; // Reduz a taxa de spawn em 25% (aumenta o tempo entre spawns)
 var enemy_status = Object.assign({}, enemy_status_configurations[selected_enemy_status_configuration]);
 var current_difficulty = "normal";
 
@@ -209,8 +211,34 @@ function update(dt) {
 
     
     //projectile updating
-    projectiles_list.forEach(function(projectile) {
-        projectile.update(dt);
+    projectiles_list.forEach(function(projectile, index) {
+        // Lógica customizada para o projétil bumerangue
+        if (projectile.is_boomerang) {
+            if (projectile.state === 'outgoing') {
+                projectile.update(dt); // Movimento normal de ida
+                const distance_from_origin = dist(projectile.x, projectile.y, projectile.origin_x, projectile.origin_y);
+                
+                // Quando atinge a distância máxima, começa a retornar
+                if (distance_from_origin >= projectile.max_distance) {
+                    projectile.state = 'returning';
+                }
+            } else if (projectile.state === 'returning') {
+                // Move de volta para o jogador
+                const dx = player.x - projectile.x;
+                const dy = player.y - projectile.y;
+                const distance_to_player = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance_to_player < projectile.radius + player.radius) {
+                    projectile.exists = false; // Desaparece ao tocar no jogador
+                } else {
+                    const move_dist = player_status.projectile_speed * dt;
+                    projectile.x += (dx / distance_to_player) * move_dist;
+                    projectile.y += (dy / distance_to_player) * move_dist;
+                }
+            }
+        } else {
+            projectile.update(dt); // Comportamento padrão para outros projéteis
+        }
     });
     
     //enemy projectile updating
@@ -280,6 +308,30 @@ function update(dt) {
             );
         }
     });
+
+    // Colisão entre inimigos e o chefe para que não se sobreponham
+    const bosses = enemies_list.filter(e => e.isBoss);
+    if (bosses.length > 0) {
+        enemies_list.forEach(enemy => {
+            // Apenas inimigos que não são chefes colidem com o chefe
+            if (!enemy.isBoss && enemy.alive) {
+                bosses.forEach(boss => {
+                    if (boss.alive && aabbCircleCollision(enemy, boss)) {
+                        // Lógica para empurrar o inimigo para fora do chefe
+                        const angle = angleBetweenPoints(boss.x, boss.y, enemy.x, enemy.y);
+                        const overlap = (enemy.radius + boss.radius) - dist(enemy.x, enemy.y, boss.x, boss.y);
+                        
+                        // Empurra o inimigo para fora da hitbox do chefe
+                        // Adiciona um pequeno buffer (1) para evitar que fiquem presos
+                        if (overlap > 0) {
+                            enemy.x += Math.cos(angle) * (overlap + 1);
+                            enemy.y += Math.sin(angle) * (overlap + 1);
+                        }
+                    }
+                });
+            }
+        });
+    }
 
     // enemy projectile updating
     enemy_projectiles_list.forEach(function(projectile) {
@@ -417,7 +469,7 @@ function updateHUD() {
 
         for (let i = 0; i < expectedHearts; i++) {
             const heartCanvas = document.createElement('canvas');
-            const heartSize = 24; // Tamanho do coração no HUD
+            const heartSize = 32; // Tamanho do coração aumentado para melhor visibilidade
             heartCanvas.width = heartSize;
             heartCanvas.height = heartSize;
             heartCanvas.style.marginRight = '2px';
@@ -445,7 +497,6 @@ function updateHUD() {
 
 function UpdateDebugHUD() {
     // Atualiza informações do HUD
-    document.getElementById('levelDisplay').textContent = player.level;
     
     // Atualizar tempo de sobrevivência
     const totalSeconds = Math.floor(survivalTime / 1000);
@@ -481,9 +532,9 @@ function UpdateDebugHUD() {
 function updateXPProgressBar() {
     // Calcular XP necessário para próximo nível (usando a mesma fórmula do PlayerObject)
     var currentLevel = player ? player.level : 1;
-    var xpNeeded = currentLevel * 100; // XP necessário para o próximo nível
-    var xpProgress = player.experience; // XP atual do jogador
-    var progressPercentage = Math.max(0, Math.min(100, (xpProgress / xpNeeded) * 100));
+    var xpNeeded = currentLevel * 100;
+    var xpProgress = player ? player.experience : 0;
+    var progressPercentage = (player && xpNeeded > 0) ? Math.max(0, Math.min(100, (xpProgress / xpNeeded) * 100)) : 0;
     
     // Criar ou atualizar barra de progressão
     var progressContainer = document.getElementById('xpProgressContainer');
@@ -491,24 +542,44 @@ function updateXPProgressBar() {
         progressContainer = document.createElement('div');
         progressContainer.id = 'xpProgressContainer';
         progressContainer.style.cssText = `
-            width: 200px;
-            height: 20px;
+            position: relative; /* Para posicionar o texto sobre a barra */
+            width: 25vw; /* Largura responsiva (25% da largura da tela) */
+            max-width: 350px; /* Largura máxima para telas muito grandes */
+            height: 24px; /* Altura aumentada */
             background: rgba(0, 0, 0, 0.7);
             border: 2px solid #FFD700;
             border-radius: 10px;
             overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         `;
         
         var progressBar = document.createElement('div');
         progressBar.id = 'xpProgressBar';
         progressBar.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
             height: 100%;
             background: linear-gradient(90deg, #FFD700, #FFA500);
             width: 0%;
             transition: width 0.3s ease;
         `;
         
+        // Cria o elemento de texto para o nível, que ficará sobre a barra
+        var levelText = document.createElement('span');
+        levelText.id = 'levelDisplay'; // Reutiliza o ID para a lógica de atualização
+        levelText.style.cssText = `
+            position: relative; /* Garante que fique sobre a barra de progresso */
+            z-index: 2;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+        `;
+        
         progressContainer.appendChild(progressBar);
+        progressContainer.appendChild(levelText);
         
         // Adicionar ao HUD
         var barParent = document.getElementById('xpBarContainer');
@@ -520,7 +591,12 @@ function updateXPProgressBar() {
     if (progressBar) {
         progressBar.style.width = progressPercentage + '%';
     }
-    
+
+    // Atualiza o texto do nível dentro da barra
+    var levelDisplayText = document.getElementById('levelDisplay');
+    if (levelDisplayText) {
+        levelDisplayText.textContent = `Nível ${currentLevel}`;
+    }
 }
 
 function showGameOver() {

@@ -19,6 +19,8 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
         isBoss: false,
         enemyType: 'flying', // Identificador do tipo
         
+        frozen: false,
+        freeze_timer: 0,
         // Propriedades específicas do FlyingEnemy
         flight_pattern: 'circle', // 'circle', 'zigzag', 'dive'
         pattern_timer: 0,
@@ -38,6 +40,16 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
             
             ctx.save();
             ctx.translate(-camera.x, -camera.y);
+
+            // Efeito visual de congelamento
+            if (this.frozen) {
+                ctx.globalAlpha = 0.8;
+                ctx.fillStyle = '#ADD8E6'; // Azul claro
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius + 4, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
 
             // Efeito de sombra no chão
             ctx.globalAlpha = 0.3;
@@ -108,6 +120,15 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
         update: function(dt) {
             if (!this.alive) return;
             
+            // Lógica de congelamento
+            if (this.frozen) {
+                this.freeze_timer -= dt;
+                if (this.freeze_timer <= 0) {
+                    this.frozen = false;
+                }
+                return; // Pula o resto da atualização se estiver congelado
+            }
+
             // Atualizar timer de invencibilidade
             if (this.invincibility_time > 0) {
                 this.invincibility_time -= dt;

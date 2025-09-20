@@ -68,7 +68,21 @@ var availableUpgrades = {
         effect: function() {
             experienceMultiplier = 2;
         }
-    }
+    },
+    "freezing_shot": {
+        name: "Tiro Congelante",
+        description: "25% de chance de congelar inimigos por 2 segundos.",
+        effect: function() {
+            player_status.has_freezing_shot = true;
+        }
+    },
+    "boomerang_shot": {
+        name: "Tiro Bumerangue",
+        description: "Projéteis perfuram e retornam para você.",
+        effect: function() {
+            player_status.has_boomerang_shot = true;
+        }
+    },
 };
 
 // Variáveis do sistema de upgrade

@@ -76,7 +76,26 @@ var PlayerObject = function(idleWalkSpriteSheet, shootingSpriteSheet, shootingAn
     },
 
     attack: function(angle = 0){
-        projectiles_list.push(new ProjectileObject(projectileSprite, this.x, this.y, angle, player_status.damage));
+        let proj = new ProjectileObject(projectileSprite, this.x, this.y, angle, player_status.damage);
+
+        // Adiciona propriedades de upgrades ao projétil
+        if (player_status.has_freezing_shot) {
+            // 25% de chance de ser um tiro congelante
+            if (Math.random() < 0.25) {
+                proj.freeze = true;
+            }
+        }
+
+        if (player_status.has_boomerang_shot) {
+            proj.is_boomerang = true;
+            proj.origin_x = this.x;
+            proj.origin_y = this.y;
+            proj.max_distance = 300; // Distância máxima do bumerangue
+            proj.state = 'outgoing'; // 'outgoing' ou 'returning'
+            proj.piercing_shot = true; // Bumerangues sempre perfuram
+        }
+
+        projectiles_list.push(proj);
         this.triggerShootingAnimation();
     },
 
