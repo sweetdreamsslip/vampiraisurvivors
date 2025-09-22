@@ -41,13 +41,21 @@ var DashEnemy = function(x, y){
 
 var FlyingEnemy = function(x, y){
     let enemy = new FlyingEnemyObject(
-        enemySprite, 
+        flyingEnemySprite, 
         x, 
         y, 
         enemy_status.base_health, 
         enemy_status.base_speed, 
         enemy_status.base_damage,
     );
+    // Define as propriedades da spritesheet para animação
+    enemy.frameWidth = 32;
+    enemy.frameHeight = 32;
+    enemy.numColumns = 2;
+    enemy.frameCount = 4;
+    enemy.animationSpeed = 195; // Velocidade da animação (ms por frame) - 30% mais lento
+    enemy.animationTimer = 0;   // Garante que o timer da animação inicie zerado
+    enemy.currentFrame = 0;     // Garante que a animação comece do primeiro frame
     return enemy;
 }
 

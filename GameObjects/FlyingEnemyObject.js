@@ -15,6 +15,13 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
         frameWidth: 32,
         frameHeight: 32,
         scale: scale,
+        
+        // Propriedades de animação
+        animationTimer: 0,
+        animationSpeed: 150, // ms por frame
+        currentFrame: 0,
+        frameCount: 4,
+        numColumns: 2,
         invincibility_time: 0,
         isBoss: false,
         enemyType: 'flying', // Identificador do tipo
@@ -75,9 +82,12 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
             
             // Sprite do inimigo
             if (this.sprite && this.sprite.complete) {
+                const frameX = (this.currentFrame % this.numColumns) * this.frameWidth;
+                const frameY = Math.floor(this.currentFrame / this.numColumns) * this.frameHeight;
+
                 ctx.drawImage(
                     this.sprite,
-                    0, 0, this.frameWidth, this.frameHeight,
+                    frameX, frameY, this.frameWidth, this.frameHeight,
                     this.x - this.radius, this.y - this.radius + wingOffset,
                     this.radius * 2, this.radius * 2
                 );
@@ -127,6 +137,13 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
                     this.frozen = false;
                 }
                 return; // Pula o resto da atualização se estiver congelado
+            }
+
+            // Atualiza a animação
+            this.animationTimer += dt;
+            if (this.animationTimer > this.animationSpeed) {
+                this.currentFrame = (this.currentFrame + 1) % this.frameCount;
+                this.animationTimer = 0;
             }
 
             // Atualizar timer de invencibilidade
