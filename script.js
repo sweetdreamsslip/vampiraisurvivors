@@ -80,8 +80,6 @@ var usedQuestions = {
 };
 
 // Sistema de Boss
-var bossSpawnTimer = 0;
-var BOSS_SPAWN_INTERVAL = 60000; // 60 segundos
 var bossActive = false;
 
 // Sistema de teclado
@@ -379,9 +377,6 @@ function update(dt) {
     damage_zones_list = damage_zones_list.filter(function(zone) {
         return zone.exists;
     });
-    
-    // Sistema de Power-ups
-    spawner.update(dt);
 
 }
 

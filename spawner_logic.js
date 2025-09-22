@@ -2,7 +2,7 @@ var SpawnerObject = function(){
 
     this.time_since_last_spawn = 0;
     this.time_between_spawns = enemy_spawn.time_between_enemy_spawn;
-    this.bossSpawnTimer = 0;
+    this.bossSpawnTimer = 55_000;
     this.BOSS_SPAWN_INTERVAL = 60_000; // ms
     this.bossActive = false;
     this.warningActive = false;
@@ -85,7 +85,13 @@ var SpawnerObject = function(){
         ctx.save();
         ctx.fillStyle = '#FF0000';
         ctx.globalAlpha = Math.min(this.waveFunction(this.warningTimer/1000), 0.7);
-        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        ctx.fillRect(0, 0, WIDTH, HEIGHT/6);
+        ctx.globalAlpha = 1.0;
+        ctx.font = "bold 48px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "#FFFFFF";
+        ctx.fillText("Hora da prova!", WIDTH / 2, (HEIGHT / 6) / 2 + 15);
         ctx.restore();
     }
     
