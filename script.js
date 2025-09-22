@@ -433,6 +433,8 @@ function render() {
                 enemy.render(ctx, camera);
             }
         });
+        // boss warning rendering
+        spawner.showBossWarning(ctx);
         
         // Atualizar HUD
         updateHUD();
@@ -775,8 +777,6 @@ function run() {
     requestAnimationFrame(run);
 }
 
-
-
 let imagesToLoad = 12;
 function onImageLoaded() {
     imagesToLoad--;
@@ -1043,53 +1043,6 @@ function showQuizResult(isCorrect, powerupType) {
 
 
 
-function spawnBoss() {
-    // Mostrar aviso de boss chegando
-    showBossWarning();
-    
-    // Limpar todos os inimigos da tela
-    enemies_list = enemies_list.filter(function(enemy) {
-        if (enemy.isBoss) return true; // Manter bosses existentes
-        return false; // Remover todos os outros inimigos
-    });
-    
-    // Limpar projéteis de inimigos
-    enemy_projectiles_list = [];
-    
-    // Aguardar 3 segundos (tempo do aviso) antes de spawnar o boss
-    setTimeout(function() {
-        var difficulty = difficulty_modes[current_difficulty] || difficulty_modes["normal"];
-        var level = player.level;
-        
-        // Stats do boss MUITO mais fortes
-        var bossHealth = Math.floor(500 * difficulty.enemy_multiplier * (1 + level * 0.5));
-        var bossDamage = Math.floor(40 * difficulty.enemy_multiplier);
-        
-        // Spawnar no centro da tela para máximo impacto
-        var x = WIDTH / 2;
-        var y = HEIGHT / 2;
-        
-        var boss = new BossObject(enemySprite, x, y, bossHealth, bossHealth);
-        boss.base_damage = bossDamage;
-        boss.base_speed = 0.1; // Mais rápido
-        enemies_list.push(boss);
-        
-        // Efeito visual de spawn dramático
-        createParticleExplosion(x, y, "#FF0000", 50);
-        
-        // Efeito de "wave" - múltiplas explosões
-        for (var i = 0; i < 5; i++) {
-            setTimeout(function() {
-                var waveX = x + (Math.random() - 0.5) * 200;
-                var waveY = y + (Math.random() - 0.5) * 200;
-                createParticleExplosion(waveX, waveY, "#FFD700", 20);
-            }, i * 200);
-        }
-        
-        bossActive = true;
-        console.log("BOSS SPAWNADO! Nível:", level, "Vida:", bossHealth);
-    }, 3000); // 3 segundos de aviso
-}
 
 
 // Função para criar onda de choque
