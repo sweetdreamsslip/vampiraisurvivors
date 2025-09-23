@@ -2,7 +2,7 @@ var SpawnerObject = function(){
 
     this.time_since_last_spawn = 0;
     this.time_between_spawns = enemy_spawn.time_between_enemy_spawn;
-    this.bossSpawnTimer = 55_000;
+    this.bossSpawnTimer = 45_000;
     this.BOSS_SPAWN_INTERVAL = 60_000; // ms
     this.bossActive = false;
     this.warningActive = false;
@@ -55,6 +55,7 @@ var SpawnerObject = function(){
             this.bossActive = true;
             this.bossSpawnTimer = 0;
             this.spawnBoss();
+            this.warningActive = false;
         }
 
         // enemy spawn logic - spawns an enemy and resets the enemy spawn timer

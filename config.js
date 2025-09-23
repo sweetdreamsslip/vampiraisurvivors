@@ -40,7 +40,7 @@ var player_status_configurations = {
 
 var enemy_spawn_configurations = {
     "default": {
-        time_between_enemy_spawn: 1200,
+        time_between_enemy_spawn: 800,
         initial_amount_of_enemies: 1,
     },
     "debug": {
