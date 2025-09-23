@@ -72,8 +72,8 @@ var quiz_difficulty = "normal"
 
 var sound_configurations = {
     "default": {
-        //shoot_sound: "sounds/lapis_scratch.mp3",
-        shoot_sound: "sounds/loud_pencil.mp3",
+        shoot_sound: "sounds/lapis_scratch.mp3",
+        
     },
 }
 

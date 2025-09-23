@@ -788,7 +788,7 @@ function onImageLoaded() {
         initialize();
         // Toca a música de fundo quando todas as imagens forem carregadas
         background_music_test.loop = true;
-        background_music_test.volume = 0.1; // Ajuste o volume conforme necessário
+        background_music_test.volume = 0.5; // Ajuste o volume conforme necessário
             background_music_test.play().catch(function(e){
             // Se o navegador bloquear autoplay, mostre um botão para o usuário iniciar a música manualmente
             console.log("Autoplay bloqueado. Clique para iniciar a música.");
