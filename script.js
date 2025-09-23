@@ -20,6 +20,7 @@ var enemy_spawn = Object.assign({}, enemy_spawn_configurations[selected_enemy_sp
 enemy_spawn.time_between_enemy_spawn /= 0.75; // Reduz a taxa de spawn em 25% (aumenta o tempo entre spawns)
 var enemy_status = Object.assign({}, enemy_status_configurations[selected_enemy_status_configuration]);
 var current_difficulty = "normal";
+var sound_configuration = Object.assign({}, sound_configurations[selected_sound_configuration]);
 
 // global variables
 var angle_between_player_and_mouse = 0;
@@ -53,6 +54,7 @@ var backgroundSprite = new Image();
 
 // sons
 var background_music_test = new Audio();
+var shootSound = new Audio();
 
 
 
@@ -786,7 +788,7 @@ function onImageLoaded() {
         initialize();
         // Toca a música de fundo quando todas as imagens forem carregadas
         background_music_test.loop = true;
-        background_music_test.volume = 0.5; // Ajuste o volume conforme necessário
+        background_music_test.volume = 0.1; // Ajuste o volume conforme necessário
             background_music_test.play().catch(function(e){
             // Se o navegador bloquear autoplay, mostre um botão para o usuário iniciar a música manualmente
             console.log("Autoplay bloqueado. Clique para iniciar a música.");
@@ -843,7 +845,11 @@ clockSprite.src = "images/clock.png";
 bossSprite.src = "images/bossmath.png";
 flyingEnemySprite.src = "images/flyingenemy.png";
 dashEnemySprite.src = "images/dashenemy.png";
+
+// music
 background_music_test.src = "sounds/sparkmandrill.mp3";
+// sounds
+shootSound.src = sound_configuration.shoot_sound;
 
 // Função para obter pergunta aleatória não utilizada
 function getUnusedQuestion(difficulty) {

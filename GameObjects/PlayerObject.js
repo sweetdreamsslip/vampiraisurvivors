@@ -77,6 +77,8 @@ var PlayerObject = function(idleWalkSpriteSheet, shootingSpriteSheet, shootingAn
 
     attack: function(angle = 0){
         let proj = new ProjectileObject(projectileSprite, this.x, this.y, angle, player_status.damage);
+        let s = new Audio(sound_configuration.shoot_sound);
+        s.play();
 
         // Adiciona propriedades de upgrades ao projétil
         if (player_status.has_freezing_shot) {

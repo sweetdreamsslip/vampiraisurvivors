@@ -3,7 +3,7 @@ var player_status_configurations = {
         speed: 0.4,
         max_health: 100,
         projectile_speed: 0.7,
-        time_between_projectiles: 800,
+        time_between_projectiles: 500,
         time_between_gun_drone_projectiles: 2000,
         damage: 10,
         invincibility_time: 1000,
@@ -70,8 +70,16 @@ var experience_configurations = {
 
 var quiz_difficulty = "normal"
 
+var sound_configurations = {
+    "default": {
+        //shoot_sound: "sounds/lapis_scratch.mp3",
+        shoot_sound: "sounds/loud_pencil.mp3",
+    },
+}
+
 
 var selected_enemy_spawn_configuration = "default";
 var selected_player_status_configuration = "default";
 var selected_enemy_status_configuration = "default";
 var selected_experience_configuration = "default";
+var selected_sound_configuration = "default";
