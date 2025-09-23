@@ -140,21 +140,33 @@ function DashEnemyObject(sprite, x, y, max_health, base_speed, base_damage) {
             ctx.globalAlpha = 1.0;
         }
 
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        // Vira o sprite para encarar o jogador
+        if (player.x < this.x) {
+            ctx.scale(-1, 1);
+        }
+
         // Sprite do inimigo
         if (this.sprite && this.sprite.complete) {
+            const frameX = (this.currentFrame % this.numColumns) * this.frameWidth;
+            const frameY = Math.floor(this.currentFrame / this.numColumns) * this.frameHeight;
+            const renderWidth = this.frameWidth * this.scale;
+            const renderHeight = this.frameHeight * this.scale;
+
             ctx.drawImage(
                 this.sprite,
-                0, 0, this.frameWidth, this.frameHeight,
-                this.x - this.radius, this.y - this.radius,
-                this.radius * 2, this.radius * 2
+                frameX, frameY, this.frameWidth, this.frameHeight,
+                -renderWidth / 2, -renderHeight / 2, renderWidth, renderHeight
             );
         } else {
             // Fallback: círculo azul claro
             ctx.fillStyle = this.is_dashing ? '#00FFFF' : '#87CEEB';
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
             ctx.fill();
         }
+        ctx.restore();
 
         // Barra de vida
         if (this.health < this.max_health) {

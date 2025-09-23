@@ -103,6 +103,7 @@ var tankSprite = new Image();
 var clockSprite = new Image(); // Adicionado para o ícone de tempo animado
 var bossSprite = new Image();
 var flyingEnemySprite = new Image();
+var dashEnemySprite = new Image();
 // controller support
 var is_gamepad_connected = false;
 
@@ -773,7 +774,7 @@ function run() {
     requestAnimationFrame(run);
 }
 
-let imagesToLoad = 14;
+let imagesToLoad = 15;
 function onImageLoaded() {
     imagesToLoad--;
     if (imagesToLoad === 0) {
@@ -795,10 +796,11 @@ tankSprite.onload = onImageLoaded;
 clockSprite.onload = onImageLoaded;
 bossSprite.onload = onImageLoaded;
 flyingEnemySprite.onload = onImageLoaded;
+dashEnemySprite.onload = onImageLoaded;
 
 playerSprite.src = "images/estudante.png";
 projectileSprite.src = "images/lapis2.png";
-enemySprite.src = "images/livro ptbr.png";
+enemySprite.src = "images/ptbrremaster.png";
 playerShootingSprite.src = "images/estudanteatirando.png";
 playerShootingAndMovingSprite.src = "images/atirandoecorrendo.png";
 xpSprite.src = "images/xp.png";
@@ -810,6 +812,7 @@ tankSprite.src = "images/tank.png";
 clockSprite.src = "images/clock.png";
 bossSprite.src = "images/bossmath.png";
 flyingEnemySprite.src = "images/flyingenemy.png";
+dashEnemySprite.src = "images/dashenemy.png";
 
 // Função para obter pergunta aleatória não utilizada
 function getUnusedQuestion(difficulty) {
