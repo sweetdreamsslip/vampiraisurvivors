@@ -167,8 +167,60 @@ function collectPowerUp(powerup) {
     // Efeito visual
     createParticleExplosion(powerup.x, powerup.y, "#FFD700", 15);
     
-    // Mostrar quiz para escolher power-up adicional
-    showPowerUpQuiz();
+    // Mostrar resultado do power-up coletado (sem quiz)
+    showPowerUpResult(powerup.type);
+}
+
+function showPowerUpResult(powerupType) {
+    // Mapear tipos para nomes e descrições (apenas os básicos originais)
+    var powerUpInfo = {
+        'speed': { name: 'Velocidade', description: 'Aumenta velocidade de movimento em 30%' },
+        'damage': { name: 'Dano', description: 'Aumenta dano dos projéteis em 5 pontos' },
+        'health': { name: 'Vida', description: 'Restaura 2 pontos de vida' },
+        'fire_rate': { name: 'Cadência', description: 'Reduz tempo entre disparos em 30%' },
+        'shield': { name: 'Escudo', description: 'Protege contra 3 ataques inimigos' }
+    };
+    
+    var info = powerUpInfo[powerupType] || { name: powerupType, description: 'Power-up coletado!' };
+    
+    var resultDiv = document.createElement('div');
+    resultDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        z-index: 3000;
+        font-family: 'Arial', sans-serif;
+        border: 3px solid #FFD700;
+    `;
+    
+    resultDiv.innerHTML = `
+        <h2 style="color: #4CAF50; margin-bottom: 15px;">✅ POWER-UP COLETADO!</h2>
+        <h3 style="color: #FFD700; margin-bottom: 10px;">${info.name}</h3>
+        <p style="margin-bottom: 20px; font-size: 1.1em;">${info.description}</p>
+        <button onclick="this.parentElement.remove(); gamePaused = false;" 
+                style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1em;">
+            CONTINUAR JOGO
+        </button>
+    `;
+    
+    document.body.appendChild(resultDiv);
+    
+    // Pausar jogo temporariamente
+    gamePaused = true;
+    
+    // Auto-remover após 5 segundos
+    setTimeout(() => {
+        if (resultDiv.parentElement) {
+            resultDiv.remove();
+            gamePaused = false;
+        }
+    }, 5000);
 }
 
 function applyPowerUpEffect(type) {
@@ -201,31 +253,6 @@ function applyPowerUpEffect(type) {
             if (!activePowerUps.shield) {
                 activePowerUps.shield = { duration: duration };
                 player.damage_reduction += 1;
-            }
-            break;
-        case 'antivirus':
-            if (!activePowerUps.antivirus) {
-                activePowerUps.antivirus = { duration: duration };
-            }
-            break;
-        case 'vpn':
-            if (!activePowerUps.vpn) {
-                activePowerUps.vpn = { duration: duration };
-            }
-            break;
-        case 'cluster':
-            if (!activePowerUps.cluster) {
-                activePowerUps.cluster = { duration: duration };
-            }
-            break;
-        case 'firewall':
-            if (!activePowerUps.firewall) {
-                activePowerUps.firewall = { duration: duration };
-            }
-            break;
-        case 'proxy':
-            if (!activePowerUps.proxy) {
-                activePowerUps.proxy = { duration: duration };
             }
             break;
     }
@@ -267,89 +294,8 @@ function updateActivePowerUps(dt) {
 // EFEITOS ESPECIAIS DOS POWER-UPS
 // ========================================
 function updateSpecialPowerUps() {
-    // Antivírus - Regenera vida por inimigo morto
-    if (activePowerUps.antivirus) {
-        // Esta lógica será chamada quando inimigo morrer
-    }
-    
-    // VPN - Modo stealth (atravessar inimigos)
-    if (activePowerUps.vpn) {
-        player.stealth = true;
-    } else {
-        player.stealth = false;
-    }
-    
-    // Cluster - Dois tipos de projéteis
-    if (activePowerUps.cluster) {
-        // Esta lógica será implementada no sistema de tiro
-    }
-    
-    // Firewall - Onda de choque ao ser atingido
-    if (activePowerUps.firewall) {
-        // Esta lógica será chamada quando jogador receber dano
-    }
-    
-    // Proxy - Teleporte (será implementado com tecla)
-    if (activePowerUps.proxy) {
-        // Esta lógica será implementada com tecla
-    }
 }
 
-// Função para aplicar efeito do Antivírus quando inimigo morre
-function applyAntivirusEffect() {
-    if (activePowerUps.antivirus) {
-        player.health = Math.min(player.health + 3, player_status.max_health);
-        // Efeito visual
-        createParticleExplosion(player.x, player.y, "#00FF00", 5);
-    }
-}
-
-// Função para aplicar efeito do Firewall quando jogador recebe dano
-function applyFirewallEffect() {
-    if (activePowerUps.firewall) {
-        // Criar onda de choque
-        createShockwave(player.x, player.y, 100, 15);
-    }
-}
-
-// Função para criar onda de choque
-function createShockwave(x, y, radius, damage) {
-    // Efeito visual
-    createParticleExplosion(x, y, "#FF4500", 20);
-    
-    // Dano em área
-    enemies_list.forEach(function(enemy) {
-        var distance = Math.sqrt((enemy.x - x) ** 2 + (enemy.y - y) ** 2);
-        if (distance <= radius) {
-            enemy.take_damage(damage);
-        }
-    });
-}
-
-// Função para teleporte do Proxy
-function useProxyTeleport() {
-    if (activePowerUps.proxy) {
-        // Teleportar para posição aleatória próxima
-        var angle = Math.random() * Math.PI * 2;
-        var distance = 100 + Math.random() * 100;
-        
-        var newX = player.x + Math.cos(angle) * distance;
-        var newY = player.y + Math.sin(angle) * distance;
-        
-        // Limitar dentro da tela
-        newX = Math.max(50, Math.min(WIDTH - 50, newX));
-        newY = Math.max(50, Math.min(HEIGHT - 50, newY));
-        
-        player.x = newX;
-        player.y = newY;
-        
-        // Efeito visual
-        createParticleExplosion(newX, newY, "#00BFFF", 15);
-        
-        // Remover power-up após uso
-        delete activePowerUps.proxy;
-    }
-}
 
 // ========================================
 // SISTEMA DE QUIZ PARA POWER-UPS
@@ -452,8 +398,8 @@ function handleQuizAnswer(isCorrect, quizDiv) {
     quizDiv.remove();
     
     if (isCorrect) {
-        // Mostrar interface de seleção de upgrades
-        createUpgradeSelectionInterface();
+        // Mostrar interface de seleção de power-ups
+        showPowerUpSelection();
     } else {
         // Aplicar power-up básico automático
         var types = ['speed', 'damage', 'health', 'fire_rate', 'shield'];
@@ -505,10 +451,195 @@ function showQuizResult(isCorrect, powerupType) {
 }
 
 // ========================================
+// SISTEMA DE SELEÇÃO DE POWER-UPS
+// ========================================
+function showPowerUpSelection() {
+    // Pausar jogo
+    gamePaused = true;
+    
+    // Lista de power-ups disponíveis (apenas os básicos originais)
+    var availablePowerUps = [
+        { type: 'speed', name: 'Velocidade', description: 'Aumenta velocidade de movimento em 30%', icon: '⚡', color: '#00FF00' },
+        { type: 'damage', name: 'Dano', description: 'Aumenta dano dos projéteis em 5 pontos', icon: '💪', color: '#FF0000' },
+        { type: 'health', name: 'Vida', description: 'Restaura 2 pontos de vida', icon: '❤️', color: '#FF69B4' },
+        { type: 'fire_rate', name: 'Cadência', description: 'Reduz tempo entre disparos em 30%', icon: '🔥', color: '#FFA500' },
+        { type: 'shield', name: 'Escudo', description: 'Protege contra 3 ataques inimigos', icon: '🛡️', color: '#00BFFF' }
+    ];
+    
+    // Selecionar 3 power-ups aleatórios
+    var selectedPowerUps = [];
+    var available = [...availablePowerUps];
+    
+    for (var i = 0; i < 3; i++) {
+        var randomIndex = Math.floor(Math.random() * available.length);
+        selectedPowerUps.push(available[randomIndex]);
+        available.splice(randomIndex, 1);
+    }
+    
+    // Criar interface
+    var powerUpDiv = document.createElement('div');
+    powerUpDiv.id = 'powerUpSelection';
+    powerUpDiv.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.9);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 4000;
+        color: white;
+        font-family: 'Arial', sans-serif;
+        pointer-events: auto;
+    `;
+    
+    // Título
+    var title = document.createElement('h1');
+    title.textContent = '🎁 ESCOLHA SEU POWER-UP! 🎁';
+    title.style.cssText = 'color: #FFD700; font-size: 2.5em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
+    powerUpDiv.appendChild(title);
+    
+    // Container dos power-ups
+    var powerUpsContainer = document.createElement('div');
+    powerUpsContainer.style.cssText = 'display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 800px;';
+    
+    selectedPowerUps.forEach((powerUp, index) => {
+        var powerUpCard = document.createElement('div');
+        powerUpCard.style.cssText = `
+            background: linear-gradient(135deg, ${powerUp.color}20, ${powerUp.color}40);
+            border: 3px solid ${powerUp.color};
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            user-select: none;
+            pointer-events: auto;
+            position: relative;
+            z-index: 1;
+        `;
+        
+        powerUpCard.innerHTML = `
+            <div style="font-size: 3em; margin-bottom: 10px;">${powerUp.icon}</div>
+            <h3 style="margin: 10px 0; color: ${powerUp.color}; font-size: 1.1em; line-height: 1.3;">${powerUp.description}</h3>
+            <div style="background: ${powerUp.color}30; padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 0.8em; color: #fff;">
+                Clique para escolher
+            </div>
+        `;
+        
+        // Efeitos hover
+        powerUpCard.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+            this.style.boxShadow = '0 6px 20px rgba(0,0,0,0.4)';
+        });
+        
+        powerUpCard.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+            this.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3)';
+        });
+        
+        // Selecionar power-up
+        powerUpCard.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            selectPowerUp(powerUp.type, powerUp.name);
+        });
+        
+        powerUpsContainer.appendChild(powerUpCard);
+    });
+    
+    powerUpDiv.appendChild(powerUpsContainer);
+    
+    // Instruções
+    var instructions = document.createElement('p');
+    instructions.textContent = 'Escolha um power-up para receber!';
+    instructions.style.cssText = 'font-size: 1.2em; color: #ccc; margin-top: 30px;';
+    powerUpDiv.appendChild(instructions);
+    
+    
+    // Botão de teste temporário
+    var testButton = document.createElement('button');
+    testButton.textContent = '🧪 TESTE - Forçar Seleção';
+    testButton.style.cssText = `
+        background: #FF6B6B;
+        color: white;
+        border: none;
+        padding: 15px 25px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 20px;
+        font-size: 1.1em;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    `;
+    testButton.addEventListener('click', function() {
+        console.log('🧪 Botão de teste clicado - testando seleção');
+        selectPowerUp('speed', 'Velocidade');
+    });
+    powerUpDiv.appendChild(testButton);
+    
+    document.body.appendChild(powerUpDiv);
+    console.log('✅ Interface de seleção adicionada ao DOM!');
+}
+
+function selectPowerUp(powerUpType, powerUpName) {
+    // Aplicar power-up escolhido
+    applyPowerUpEffect(powerUpType);
+    
+    // Remover interface
+    var powerUpDiv = document.getElementById('powerUpSelection');
+    if (powerUpDiv) {
+        powerUpDiv.remove();
+    }
+    
+    // Continuar jogo
+    gamePaused = false;
+    
+    // Mostrar confirmação
+    showPowerUpSelectionResult(powerUpName);
+}
+
+function showPowerUpSelectionResult(powerUpName) {
+    var resultDiv = document.createElement('div');
+    resultDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0, 0, 0, 0.9);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        z-index: 3000;
+        font-family: 'Arial', sans-serif;
+        border: 2px solid #4CAF50;
+    `;
+    
+    resultDiv.innerHTML = `
+        <h2 style="color: #4CAF50; margin-bottom: 15px;">🎉 POWER-UP ESCOLHIDO!</h2>
+        <p>Você escolheu: <strong style="color: #FFD700;">${powerUpName}</strong></p>
+        <p style="font-size: 0.9em; margin-top: 10px; color: #ccc;">Boa sorte na batalha!</p>
+    `;
+    
+    document.body.appendChild(resultDiv);
+    
+    // Remover após 3 segundos
+    setTimeout(() => {
+        resultDiv.remove();
+    }, 3000);
+}
+
+// ========================================
 // FUNÇÕES AUXILIARES
 // ========================================
 function getUnusedQuestion(difficulty) {
-    var availableQuestions = CompleteQuizSystem.questions[difficulty] || CompleteQuizSystem.questions['normal'];
+    var availableQuestions = QuestionPoolObject.questions[difficulty] || QuestionPoolObject.questions['normal'];
     var used = usedQuestions[difficulty] || [];
     
     // Se todas as perguntas foram usadas, resetar a lista
@@ -543,7 +674,7 @@ function getUnusedQuestion(difficulty) {
     }
     
     // Aplicar embaralhamento para evitar que jogador decore posições
-    return CompleteQuizSystem.shuffleOptions(selectedQuestion);
+    return QuestionPoolObject.shuffleOptions(selectedQuestion);
 }
 
 // Event listeners para teclado

@@ -150,6 +150,17 @@ function update(dt) {
     time_since_last_projectile += dt;
     time_since_last_enemy_spawn += dt;
     const gamepadState = pollGamepad();
+<<<<<<< Updated upstream
+=======
+    handleGamepadMenuInput(gamepadState);
+
+    if (!gameStarted || gamePaused) return;    
+    survivalTime += dt;
+    camera.update(dt);
+    spawner.update(dt);
+    
+    // spawn power-ups removido - power-ups aparecem apenas no level up
+>>>>>>> Stashed changes
 
     // Define o ângulo de mira: prioriza o controle, senão usa o mouse
     if (gamepadState.aimAngle !== null) {
@@ -202,9 +213,6 @@ function update(dt) {
                     damage = Math.max(1, damage - player.damage_reduction);
                 }
                 player.take_damage(damage);
-                
-                // Aplicar efeito do Firewall se ativo
-                applyFirewallEffect();
             }
         }
     }
@@ -298,10 +306,52 @@ function update(dt) {
         zone.update(dt);
     });
     
+<<<<<<< Updated upstream
     // update experience orbs
     experience_orbs_list.forEach(function(orb) {
         orb.update(dt, player.x, player.y);
     });
+=======
+    // update power-ups removido - power-ups aparecem apenas no level up
+    
+    // update active power-ups
+    updateActivePowerUps(dt);
+    
+    // update boss system
+    if (typeof updateBossSystem === 'function') {
+        updateBossSystem(dt);
+    }
+    
+    // update enemy spawning
+    if (typeof updateEnemySpawning === 'function') {
+        updateEnemySpawning(dt);
+    }
+    
+    // adjust enemy difficulty
+    if (typeof adjustEnemyDifficulty === 'function') {
+        adjustEnemyDifficulty();
+    }
+    
+    // update HUD
+    if (typeof updateHUD === 'function') {
+        updateHUD();
+    }
+    
+    // update XP progress bar
+    if (typeof updateXPProgressBar === 'function') {
+        updateXPProgressBar();
+    }
+    
+    // update ranking
+    if (typeof updateRanking === 'function') {
+        updateRanking(survivalTime);
+    }
+    
+    // update special power-ups
+    if (typeof updateSpecialPowerUps === 'function') {
+        updateSpecialPowerUps();
+    }
+>>>>>>> Stashed changes
 
     // remove enemies that are no longer exists
     enemies_list = enemies_list.filter(function(enemy) {
@@ -369,6 +419,12 @@ function update(dt) {
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+<<<<<<< Updated upstream
+=======
+    // Desenha o fundo do cenário, movendo-o de acordo com a câmera para criar o efeito de scroll.
+    // A imagem de fundo tem o mesmo tamanho do cenário.
+    ctx.drawImage(backgroundSprite, -camera.x, -camera.y, scenario.width, scenario.height);
+>>>>>>> Stashed changes
     if (gameStarted && !gamePaused) {
         //enemy rendering
         experience_orbs_list.forEach(function(orb) {
@@ -462,6 +518,36 @@ function updateHUD() {
     document.getElementById('levelDisplay').textContent = player.level;
     document.getElementById('projectilesDisplay').textContent = projectiles_list.length;
     
+<<<<<<< Updated upstream
+=======
+    // Atualizar tempo de sobrevivência
+    const totalSeconds = Math.floor(survivalTime / 1000);
+    const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+    document.getElementById('timeDisplay').textContent = `${minutes}:${seconds}`;
+
+    // Renderiza a animação do ícone de relógio
+    const clockCanvas = document.getElementById('clockIconCanvas');
+    if (clockCanvas && clockSprite.complete) {
+        const cctx = clockCanvas.getContext('2d');
+        cctx.clearRect(0, 0, clockCanvas.width, clockCanvas.height);
+
+        const frameX = (clockAnimation.currentFrame % clockAnimation.numColumns) * clockAnimation.frameWidth;
+        const frameY = Math.floor(clockAnimation.currentFrame / clockAnimation.numColumns) * clockAnimation.frameHeight;
+
+        // Desativa o anti-aliasing para manter o estilo pixelado
+        cctx.imageSmoothingEnabled = false;
+
+        cctx.drawImage(
+            clockSprite,
+            frameX, frameY,
+            clockAnimation.frameWidth, clockAnimation.frameHeight,
+            0, 0,
+            clockCanvas.width, clockCanvas.height
+        );
+    }
+    
+>>>>>>> Stashed changes
     // Atualizar barra de progressão de XP
     updateXPProgressBar();
 }
@@ -512,6 +598,7 @@ function updateXPProgressBar() {
         progressBar.style.width = progressPercentage + '%';
     }
     
+<<<<<<< Updated upstream
     // Atualizar texto de progressão
     var progressText = document.getElementById('xpProgressText');
     if (!progressText) {
@@ -524,6 +611,12 @@ function updateXPProgressBar() {
             margin-top: 2px;
         `;
         progressContainer.appendChild(progressText);
+=======
+    // Atualiza o texto do nível dentro da barra
+    var levelDisplayText = document.getElementById('levelDisplay');
+    if (levelDisplayText) {
+        levelDisplayText.textContent = `Nível ${currentLevel}`;
+>>>>>>> Stashed changes
     }
     
     progressText.textContent = `${xpProgress}/${xpNeeded} XP para próximo nível`;
@@ -838,7 +931,7 @@ function spawnEnemy() {
 
 // Função para obter pergunta aleatória não utilizada
 function getUnusedQuestion(difficulty) {
-    var availableQuestions = QuizSystem.questions[difficulty] || QuizSystem.questions['normal'];
+    var availableQuestions = QuestionPoolObject.questions[difficulty] || QuestionPoolObject.questions['normal'];
     var used = usedQuestions[difficulty] || [];
     
     // Se todas as perguntas foram usadas, resetar a lista
@@ -876,13 +969,13 @@ function getUnusedQuestion(difficulty) {
     // MUDANÇA PRINCIPAL: EMBARALHAMENTO DE RESPOSTAS
     // ========================================
     // Aplicar embaralhamento para evitar que jogador decore posições
-    return QuizSystem.shuffleOptions(selectedQuestion);
+    return QuestionPoolObject.shuffleOptions(selectedQuestion);
 }
 
 // Função para mostrar estatísticas de perguntas (debug)
 function showQuestionStats() {
     var difficulty = current_difficulty || 'normal';
-    var total = QuizSystem.questions[difficulty].length;
+    var total = QuestionPoolObject.questions[difficulty].length;
     var used = usedQuestions[difficulty].length;
     var remaining = total - used;
     
@@ -913,6 +1006,7 @@ function createExplosionEffect(x, y) {
     });
 }
 
+<<<<<<< Updated upstream
 // Função para aplicar regeneração
 function applyRegeneration(dt) {
     if (player.regeneration && player.health < player.max_health) {
@@ -1021,63 +1115,13 @@ function showPowerUpQuiz() {
     
     document.body.appendChild(quizDiv);
 }
+=======
+// showPowerUpQuiz já está definido em powerup_system.js
+>>>>>>> Stashed changes
 
-function handleQuizAnswer(isCorrect, quizDiv) {
-    // Remover interface do quiz
-    quizDiv.remove();
-    
-    if (isCorrect) {
-        // Mostrar interface de seleção de upgrades
-        createUpgradeSelectionInterface();
-    } else {
-        // Aplicar power-up básico automático
-        var types = ['speed', 'damage', 'health', 'fire_rate', 'shield'];
-        var randomType = types[Math.floor(Math.random() * types.length)];
-        applyPowerUpEffect(randomType);
-        
-        // Mostrar resultado
-        showQuizResult(false, randomType);
-        
-        // Continuar jogo
-        gamePaused = false;
-    }
-}
+// handleQuizAnswer já está definido em powerup_system.js
 
-function showQuizResult(isCorrect, powerupType) {
-    var resultDiv = document.createElement('div');
-    resultDiv.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0, 0, 0, 0.9);
-        color: white;
-        padding: 30px;
-        border-radius: 15px;
-        text-align: center;
-        z-index: 3000;
-        font-family: 'Arial', sans-serif;
-    `;
-    
-    if (isCorrect) {
-        resultDiv.innerHTML = `
-            <h2 style="color: #4CAF50; margin-bottom: 15px;">✅ CORRETO!</h2>
-            <p>Você ganhou um power-up adicional: <strong>${powerupType}</strong></p>
-        `;
-    } else {
-        resultDiv.innerHTML = `
-            <h2 style="color: #f44336; margin-bottom: 15px;">❌ INCORRETO</h2>
-            <p>Você ainda ganha o power-up que coletou!</p>
-        `;
-    }
-    
-    document.body.appendChild(resultDiv);
-    
-    // Remover após 3 segundos
-    setTimeout(() => {
-        resultDiv.remove();
-    }, 3000);
-}
+// showQuizResult já está definido em powerup_system.js
 
 // Sistema de Boss
 function updateBossSystem(dt) {
@@ -1180,6 +1224,7 @@ function updateSpecialPowerUps() {
     }
 }
 
+<<<<<<< Updated upstream
 // Função para aplicar efeito do Antivírus quando inimigo morre
 function applyAntivirusEffect() {
     if (activePowerUps.antivirus) {
@@ -1244,3 +1289,5 @@ document.addEventListener('keydown', function(event) {
 document.addEventListener('keyup', function(event) {
     keys[event.key] = false;
 });
+=======
+>>>>>>> Stashed changes
