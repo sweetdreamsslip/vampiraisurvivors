@@ -10,7 +10,17 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
         piercing_strength: 0,
         current_pierce_strength: 0,
         attackSound: new Audio('sounds/attacksound.mp4'),
+        
+        /*
+            Projéteis especiais
+        */
         freezing_effect: 0,
+        explosive: false,
+        is_boomerang: player_status.has_boomerang_shot,
+        is_returning: false,
+        origin_x: x,
+        origin_y: y,
+        max_distance: player_status.boomerang_max_distance,
 
         // Propriedades do Sprite
         sprite: spriteSheet,
@@ -38,14 +48,46 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
             ctx.restore();
         },
         update: function(dt){
-            this.x += Math.cos(this.initial_angle) * player_status.projectile_speed * dt;
-            this.y += Math.sin(this.initial_angle) * player_status.projectile_speed * dt;
-            if(outOfBounds(this.x, this.y, scenario.width, scenario.height)){
-                
-                this.exists = false;
-            }else if(this.current_pierce_strength < this.piercing_strength){
+            if(this.is_boomerang){
+                this.boomerang_move(dt);
+            } else {
+                this.normal_move(dt);
+                if(outOfBounds(this.x, this.y, scenario.width, scenario.height)){
+                    this.exists = false;
+                }
+            }
+            if(this.current_pierce_strength < this.piercing_strength){
                 this.playSound();
                 this.exists = false;
+            }
+        },
+        normal_move: function(dt){
+            this.x += Math.cos(this.initial_angle) * player_status.projectile_speed * dt;
+            this.y += Math.sin(this.initial_angle) * player_status.projectile_speed * dt;
+        },
+        boomerang_move: function(dt){
+            if (!this.is_returning) {
+                this.normal_move(dt); // Movimento normal de ida
+                
+                // Verifica se atingiu a distância máxima
+                const distance_from_origin_squared = distSquared(this.x, this.y, this.origin_x, this.origin_y);
+                // Quando atinge a distância máxima, começa a retornar
+                if (distance_from_origin_squared >= this.max_distance * this.max_distance) {
+                    this.is_returning = true;
+                }
+            } else if (this.is_returning) {
+                // Move de volta para o jogador
+                const dx = player.x - this.x;
+                const dy = player.y - this.y;
+                const distance_to_player_squared = dx * dx + dy * dy;
+    
+                if (distance_to_player_squared < this.radius*this.radius + player.radius*player.radius) {
+                    this.exists = false; // Desaparece ao tocar no jogador
+                } else {
+                    const move_dist = player_status.projectile_speed * dt;
+                    this.x += (dx / Math.sqrt(distance_to_player_squared)) * move_dist;
+                    this.y += (dy / Math.sqrt(distance_to_player_squared)) * move_dist;
+                }
             }
         },
     }

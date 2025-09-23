@@ -222,33 +222,7 @@ function update(dt) {
     
     //projectile updating
     projectiles_list.forEach(function(projectile, index) {
-        // Lógica customizada para o projétil bumerangue
-        if (projectile.is_boomerang) {
-            if (projectile.state === 'outgoing') {
-                projectile.update(dt); // Movimento normal de ida
-                const distance_from_origin = dist(projectile.x, projectile.y, projectile.origin_x, projectile.origin_y);
-                
-                // Quando atinge a distância máxima, começa a retornar
-                if (distance_from_origin >= projectile.max_distance) {
-                    projectile.state = 'returning';
-                }
-            } else if (projectile.state === 'returning') {
-                // Move de volta para o jogador
-                const dx = player.x - projectile.x;
-                const dy = player.y - projectile.y;
-                const distance_to_player = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance_to_player < projectile.radius + player.radius) {
-                    projectile.exists = false; // Desaparece ao tocar no jogador
-                } else {
-                    const move_dist = player_status.projectile_speed * dt;
-                    projectile.x += (dx / distance_to_player) * move_dist;
-                    projectile.y += (dy / distance_to_player) * move_dist;
-                }
-            }
-        } else {
-            projectile.update(dt); // Comportamento padrão para outros projéteis
-        }
+        projectile.update(dt); // Comportamento padrão para outros projéteis
     });
     
     //enemy projectile updating
