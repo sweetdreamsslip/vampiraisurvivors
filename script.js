@@ -160,6 +160,9 @@ function update(dt) {
     spawner.update(dt);
     
     // spawn power-ups removido - power-ups aparecem apenas no level up
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
     // Define o ângulo de mira: prioriza o controle, senão usa o mouse
@@ -307,11 +310,14 @@ function update(dt) {
     });
     
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     // update experience orbs
     experience_orbs_list.forEach(function(orb) {
         orb.update(dt, player.x, player.y);
     });
 =======
+=======
+>>>>>>> Stashed changes
     // update power-ups removido - power-ups aparecem apenas no level up
     
     // update active power-ups
@@ -351,6 +357,9 @@ function update(dt) {
     if (typeof updateSpecialPowerUps === 'function') {
         updateSpecialPowerUps();
     }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
     // remove enemies that are no longer exists
@@ -420,7 +429,10 @@ function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
     // Desenha o fundo do cenário, movendo-o de acordo com a câmera para criar o efeito de scroll.
     // A imagem de fundo tem o mesmo tamanho do cenário.
     ctx.drawImage(backgroundSprite, -camera.x, -camera.y, scenario.width, scenario.height);
@@ -547,6 +559,9 @@ function updateHUD() {
         );
     }
     
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     // Atualizar barra de progressão de XP
     updateXPProgressBar();
@@ -599,6 +614,7 @@ function updateXPProgressBar() {
     }
     
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     // Atualizar texto de progressão
     var progressText = document.getElementById('xpProgressText');
     if (!progressText) {
@@ -612,6 +628,8 @@ function updateXPProgressBar() {
         `;
         progressContainer.appendChild(progressText);
 =======
+=======
+>>>>>>> Stashed changes
     // Atualiza o texto do nível dentro da barra
     var levelDisplayText = document.getElementById('levelDisplay');
     if (levelDisplayText) {
@@ -1007,6 +1025,7 @@ function createExplosionEffect(x, y) {
 }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 // Função para aplicar regeneração
 function applyRegeneration(dt) {
     if (player.regeneration && player.health < player.max_health) {
@@ -1193,6 +1212,13 @@ function spawnBoss() {
         console.log("BOSS SPAWNADO! Nível:", level, "Vida:", bossHealth);
     }, 3000); // 3 segundos de aviso
 }
+=======
+// showPowerUpQuiz já está definido em powerup_system.js
+
+// handleQuizAnswer já está definido em powerup_system.js
+
+// showQuizResult já está definido em powerup_system.js
+>>>>>>> Stashed changes
 
 // Efeitos especiais dos power-ups
 function updateSpecialPowerUps() {
@@ -1234,6 +1260,7 @@ function applyAntivirusEffect() {
     }
 }
 
+<<<<<<< Updated upstream
 // Função para aplicar efeito do Firewall quando jogador recebe dano
 function applyFirewallEffect() {
     if (activePowerUps.firewall) {
@@ -1290,4 +1317,7 @@ document.addEventListener('keyup', function(event) {
     keys[event.key] = false;
 });
 =======
+>>>>>>> Stashed changes
+=======
+
 >>>>>>> Stashed changes
