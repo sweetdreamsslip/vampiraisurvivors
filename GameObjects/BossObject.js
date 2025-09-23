@@ -92,6 +92,8 @@ BossObject.prototype.attack = function() {
 };
 
 BossObject.prototype.onDeath = function() {
+    let s = new Audio(sound_configuration.defeated_boss_sound);
+    s.play();
     // Dramatic death visual effect
     createParticleExplosion(this.x, this.y, "#FFD700", 50);
     

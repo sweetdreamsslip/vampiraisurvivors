@@ -21,6 +21,7 @@ enemy_spawn.time_between_enemy_spawn /= 0.75; // Reduz a taxa de spawn em 25% (a
 var enemy_status = Object.assign({}, enemy_status_configurations[selected_enemy_status_configuration]);
 var current_difficulty = "normal";
 var sound_configuration = Object.assign({}, sound_configurations[selected_sound_configuration]);
+var texture_configuration = Object.assign({}, texture_configurations[selected_texture_configuration]);
 
 // global variables
 var angle_between_player_and_mouse = 0;
@@ -55,6 +56,8 @@ var backgroundSprite = new Image();
 // sons
 var background_music_test = new Audio();
 var shootSound = new Audio();
+var dogShootSound = new Audio();
+var defeatedBossSound = new Audio();
 
 
 
@@ -830,26 +833,29 @@ bossSprite.onload = onImageLoaded;
 flyingEnemySprite.onload = onImageLoaded;
 dashEnemySprite.onload = onImageLoaded;
 
-playerSprite.src = "images/estudante.png";
-projectileSprite.src = "images/lapis2.png";
-enemySprite.src = "images/ptbrremaster.png";
-playerShootingSprite.src = "images/estudanteatirando.png";
-playerShootingAndMovingSprite.src = "images/atirandoecorrendo.png";
-xpSprite.src = "images/xp.png";
-heartSprite.src = "images/heart.png";
-backgroundSprite.src = "images/bg.png";
-gunDroneSprite.src = "images/Dogpet.png";
-gunDroneProjectileSprite.src = "images/petprojectile.png";
-tankSprite.src = "images/tank.png";
-clockSprite.src = "images/clock.png";
-bossSprite.src = "images/bossmath.png";
-flyingEnemySprite.src = "images/flyingenemy.png";
-dashEnemySprite.src = "images/dashenemy.png";
+playerSprite.src = texture_configuration.playerSprite;
+projectileSprite.src = texture_configuration.projectileSprite;
+enemySprite.src = texture_configuration.enemySprite;
+playerShootingSprite.src = texture_configuration.playerShootingSprite;
+playerShootingAndMovingSprite.src = texture_configuration.playerShootingAndMovingSprite;
+xpSprite.src = texture_configuration.xpSprite;
+heartSprite.src = texture_configuration.heartSprite;
+backgroundSprite.src = texture_configuration.backgroundSprite;
+gunDroneSprite.src = texture_configuration.gunDroneSprite;
+gunDroneProjectileSprite.src = texture_configuration.gunDroneProjectileSprite;
+tankSprite.src = texture_configuration.tankSprite;
+clockSprite.src = texture_configuration.clockSprite;
+bossSprite.src = texture_configuration.bossSprite;
+flyingEnemySprite.src = texture_configuration.flyingEnemySprite;
+dashEnemySprite.src = texture_configuration.dashEnemySprite;
 
 // music
-background_music_test.src = "sounds/sparkmandrill.mp3";
+background_music_test.src = sound_configuration.background_music;
+
 // sounds
 shootSound.src = sound_configuration.shoot_sound;
+dogShootSound.src = sound_configuration.dog_shoot_sound;
+defeatedBossSound.src = sound_configuration.defeated_boss_sound;
 
 // Função para obter pergunta aleatória não utilizada
 function getUnusedQuestion(difficulty) {
