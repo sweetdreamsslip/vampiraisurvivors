@@ -200,19 +200,78 @@ function createUpgradeInterface() {
 // Função para selecionar resposta
 function selectAnswer(selectedIndex) {
     var isCorrect = selectedIndex === currentQuizQuestion.correct;
-    
+
     // Remover interface atual
     var upgradeInterface = document.getElementById('upgradeInterface');
     if (upgradeInterface) {
         upgradeInterface.remove();
     }
-    
-    // Mostrar resultado
-    showUpgradeResult(isCorrect);
+
+    if (isCorrect) {
+        // Resposta correta: mostra a tela de seleção de upgrades.
+        createUpgradeSelectionInterface();
+    } else {
+        // Resposta incorreta: mostra o resultado com um upgrade aleatório.
+        showUpgradeResult(false);
+    }
+}
+
+// Função para criar a interface de seleção de upgrades
+function createUpgradeSelectionInterface() {
+    gamePaused = true;
+
+    // Selecionar 3 upgrades aleatórios e únicos
+    var upgradeKeys = Object.keys(availableUpgrades);
+    var selectedUpgrades = [];
+    while (selectedUpgrades.length < 3 && upgradeKeys.length > 0) {
+        var randomIndex = Math.floor(Math.random() * upgradeKeys.length);
+        selectedUpgrades.push(upgradeKeys.splice(randomIndex, 1)[0]);
+    }
+
+    var selectionDiv = document.createElement('div');
+    selectionDiv.id = 'upgradeSelectionInterface';
+    selectionDiv.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9);
+        display: flex; flex-direction: column; justify-content: center; align-items: center;
+        z-index: 2000; color: white; font-family: 'Arial', sans-serif;
+    `;
+
+    selectionDiv.innerHTML = `
+        <h1 style="color: #4CAF50; font-size: 2.5em; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">✅ RESPOSTA CORRETA! ✅</h1>
+        <h2 style="color: #FFD700; font-size: 1.8em; margin-bottom: 30px;">Escolha seu upgrade:</h2>
+    `;
+
+    var optionsContainer = document.createElement('div');
+    optionsContainer.style.cssText = 'display: flex; gap: 20px; justify-content: center; align-items: stretch;';
+
+    selectedUpgrades.forEach(upgradeKey => {
+        var upgrade = availableUpgrades[upgradeKey];
+        var optionButton = document.createElement('button');
+        optionButton.className = 'upgrade-option-button';
+        optionButton.style.cssText = `
+            background: rgba(255, 255, 255, 0.1); color: white; border: 3px solid #FFD700;
+            padding: 20px; border-radius: 10px; cursor: pointer; font-size: 1em;
+            transition: all 0.3s ease; width: 220px; display: flex; flex-direction: column;
+            justify-content: space-between; text-align: center;
+        `;
+        optionButton.innerHTML = `
+            <h3 style="margin: 0 0 10px 0; color: #FFD700; font-size: 1.3em;">${upgrade.name}</h3>
+            <p style="margin: 0; font-size: 0.9em; color: #eee;">${upgrade.description}</p>
+        `;
+        optionButton.addEventListener('click', function() {
+            upgrade.effect();
+            selectionDiv.remove();
+            showUpgradeResult(true, upgrade);
+        });
+        optionsContainer.appendChild(optionButton);
+    });
+
+    selectionDiv.appendChild(optionsContainer);
+    document.body.appendChild(selectionDiv);
 }
 
 // Função para mostrar resultado do upgrade
-function showUpgradeResult(isCorrect) {
+function showUpgradeResult(isCorrect, chosenUpgrade = null) {
     var resultDiv = document.createElement('div');
     resultDiv.id = 'upgradeResult';
     resultDiv.style.cssText = `
@@ -229,19 +288,22 @@ function showUpgradeResult(isCorrect) {
         z-index: 2000;
         color: white;
     `;
-    
-    // Selecionar upgrade aleatório
-    var upgradeKeys = Object.keys(availableUpgrades);
-    var randomUpgradeKey = upgradeKeys[Math.floor(Math.random() * upgradeKeys.length)];
-    var upgrade = availableUpgrades[randomUpgradeKey];
-    
-    // Aplicar upgrade
-    upgrade.effect();
-    
+
+    var upgrade;
+    if (chosenUpgrade) {
+        upgrade = chosenUpgrade;
+    } else {
+        // Para respostas incorretas, seleciona e aplica um upgrade aleatório
+        var upgradeKeys = Object.keys(availableUpgrades);
+        var randomUpgradeKey = upgradeKeys[Math.floor(Math.random() * upgradeKeys.length)];
+        upgrade = availableUpgrades[randomUpgradeKey];
+        upgrade.effect();
+    }
+
     if (isCorrect) {
         // Título de sucesso
         var title = document.createElement('h1');
-        title.textContent = '✅ RESPOSTA CORRETA! ✅';
+        title.textContent = '✅ UPGRADE ADQUIRIDO! ✅';
         title.style.cssText = 'color: #4CAF50; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
         resultDiv.appendChild(title);
         
@@ -259,7 +321,7 @@ function showUpgradeResult(isCorrect) {
         upgradeDesc.style.cssText = 'font-size: 1.3em; margin-bottom: 20px;';
         upgradeInfo.appendChild(upgradeDesc);
         
-        resultDiv.appendChild(upgradeInfo);
+        resultDiv.appendChild(upgradeInfo); 
         
     } else {
         // Título de erro

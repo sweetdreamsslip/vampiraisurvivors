@@ -452,10 +452,10 @@ function handleQuizAnswer(isCorrect, quizDiv) {
     quizDiv.remove();
     
     if (isCorrect) {
-        // Mostrar interface de seleção de upgrades
-        createUpgradeSelectionInterface();
+        // Mostrar interface de seleção de power-ups
+        createPowerUpSelectionInterface();
     } else {
-        // Aplicar power-up básico automático
+        // Resposta incorreta: aplica um power-up básico aleatório
         var types = ['speed', 'damage', 'health', 'fire_rate', 'shield'];
         var randomType = types[Math.floor(Math.random() * types.length)];
         applyPowerUpEffect(randomType);
@@ -466,6 +466,72 @@ function handleQuizAnswer(isCorrect, quizDiv) {
         // Continuar jogo
         gamePaused = false;
     }
+}
+
+// Função para criar a interface de seleção de power-ups
+function createPowerUpSelectionInterface() {
+    gamePaused = true;
+
+    var availablePowerUpTypes = ['speed', 'damage', 'fire_rate', 'shield', 'antivirus', 'vpn', 'firewall', 'proxy'];
+    var choices = [];
+    while (choices.length < 3 && availablePowerUpTypes.length > 0) {
+        var randomIndex = Math.floor(Math.random() * availablePowerUpTypes.length);
+        choices.push(availablePowerUpTypes.splice(randomIndex, 1)[0]);
+    }
+
+    var selectionDiv = document.createElement('div');
+    selectionDiv.id = 'powerUpSelectionInterface';
+    selectionDiv.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column;
+        justify-content: center; align-items: center; z-index: 3000;
+        color: white; font-family: 'Arial', sans-serif;
+    `;
+
+    selectionDiv.innerHTML = `
+        <h1 style="color: #4CAF50; font-size: 2.5em; margin-bottom: 20px;">✅ CORRETO! ✅</h1>
+        <h2 style="color: #FFD700; font-size: 1.8em; margin-bottom: 30px;">Escolha um Power-Up adicional:</h2>
+    `;
+
+    var optionsContainer = document.createElement('div');
+    optionsContainer.style.cssText = 'display: flex; gap: 20px;';
+
+    const powerUpInfo = new PowerUpObject(0, 0, 'speed'); // Objeto para acessar ícones e cores
+    const powerUpDescriptions = {
+        speed: 'Aumenta sua velocidade de movimento.',
+        damage: 'Aumenta o dano dos seus ataques.',
+        fire_rate: 'Aumenta sua cadência de tiro.',
+        shield: 'Reduz o dano recebido.',
+        antivirus: 'Recupera vida ao derrotar inimigos.',
+        vpn: 'Permite atravessar inimigos sem sofrer dano.',
+        firewall: 'Causa uma onda de choque ao receber dano.',
+        proxy: 'Permite que você se teleporte (tecla T).'
+    };
+
+    choices.forEach(type => {
+        var optionButton = document.createElement('button');
+        optionButton.style.cssText = `
+            background: rgba(255, 255, 255, 0.1); color: white;
+            border: 3px solid ${powerUpInfo.colors[type] || '#FFFFFF'}; padding: 20px; border-radius: 10px;
+            cursor: pointer; font-size: 1em; transition: all 0.3s ease;
+            width: 200px; display: flex; flex-direction: column; align-items: center; text-align: center;
+        `;
+        optionButton.innerHTML = `
+            <span style="font-size: 2em; margin-bottom: 10px;">${powerUpInfo.icons[type] || '?'}</span>
+            <h3 style="margin: 0 0 10px 0; color: #FFD700; text-transform: capitalize;">${type.replace('_', ' ')}</h3>
+            <p style="margin: 0; font-size: 0.9em; color: #eee;">${powerUpDescriptions[type] || 'Um power-up misterioso!'}</p>
+        `;
+        optionButton.addEventListener('click', function() {
+            selectionDiv.remove();
+            applyPowerUpEffect(type);
+            showQuizResult(true, type);
+            gamePaused = false;
+        });
+        optionsContainer.appendChild(optionButton);
+    });
+
+    selectionDiv.appendChild(optionsContainer);
+    document.body.appendChild(selectionDiv);
 }
 
 function showQuizResult(isCorrect, powerupType) {
