@@ -51,6 +51,11 @@ var xpSprite = new Image();
 var heartSprite = new Image();
 var backgroundSprite = new Image();
 
+// sons
+var background_music_test = new Audio();
+
+
+
 // HUD elements
 const HEALTH_PER_HEART = 20; // Vida representada por cada coração no HUD
 var lastPlayerHealthForHUD = -1; // Otimização para o HUD
@@ -779,6 +784,31 @@ function onImageLoaded() {
     imagesToLoad--;
     if (imagesToLoad === 0) {
         initialize();
+        // Toca a música de fundo quando todas as imagens forem carregadas
+        background_music_test.loop = true;
+        background_music_test.volume = 0.5; // Ajuste o volume conforme necessário
+            background_music_test.play().catch(function(e){
+            // Se o navegador bloquear autoplay, mostre um botão para o usuário iniciar a música manualmente
+            console.log("Autoplay bloqueado. Clique para iniciar a música.");
+            let musicButton = document.getElementById('musicPlayButton');
+            if (!musicButton) {
+                musicButton = document.createElement('button');
+                musicButton.id = 'musicPlayButton';
+                musicButton.textContent = 'Clique para ativar a música';
+                musicButton.style.position = 'absolute';
+                musicButton.style.top = '20px';
+                musicButton.style.right = '20px';
+                musicButton.style.zIndex = 1000;
+                document.body.appendChild(musicButton);
+                musicButton.addEventListener('click', function() {
+                    background_music_test.play().then(() => {
+                        musicButton.remove();
+                    }).catch(function(err){
+                        alert("Não foi possível iniciar a música: " + err);
+                    });
+                });
+            }
+        });
     }
 }
 
@@ -813,6 +843,7 @@ clockSprite.src = "images/clock.png";
 bossSprite.src = "images/bossmath.png";
 flyingEnemySprite.src = "images/flyingenemy.png";
 dashEnemySprite.src = "images/dashenemy.png";
+background_music_test.src = "sounds/sparkmandrill.mp3";
 
 // Função para obter pergunta aleatória não utilizada
 function getUnusedQuestion(difficulty) {
