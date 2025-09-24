@@ -13,7 +13,8 @@ var GrowingProjectileObject = function(sprite, x, y, angle, damage) {
         damage: damage || player_status.damage,
         exists: true,
         sprite: sprite,
-        
+        piercing_strength: 1,
+        current_pierce_strength: this.piercing_strength,
         // Propriedades de crescimento
         currentScale: initialScale,
 
@@ -36,6 +37,13 @@ var GrowingProjectileObject = function(sprite, x, y, angle, damage) {
 
             // Verificação de limites do cenário
             if(this.x < 0 || this.x > scenario.width || this.y < 0 || this.y > scenario.height){
+                this.exists = false;
+            }
+        },
+
+        hit: function(){
+            this.current_pierce_strength--;
+            if(this.current_pierce_strength < 0){
                 this.exists = false;
             }
         },

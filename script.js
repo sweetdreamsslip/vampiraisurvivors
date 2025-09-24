@@ -261,7 +261,6 @@ function update(dt) {
         for(var j = 0; j < enemies_list.length; j++){
             if(aabbCircleCollision(projectiles_list[i], enemies_list[j]) && projectiles_list[i].exists && enemies_list[j].alive){
                 createParticleExplosion(enemies_list[j].x, enemies_list[j].y, "#8A2BE2", randomIntBetween(10, 20)); // Cor roxa para explosão do livro
-                
                 // Efeito de explosão
                 if (projectiles_list[i].explosive) {
                     createExplosionEffect(projectiles_list[i].x, projectiles_list[i].y);
@@ -278,6 +277,7 @@ function update(dt) {
                     projectiles_list[i].exists = false;	
                 }
                 
+                projectiles_list[i].hit();
                 enemies_list[j].take_damage(projectiles_list[i].damage);
             }
         }

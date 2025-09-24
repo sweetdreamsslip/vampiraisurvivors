@@ -10,7 +10,7 @@ var player_status_configurations = {
         magnet_max_distance: 200,
         piercing_strength: 0,
         freezing_effect: 0,
-        has_boomerang_shot: false,
+        has_boomerang_shot: true,
         boomerang_max_distance: 300,
     },
     "debug": {

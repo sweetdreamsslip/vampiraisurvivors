@@ -7,9 +7,9 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
         initial_angle: initial_angle,
         exists: true,
         damage: damage,
-        piercing_strength: 0,
-        current_pierce_strength: 0,
-        attackSound: new Audio('sounds/attacksound.mp4'),
+        piercing_strength: player_status.piercing_strength,
+        current_pierce_strength: this.piercing_strength,
+        attackSound_source: new Audio(sound_configuration.attack_sound),
         
         /*
             Projéteis especiais
@@ -29,7 +29,8 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
         scale: scale,
 
         playSound: function() {
-            this.attackSound.play();
+            let s = new Audio(sound_configuration.attack_sound);
+            s.play();
         },
         render: function(ctx, camera){
             ctx.save();
@@ -90,5 +91,11 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
                 }
             }
         },
+        hit: function(){
+            this.current_pierce_strength--;
+            if(this.current_pierce_strength < 0){
+                this.exists = false;
+            }
+        }
     }
 };
