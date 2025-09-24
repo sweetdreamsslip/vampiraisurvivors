@@ -37,6 +37,21 @@
             <div style="display: flex; align-items: center;"><canvas id="clockIconCanvas" width="24" height="24" style="margin-right: 8px;"></canvas>Tempo: <span id="timeDisplay">00:00</span></div>
         </div>
 
+        <!-- Volume Control -->
+        <div id="volumeControlContainer" style="display: none;">
+            <div class="volume-compact">
+                <button id="volumeIcon" class="volume-icon">🎵</button>
+            </div>
+            <div class="volume-expanded">
+                <div class="volume-label">🔊 Volume</div>
+                <div class="volume-controls">
+                    <button id="muteButton" class="mute-btn">🔊</button>
+                    <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="50">
+                    <span id="volumeDisplay" class="volume-display">50%</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Tela de Game Over -->
         <div id="gameOverScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000;">
             <h1 style="color: #ff6b6b; font-size: 3em; margin-bottom: 20px;">GAME OVER</h1>
@@ -53,6 +68,7 @@
     <!-- Utils -->
     <script src="utils.js"></script>
     <script src="gamepad_utils.js"></script>
+    <script src="volume_control.js"></script>
 
     <!-- Game Objects -->
     <script src="GameObjects/CameraObject.js"></script>

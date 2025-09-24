@@ -766,26 +766,56 @@ function onImageLoaded() {
         // Toca a música de fundo quando todas as imagens forem carregadas
         background_music_test.loop = true;
         background_music_test.volume = 0.5; // Ajuste o volume conforme necessário
-            background_music_test.play().catch(function(e){
+        background_music_test.play().then(() => {
+            // If autoplay works, initialize volume control immediately
+            initializeVolumeControl(background_music_test);
+        }).catch(function(e){
             // Se o navegador bloquear autoplay, mostre um botão para o usuário iniciar a música manualmente
             console.log("Autoplay bloqueado. Clique para iniciar a música.");
             let musicButton = document.getElementById('musicPlayButton');
             if (!musicButton) {
                 musicButton = document.createElement('button');
                 musicButton.id = 'musicPlayButton';
-                musicButton.textContent = 'Clique para ativar a música';
-                musicButton.style.position = 'absolute';
-                musicButton.style.top = '20px';
-                musicButton.style.right = '20px';
-                musicButton.style.zIndex = 1000;
-                document.body.appendChild(musicButton);
+                musicButton.textContent = '🎵 Ativar Música';
+                musicButton.style.cssText = `
+                    position: absolute;
+                    top: 20px;
+                    right: 20px;
+                    z-index: 1000;
+                    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+                    color: white;
+                    border: none;
+                    padding: 12px 20px;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: bold;
+                    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+                    transition: all 0.3s ease;
+                `;
+                
+                // Add hover effects
+                musicButton.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.05)';
+                    this.style.boxShadow = '0 6px 20px rgba(255, 107, 107, 0.6)';
+                });
+                
+                musicButton.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                    this.style.boxShadow = '0 4px 15px rgba(255, 107, 107, 0.4)';
+                });
+                
                 musicButton.addEventListener('click', function() {
                     background_music_test.play().then(() => {
                         musicButton.remove();
+                        // Initialize volume control after music is allowed
+                        initializeVolumeControl(background_music_test);
                     }).catch(function(err){
                         alert("Não foi possível iniciar a música: " + err);
                     });
                 });
+                
+                document.body.appendChild(musicButton);
             }
         });
     }
