@@ -97,7 +97,7 @@ var availableUpgrades = {
     "gun_drone_unlock": {
         name: "Companheiro Canino",
         description: "Ganha um cão de guarda que atira nos inimigos.",
-        icon: "images/Dogpet.png",
+        icon: "images/Dogpeticon.png",
         effect: function() {
             if (gun_drones_list.length === 0) {
                 gun_drones_list.push(new GunDroneObject(player.x + 60, player.y, 60));
