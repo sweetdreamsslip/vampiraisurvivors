@@ -8,6 +8,7 @@ var availableUpgrades = {
     "tech_boost": {
         name: "Impulso Tecnológico",
         description: "Aumenta velocidade de movimento em 20%",
+        icon: "images/movespeedupgrade.png",
         effect: function() {
             player_status.speed *= 1.2;
         }
@@ -15,6 +16,7 @@ var availableUpgrades = {
     "speed_boost": {
         name: "Velocidade Supersônica",
         description: "Aumenta velocidade de movimento em 30%",
+        icon: "images/movespeedupgrade.png",
         effect: function() {
             player_status.speed *= 1.3;
         }
@@ -22,6 +24,7 @@ var availableUpgrades = {
     "health_boost": {
         name: "Vida Extra",
         description: "Aumenta vida máxima em 50 pontos",
+        icon: "images/heart.png",
         effect: function() {
             player_status.max_health += 50;
             player.health = player_status.max_health;
@@ -30,6 +33,7 @@ var availableUpgrades = {
     "damage_boost": {
         name: "Dano Devastador",
         description: "Aumenta dano em 5 pontos",
+        icon: "images/tiroperfurante.png",
         effect: function() {
             player_status.damage += 5;
         }
@@ -37,6 +41,7 @@ var availableUpgrades = {
     "projectile_speed": {
         name: "Projéteis Relâmpago",
         description: "Aumenta velocidade dos projéteis em 40%",
+        icon: "images/attackspeedupgrade.png",
         effect: function() {
             player_status.projectile_speed *= 1.4;
         }
@@ -44,6 +49,7 @@ var availableUpgrades = {
     "fire_rate": {
         name: "Taxa de Tiro Rápida",
         description: "Reduz tempo entre disparos em 30%",
+        icon: "images/attackspeedupgrade.png",
         effect: function() {
             player_status.time_between_projectiles *= 0.7;
         }
@@ -51,6 +57,7 @@ var availableUpgrades = {
     "magnet_range": {
         name: "Ímã de Experiência",
         description: "Aumenta alcance de atração de experiência em 50%",
+        icon: "images/magnet.png",
         effect: function() {
             player_status.magnet_max_distance *= 1.5;
         }
@@ -58,6 +65,7 @@ var availableUpgrades = {
     "invincibility_time": {
         name: "Invencibilidade Estendida",
         description: "Aumenta tempo de invencibilidade em 50%",
+        icon: "images/invincibility.png",
         effect: function() {
             player_status.invincibility_time *= 1.5;
         }
@@ -65,6 +73,7 @@ var availableUpgrades = {
     "experience_boost": {
         name: "Experiência Duplicada",
         description: "Ganha 2x mais experiência",
+        icon: "images/xpemdobro.png",
         effect: function() {
             experienceMultiplier = 2;
         }
@@ -72,6 +81,7 @@ var availableUpgrades = {
     "freezing_shot": {
         name: "Tiro Congelante",
         description: "25% de chance de congelar inimigos por 2 segundos.",
+        icon: "images/tirocongelante.png",
         effect: function() {
             player_status.has_freezing_shot = true;
         }
@@ -79,6 +89,7 @@ var availableUpgrades = {
     "boomerang_shot": {
         name: "Tiro Bumerangue",
         description: "Projéteis perfuram e retornam para você.",
+        icon: "images/bumerange.png",
         effect: function() {
             player_status.has_boomerang_shot = true;
         }
@@ -89,6 +100,7 @@ var availableUpgrades = {
 var upgradeScreenVisible = false;
 var currentQuizQuestion = null;
 var selectedUpgrade = null;
+var quiz_difficulty = 'normal'; // Adicionado para compatibilidade
 
 // Função para mostrar tela de upgrade
 function showUpgradeScreen() {
@@ -255,6 +267,7 @@ function createUpgradeSelectionInterface() {
             justify-content: space-between; text-align: center;
         `;
         optionButton.innerHTML = `
+            <img src="${upgrade.icon}" alt="${upgrade.name}" style="width: 64px; height: 64px; margin-bottom: 10px; image-rendering: pixelated;">
             <h3 style="margin: 0 0 10px 0; color: #FFD700; font-size: 1.3em;">${upgrade.name}</h3>
             <p style="margin: 0; font-size: 0.9em; color: #eee;">${upgrade.description}</p>
         `;
