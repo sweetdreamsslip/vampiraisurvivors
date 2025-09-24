@@ -57,7 +57,7 @@ var availableUpgrades = {
     "magnet_range": {
         name: "Ímã de Experiência",
         description: "Aumenta alcance de atração de experiência em 50%",
-        icon: "images/magnet.png",
+        icon: "images/magnetico.png",
         effect: function() {
             player_status.magnet_max_distance *= 1.5;
         }
@@ -65,7 +65,7 @@ var availableUpgrades = {
     "invincibility_time": {
         name: "Invencibilidade Estendida",
         description: "Aumenta tempo de invencibilidade em 50%",
-        icon: "images/invincibility.png",
+        icon: "images/escudo.png",
         effect: function() {
             player_status.invincibility_time *= 1.5;
         }
@@ -92,6 +92,16 @@ var availableUpgrades = {
         icon: "images/bumerange.png",
         effect: function() {
             player_status.has_boomerang_shot = true;
+        }
+    },
+    "gun_drone_unlock": {
+        name: "Companheiro Canino",
+        description: "Ganha um cão de guarda que atira nos inimigos.",
+        icon: "images/Dogpet.png",
+        effect: function() {
+            if (gun_drones_list.length === 0) {
+                gun_drones_list.push(new GunDroneObject(player.x + 60, player.y, 60));
+            }
         }
     },
 };
@@ -263,8 +273,8 @@ function createUpgradeSelectionInterface() {
         optionButton.style.cssText = `
             background: rgba(255, 255, 255, 0.1); color: white; border: 3px solid #FFD700;
             padding: 20px; border-radius: 10px; cursor: pointer; font-size: 1em;
-            transition: all 0.3s ease; width: 220px; display: flex; flex-direction: column;
-            justify-content: space-between; text-align: center;
+            transition: all 0.3s ease; width: 220px; display: flex; flex-direction: column; 
+            justify-content: space-between; text-align: center; align-items: center;
         `;
         optionButton.innerHTML = `
             <img src="${upgrade.icon}" alt="${upgrade.name}" style="width: 64px; height: 64px; margin-bottom: 10px; image-rendering: pixelated;">
