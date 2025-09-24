@@ -66,6 +66,7 @@ var SpawnerObject = function(){
     },
 
     this.spawnEnemy = function(){
+        enemies_spawned++;
         // Arguments for enemy constructors
         var args = [randomIntBetween(0, scenario.width), randomIntBetween(0, scenario.height)];
         // Pick a random enemy class based on weights and spawn it

@@ -11,6 +11,7 @@ function NormalBook(x, y){
         enemy_status.base_damage // base_damage
     );
     book.enemyType = "normal";
+    book.id = enemies_spawned;
 
     // Adiciona propriedades de animação
     book.frameWidth = 32;
@@ -95,6 +96,7 @@ function FastBook(x, y){
         enemy_status.base_damage * 0.75 // base_damage
     );
     book.enemyType = "fast";
+    book.id = enemies_spawned;
     return book;
 }
 
@@ -107,6 +109,7 @@ var DashEnemy = function(x, y){
         enemy_status.base_speed * 2, 
         enemy_status.base_damage * 0.75,
     );
+    enemy.id = enemies_spawned;
     return enemy;
 }
 
@@ -127,6 +130,7 @@ var FlyingEnemy = function(x, y){
     enemy.animationSpeed = 195; // Velocidade da animação (ms por frame) - 30% mais lento
     enemy.animationTimer = 0;   // Garante que o timer da animação inicie zerado
     enemy.currentFrame = 0;     // Garante que a animação comece do primeiro frame
+    enemy.id = enemies_spawned;
     return enemy;
 }
 
@@ -139,5 +143,6 @@ var TankEnemy = function(x, y){
         enemy_status.base_speed, 
         enemy_status.base_damage,
     );
+    enemy.id = enemies_spawned;
     return enemy;
 }

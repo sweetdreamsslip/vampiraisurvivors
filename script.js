@@ -28,6 +28,7 @@ var angle_between_player_and_mouse = 0;
 var time_since_last_projectile = 0;
 var survivalTime = 0;
 var time_since_last_enemy_spawn = 0;
+var enemies_spawned = 0;
 var gamePaused = false;
 var gameStarted = false;
 
@@ -259,7 +260,7 @@ function update(dt) {
     //projectile collision
     for(var i = 0; i < projectiles_list.length; i++){
         for(var j = 0; j < enemies_list.length; j++){
-            if(aabbCircleCollision(projectiles_list[i], enemies_list[j]) && projectiles_list[i].exists && enemies_list[j].alive){
+            if(aabbCircleCollision(projectiles_list[i], enemies_list[j]) && projectiles_list[i].exists && enemies_list[j].alive && !projectiles_list[i].hitted_enemies.includes(enemies_list[j])){
                 createParticleExplosion(enemies_list[j].x, enemies_list[j].y, "#8A2BE2", randomIntBetween(10, 20)); // Cor roxa para explosão do livro
                 // Efeito de explosão
                 if (projectiles_list[i].explosive) {
@@ -272,13 +273,9 @@ function update(dt) {
                     enemies_list[j].freeze_timer = 2000; // 2 segundos congelado
                 }
                 
-                // Tiro perfurante - não remove o projétil
-                if (!projectiles_list[i].piercing_shot) {
-                    projectiles_list[i].exists = false;	
-                }
-                
                 projectiles_list[i].hit();
                 enemies_list[j].take_damage(projectiles_list[i].damage);
+                projectiles_list[i].hitted_enemies.push(enemies_list[j]);
             }
         }
     }

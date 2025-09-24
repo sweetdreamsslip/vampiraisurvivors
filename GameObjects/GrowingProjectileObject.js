@@ -13,10 +13,11 @@ var GrowingProjectileObject = function(sprite, x, y, angle, damage) {
         damage: damage || player_status.damage,
         exists: true,
         sprite: sprite,
-        piercing_strength: 1,
-        current_pierce_strength: this.piercing_strength,
+        piercing_strength: player_status.gun_drone_piercing_strength,
+        current_pierce_strength: player_status.gun_drone_piercing_strength,
         // Propriedades de crescimento
         currentScale: initialScale,
+        hitted_enemies: [],
 
         update: function(dt){
             // Aumenta a escala do projétil ao longo do tempo

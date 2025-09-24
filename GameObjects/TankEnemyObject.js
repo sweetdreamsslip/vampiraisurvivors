@@ -95,11 +95,6 @@ var TankEnemyObject = function(sprite, x, y, health, damage) {
                            healthPercent > 0.25 ? 'rgba(255, 255, 0, 0.9)' : 'rgba(255, 0, 0, 0.9)';
             ctx.fillRect(this.x - barWidth/2, barY, barWidth * healthPercent, barHeight);
             
-            // Texto "TANK"
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 12px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText('TANK', this.x, this.y + 5);
             
             ctx.restore();
         },

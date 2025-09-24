@@ -8,8 +8,9 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
         exists: true,
         damage: damage,
         piercing_strength: player_status.piercing_strength,
-        current_pierce_strength: this.piercing_strength,
+        current_pierce_strength: player_status.piercing_strength,
         attackSound_source: new Audio(sound_configuration.attack_sound),
+        hitted_enemies: [],
         
         /*
             Projéteis especiais
