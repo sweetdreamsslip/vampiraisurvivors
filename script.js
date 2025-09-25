@@ -478,7 +478,6 @@ function updateHUD() {
             healthContainer.appendChild(heartCanvas);
         }
     }
-    
 }
 
 function UpdateDebugHUD() {
@@ -529,14 +528,13 @@ function updateXPProgressBar() {
         progressContainer.id = 'xpProgressContainer';
         progressContainer.style.cssText = `
             position: relative; /* Para posicionar o texto sobre a barra */
-            width: 25vw; /* Largura responsiva (25% da largura da tela) */
-            max-width: 350px; /* Largura máxima para telas muito grandes */
-            height: 24px; /* Altura aumentada */
-            background: rgba(0, 0, 0, 0.7);
-            border: 2px solid #FFD700;
-            border-radius: 10px;
+            width: 35vw; /* Largura aumentada para 35% da tela */
+            max-width: 500px; /* Largura máxima de 500px */
+            height: 28px; /* Altura aumentada */
+            background: #402c1a; /* Cor de fundo escura */
+            border: 2px solid #e4a83a; /* Borda completa */
             overflow: hidden;
-            display: flex;
+            display: flex; /* Mantém o display flex */
             align-items: center;
             justify-content: center;
         `;
@@ -547,10 +545,9 @@ function updateXPProgressBar() {
             position: absolute;
             top: 0;
             left: 0;
-            height: 100%;
-            background: linear-gradient(90deg, #FFD700, #FFA500);
-            width: 0%;
-            transition: width 0.3s ease;
+            height: 100%; /* Altura total */
+            background: #FFD700; /* Cor sólida amarela */
+            width: 0%; /* Inicia vazia */
         `;
         
         // Cria o elemento de texto para o nível, que ficará sobre a barra

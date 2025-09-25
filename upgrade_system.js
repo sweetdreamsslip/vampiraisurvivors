@@ -183,6 +183,7 @@ function createUpgradeInterface() {
             border-radius: 8px;
             padding: 12px 20px;
             cursor: pointer;
+            font-family: "Pixelify Sans", sans-serif;
             font-size: 1.1em;
             text-align: left;
             transition: all 0.2s ease;
@@ -254,12 +255,15 @@ function createUpgradeSelectionInterface() {
     selectionDiv.id = 'upgradeSelectionInterface';
     selectionDiv.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9);
-        display: flex; flex-direction: column; justify-content: center; align-items: center;
-        z-index: 2000; color: white; font-family: 'Arial', sans-serif;
+        display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 2000; color: white;
     `;
 
     selectionDiv.innerHTML = `
-        <h1 style="color: #4CAF50; font-size: 2.5em; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">✅ RESPOSTA CORRETA! ✅</h1>
+        <h1 style="color: #4CAF50; font-size: 2.5em; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 15px;">
+            <img src="images/checksign.png" style="height: 2em; image-rendering: pixelated;">
+            RESPOSTA CORRETA!
+            <img src="images/checksign.png" style="height: 2em; image-rendering: pixelated;">
+        </h1>
         <h2 style="color: #FFD700; font-size: 1.8em; margin-bottom: 30px;">Escolha seu upgrade:</h2>
     `;
 
@@ -273,7 +277,7 @@ function createUpgradeSelectionInterface() {
         optionButton.style.cssText = `
             background: rgba(255, 255, 255, 0.1); color: white; border: 3px solid #FFD700;
             padding: 20px; border-radius: 10px; cursor: pointer; font-size: 1em;
-            transition: all 0.3s ease; width: 220px; display: flex; flex-direction: column; 
+            transition: all 0.3s ease; width: 220px; display: flex; flex-direction: column; font-family: "Pixelify Sans", sans-serif;
             justify-content: space-between; text-align: center; align-items: center;
         `;
         optionButton.innerHTML = `
@@ -326,8 +330,12 @@ function showUpgradeResult(isCorrect, chosenUpgrade = null) {
     if (isCorrect) {
         // Título de sucesso
         var title = document.createElement('h1');
-        title.textContent = '✅ UPGRADE ADQUIRIDO! ✅';
-        title.style.cssText = 'color: #4CAF50; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
+        title.style.cssText = 'color: #4CAF50; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 15px;';
+        title.innerHTML = `
+            <img src="images/checksign.png" style="height: 2em; image-rendering: pixelated;">
+            UPGRADE ADQUIRIDO!
+            <img src="images/checksign.png" style="height: 2em; image-rendering: pixelated;">
+        `;
         resultDiv.appendChild(title);
         
         // Informações do upgrade
@@ -349,8 +357,12 @@ function showUpgradeResult(isCorrect, chosenUpgrade = null) {
     } else {
         // Título de erro
         var title = document.createElement('h1');
-        title.textContent = '❌ RESPOSTA INCORRETA ❌';
-        title.style.cssText = 'color: #f44336; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
+        title.style.cssText = 'color: #f44336; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 15px;';
+        title.innerHTML = `
+            <img src="images/wrongsign.png" style="height: 2em; image-rendering: pixelated;">
+            RESPOSTA INCORRETA
+            <img src="images/wrongsign.png" style="height: 2em; image-rendering: pixelated;">
+        `;
         resultDiv.appendChild(title);
         
         // Resposta correta
@@ -395,6 +407,7 @@ function showUpgradeResult(isCorrect, chosenUpgrade = null) {
         border: none;
         padding: 15px 30px;
         font-size: 1.2em;
+        font-family: "Pixelify Sans", sans-serif;
         border-radius: 10px;
         cursor: pointer;
         margin-top: 30px;

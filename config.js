@@ -83,7 +83,7 @@ var sound_configurations = {
     "default": {
         shoot_sound: "sounds/lapis_scratch.mp3",
         dog_shoot_sound: "sounds/dog_bark1.mp3",
-        background_music: "sounds/sparkmandrill.mp3",
+        background_music: "sounds/bgm3.wav",
         defeated_boss_sound: "sounds/Jogo-Morte do Boss.mp3",
         enemy_death_sound: "sounds/Som_Jogo Livro.mp3",
     },

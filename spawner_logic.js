@@ -84,16 +84,24 @@ var SpawnerObject = function(){
     this.showBossWarning = function(ctx) {
         if (!this.warningActive) return;
 
+        const hudTopOffset = 85; // Altura da área do HUD superior para não sobrepor
+        const warningAreaHeight = (HEIGHT / 6);
+
+        // Garante que a área de aviso não seja desenhada se for muito pequena
+        if (warningAreaHeight <= hudTopOffset) return;
+
         ctx.save();
         ctx.fillStyle = '#FF0000';
         ctx.globalAlpha = Math.min(this.waveFunction(this.warningTimer/1000), 0.7);
-        ctx.fillRect(0, 0, WIDTH, HEIGHT/6);
+        // Desenha o retângulo de aviso abaixo do HUD
+        ctx.fillRect(0, hudTopOffset, WIDTH, warningAreaHeight);
         ctx.globalAlpha = 1.0;
-        ctx.font = "bold 48px Arial";
+        ctx.font = "bold 48px 'Pixelify Sans', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#FFFFFF";
-        ctx.fillText("Hora da prova!", WIDTH / 2, (HEIGHT / 6) / 2 + 15);
+        // Centraliza o texto na nova área de aviso
+        ctx.fillText("Hora da prova!", WIDTH / 2, hudTopOffset + (warningAreaHeight / 2));
         ctx.restore();
     }
     

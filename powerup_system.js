@@ -377,7 +377,6 @@ function showPowerUpQuiz() {
         align-items: center;
         z-index: 3000;
         color: white;
-        font-family: 'Arial', sans-serif;
     `;
     
     // Título
@@ -414,6 +413,7 @@ function showPowerUpQuiz() {
             padding: 15px 20px;
             border-radius: 8px;
             cursor: pointer;
+            font-family: "Pixelify Sans", sans-serif;
             font-size: 1.1em;
             transition: all 0.3s ease;
         `;
@@ -484,12 +484,15 @@ function createPowerUpSelectionInterface() {
     selectionDiv.style.cssText = `
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0, 0, 0, 0.9); display: flex; flex-direction: column;
-        justify-content: center; align-items: center; z-index: 3000;
-        color: white; font-family: 'Arial', sans-serif;
+        justify-content: center; align-items: center; z-index: 3000; color: white;
     `;
 
     selectionDiv.innerHTML = `
-        <h1 style="color: #4CAF50; font-size: 2.5em; margin-bottom: 20px;">✅ CORRETO! ✅</h1>
+        <h1 style="color: #4CAF50; font-size: 2.5em; margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
+            <img src="images/checksign.png" style="height: 2em; image-rendering: pixelated;">
+            CORRETO!
+            <img src="images/checksign.png" style="height: 2em; image-rendering: pixelated;">
+        </h1>
         <h2 style="color: #FFD700; font-size: 1.8em; margin-bottom: 30px;">Escolha um Power-Up adicional:</h2>
     `;
 
@@ -513,7 +516,7 @@ function createPowerUpSelectionInterface() {
         optionButton.style.cssText = `
             background: rgba(255, 255, 255, 0.1); color: white;
             border: 3px solid ${powerUpInfo.colors[type] || '#FFFFFF'}; padding: 20px; border-radius: 10px;
-            cursor: pointer; font-size: 1em; transition: all 0.3s ease;
+            cursor: pointer; font-size: 1em; transition: all 0.3s ease; font-family: "Pixelify Sans", sans-serif;
             width: 200px; display: flex; flex-direction: column; align-items: center; text-align: center;
         `;
         optionButton.innerHTML = `
@@ -547,17 +550,22 @@ function showQuizResult(isCorrect, powerupType) {
         border-radius: 15px;
         text-align: center;
         z-index: 3000;
-        font-family: 'Arial', sans-serif;
     `;
     
     if (isCorrect) {
         resultDiv.innerHTML = `
-            <h2 style="color: #4CAF50; margin-bottom: 15px;">✅ CORRETO!</h2>
+            <h2 style="color: #4CAF50; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <img src="images/checksign.png" style="height: 2.4em; image-rendering: pixelated;">
+                CORRETO!
+            </h2>
             <p>Você ganhou um power-up adicional: <strong>${powerupType}</strong></p>
         `;
     } else {
         resultDiv.innerHTML = `
-            <h2 style="color: #f44336; margin-bottom: 15px;">❌ INCORRETO</h2>
+            <h2 style="color: #f44336; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <img src="images/wrongsign.png" style="height: 2.4em; image-rendering: pixelated;">
+                INCORRETO
+            </h2>
             <p>Você ainda ganha o power-up que coletou!</p>
         `;
     }
