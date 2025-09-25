@@ -13,7 +13,7 @@ var ExperienceOrbObject = function(sprite, x, y, experience_value) {
         exists: true,
         sprite: sprite,
         speed: 0.2, // Velocidade de movimento em direção ao jogador
-        attraction_radius: 150, // A distância em que o jogador começa a atrair o orbe
+        attraction_radius: player_status.magnet_max_distance, // A distância em que o jogador começa a atrair o orbe
         attraction_speed_multiplier: 1,
 
         update: function(dt, playerX, playerY) {
