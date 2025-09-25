@@ -33,8 +33,8 @@ var player_status_configurations = {
         speed: 0.5,
         max_health: 100,
         projectile_speed: 1,
-        time_between_projectiles: 1000, // 60 projéteis por minuto
-        time_between_gun_drone_projectiles: 1000, // 60 projéteis por minuto
+        time_between_projectiles: 100,
+        time_between_gun_drone_projectiles: 100,
         damage: 10,
         invincibility_time: 1000,
         magnet_max_distance: 100,
@@ -43,7 +43,7 @@ var player_status_configurations = {
         freezing_effect: 0,
         has_boomerang_shot: false,
         boomerang_max_distance: 300,
-    }
+    },
 }
 
 
