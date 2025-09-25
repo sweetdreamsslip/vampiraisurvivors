@@ -94,9 +94,6 @@ var usedQuestions = {
 // Sistema de Boss
 var bossActive = false;
 
-// Sistema de teclado
-var keys = {};
-
 // Estado do jogo
 var game_running = false;
 
@@ -166,6 +163,10 @@ window.addEventListener("keydown", function(e) {
     }
     if (e.key === 'Enter' && !gameStarted) { // Enter para iniciar
         startGame();
+    }
+    // Controle do teleporte Proxy (tecla T)
+    if (e.key === 't' || e.key === 'T') {
+        useProxyTeleport();
     }
 });
 window.addEventListener("keyup", function(e) {

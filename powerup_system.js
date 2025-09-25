@@ -26,9 +26,6 @@ var usedQuestions = {
     hard: []
 };
 
-// Sistema de teclado para controles especiais
-var keys = {};
-
 // ========================================
 // CLASSE POWER-UP OBJECT
 // ========================================
@@ -619,19 +616,5 @@ function getUnusedQuestion(difficulty) {
     // Aplicar embaralhamento para evitar que jogador decore posições
     return CompleteQuizSystem.shuffleOptions(selectedQuestion);
 }
-
-// Event listeners para teclado
-document.addEventListener('keydown', function(event) {
-    keys[event.key] = true;
-    
-    // Controle do teleporte Proxy (tecla T)
-    if (event.key === 't' || event.key === 'T') {
-        useProxyTeleport();
-    }
-});
-
-document.addEventListener('keyup', function(event) {
-    keys[event.key] = false;
-});
 
 console.log('Sistema de power-ups carregado!');
