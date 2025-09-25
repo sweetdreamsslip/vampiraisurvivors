@@ -18,7 +18,6 @@ function DashEnemyObject(sprite, x, y, max_health, base_speed, base_damage) {
     // Propriedades específicas do DashEnemy
     base.invincibility_time = 0;
     base.enemyType = 'dash';
-    base.frozen = false;
     base.freeze_timer = 0;
 
     
@@ -58,10 +57,10 @@ function DashEnemyObject(sprite, x, y, max_health, base_speed, base_damage) {
     base.update = function(dt) {
 
         // Lógica de congelamento
-        if (this.frozen) {
+        if (this.freeze_timer > 0) {
             this.freeze_timer -= dt;
             if (this.freeze_timer <= 0) {
-                this.frozen = false;
+                this.freeze_timer = 0;
             }
             return; // Pula o resto da atualização se estiver congelado
         }
@@ -113,7 +112,7 @@ function DashEnemyObject(sprite, x, y, max_health, base_speed, base_damage) {
         ctx.translate(-camera.x, -camera.y);
 
         // Efeito visual de congelamento
-        if (this.frozen) {
+        if (this.freeze_timer > 0) {
             ctx.globalAlpha = 0.8;
             ctx.fillStyle = '#ADD8E6'; // Azul claro
             ctx.beginPath();

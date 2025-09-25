@@ -81,10 +81,9 @@ var PlayerObject = function(idleWalkSpriteSheet, shootingSpriteSheet, shootingAn
         s.play();
 
         // Adiciona propriedades de upgrades ao projétil
-        if (player_status.has_freezing_shot) {
-            // 25% de chance de ser um tiro congelante
-            if (Math.random() < 0.25) {
-                proj.freeze = true;
+        if (player_status.freezing_chance > 0) {
+            if (Math.random() <= player_status.freezing_chance / 100) {
+                proj.freezing_effect = player_status.freezing_effect;
             }
         }
 

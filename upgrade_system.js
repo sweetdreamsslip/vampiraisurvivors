@@ -83,7 +83,18 @@ var availableUpgrades = {
         description: "25% de chance de congelar inimigos por 2 segundos.",
         icon: "images/tirocongelante.png",
         effect: function() {
-            player_status.has_freezing_shot = true;
+            if(player_status.freezing_effect === 0){
+                player_status.freezing_effect = player_status_configurations[selected_player_status_configuration].freezing_effect;
+            } else {
+                player_status.freezing_effect += player_status_configurations[selected_player_status_configuration].freezing_effect/2;
+            }
+            if(player_status.freezing_chance === 0){
+                player_status.freezing_chance = player_status_configurations[selected_player_status_configuration].freezing_chance;
+            }
+            else{
+                player_status.freezing_chance += 25;
+            }
+            
         }
     },
     "boomerang_shot": {

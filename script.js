@@ -270,9 +270,8 @@ function update(dt) {
                 }
                 
                 // Efeito de congelamento
-                if (projectiles_list[i].freeze) {
-                    enemies_list[j].frozen = true;
-                    enemies_list[j].freeze_timer = 2000; // 2 segundos congelado
+                if (projectiles_list[i].freezing_effect > 0) {
+                    enemies_list[j].freeze_timer = projectiles_list[i].freezing_effect;
                 }
                 
                 projectiles_list[i].hit();
