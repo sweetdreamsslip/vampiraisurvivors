@@ -59,6 +59,7 @@ var background_music_test = new Audio();
 var shootSound = new Audio();
 var dogShootSound = new Audio();
 var defeatedBossSound = new Audio();
+var enemyDeathSound = new Audio();
 
 
 
@@ -287,6 +288,11 @@ function update(dt) {
             experience_orbs_list.push(
                 new ExperienceOrbObject(xpSprite, enemy.x, enemy.y, experience_configurations[selected_experience_configuration].base_orb_value * experience_configurations[selected_experience_configuration].base_orb_value_multiplier)
             );
+            // Toca o som de morte do inimigo, mas não para o chefe
+            if (!enemy.isBoss) {
+                enemyDeathSound.currentTime = 0;
+                enemyDeathSound.play();
+            }
         }
     });
 
@@ -857,6 +863,7 @@ background_music_test.src = sound_configuration.background_music;
 shootSound.src = sound_configuration.shoot_sound;
 dogShootSound.src = sound_configuration.dog_shoot_sound;
 defeatedBossSound.src = sound_configuration.defeated_boss_sound;
+enemyDeathSound.src = sound_configuration.enemy_death_sound;
 
 // Função para obter pergunta aleatória não utilizada
 function getUnusedQuestion(difficulty) {

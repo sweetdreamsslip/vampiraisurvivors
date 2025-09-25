@@ -3,8 +3,8 @@ var player_status_configurations = {
         speed: 0.4,
         max_health: 100,
         projectile_speed: 0.7,
-        time_between_projectiles: 500,
-        time_between_gun_drone_projectiles: 2000,
+        time_between_projectiles: 1000, // 60 projéteis por minuto
+        time_between_gun_drone_projectiles: 1000, // 60 projéteis por minuto
         damage: 10,
         invincibility_time: 1000,
         magnet_max_distance: 200,
@@ -18,8 +18,8 @@ var player_status_configurations = {
         speed: 0.4,
         max_health: 300,
         projectile_speed: 0.7,
-        time_between_projectiles: 500,
-        time_between_gun_drone_projectiles: 2000,
+        time_between_projectiles: 1000, // 60 projéteis por minuto
+        time_between_gun_drone_projectiles: 1000, // 60 projéteis por minuto
         damage: 10,
         invincibility_time: 1000,
         magnet_max_distance: 200,
@@ -33,23 +33,8 @@ var player_status_configurations = {
         speed: 0.5,
         max_health: 100,
         projectile_speed: 1,
-        time_between_projectiles: 100,
-        time_between_gun_drone_projectiles: 100,
-        damage: 10,
-        invincibility_time: 1000,
-        magnet_max_distance: 100,
-        piercing_strength: 0,
-        gun_drone_piercing_strength: 5,
-        freezing_effect: 0,
-        has_boomerang_shot: false,
-        boomerang_max_distance: 300,
-    },
-    "debug": {
-        speed: 1,
-        max_health: 100,
-        projectile_speed: 1,
-        time_between_projectiles: 5,
-        time_between_gun_drone_projectiles: 5,
+        time_between_projectiles: 1000, // 60 projéteis por minuto
+        time_between_gun_drone_projectiles: 1000, // 60 projéteis por minuto
         damage: 10,
         invincibility_time: 1000,
         magnet_max_distance: 100,
@@ -98,14 +83,16 @@ var sound_configurations = {
     "default": {
         shoot_sound: "sounds/lapis_scratch.mp3",
         dog_shoot_sound: "sounds/dog_bark1.mp3",
-        background_music: "sounds/bgm1.mp3",
+        background_music: "sounds/sparkmandrill.mp3",
         defeated_boss_sound: "sounds/Jogo-Morte do Boss.mp3",
+        enemy_death_sound: "sounds/Som_Jogo Livro.mp3",
     },
     "debug": {
         shoot_sound: "sounds/lapis_scratch.mp3",
         dog_shoot_sound: "sounds/dog_bark1.mp3",
         background_music: "sounds/guitarra.mp3",
         defeated_boss_sound: "sounds/Jogo-Morte do Boss.mp3",
+        enemy_death_sound: "sounds/Som_Jogo Livro.mp3",
     },
 }
 
