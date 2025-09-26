@@ -250,7 +250,7 @@ var QuestionPoolObject = {
             },
             {
                 question: "Qual é a altitude aproximada da cidade de Piraí?",
-                options: ["350 m", "500 m", "200 m", "100 m"],
+                options: ["390 m", "500 m", "200 m", "100 m"],
                 correct: 0,
                 category: "Piraí"
             },
@@ -458,7 +458,7 @@ var QuestionPoolObject = {
             // PIRAI - NORMAL (competência 2)
             {
                 question: "Qual é o distrito de Piraí famoso pela represa?",
-                options: ["Santana", "Jaqueira", "Arrozal", "Varjão"],
+                options: ["Lajes", "Jaqueira", "Arrozal", "Varjão"],
                 correct: 0,
                 category: "Piraí"
             },
@@ -468,12 +468,7 @@ var QuestionPoolObject = {
                 correct: 0,
                 category: "Piraí"
             },
-            {
-                question: "Em que ano Piraí foi elevada à categoria de cidade?",
-                options: ["1837", "1850", "1822", "1900"],
-                correct: 0,
-                category: "Piraí"
-            },
+            
             {
                 question: "Qual é a principal rodovia estadual que passa por Piraí?",
                 options: ["RJ-145", "RJ-116", "RJ-155", "RJ-115"],
@@ -488,48 +483,32 @@ var QuestionPoolObject = {
             },
             {
                 question: "Qual é o nome do distrito de Piraí famoso pela produção rural?",
-                options: ["Varjão", "Centro", "Cacaria", "Santanésia"],
+                options: ["Arrozal", "Centro", "Cacaria", "Santanésia"],
                 correct: 0,
                 category: "Piraí"
             },
-            {
-                question: "Qual é o nome da ponte histórica de Piraí?",
-                options: ["Ponte dos Arcos", "Ponte da Amizade", "Ponte Nova", "Ponte Antiga"],
-                correct: 0,
-                category: "Piraí"
-            },
+          
             {
                 question: "Qual é a população aproximada de Piraí?",
-                options: ["30 mil habitantes", "50 mil habitantes", "20 mil habitantes", "80 mil habitantes"],
+                options: ["30 mil habitantes", "50 mil habitantes", "60 mil habitantes", "80 mil habitantes"],
                 correct: 0,
                 category: "Piraí"
             },
             {
                 question: "Qual é a principal praça do Centro de Piraí?",
-                options: ["Praça Getúlio Vargas", "Praça São João", "Praça Tiradentes", "Praça 15"],
+                options: ["Praça da Preguiça", "Praça São João", "Praça Tiradentes", "Praça 15"],
                 correct: 0,
                 category: "Piraí"
             },
-            {
-                question: "Qual é o nome do bairro próximo ao lago do Funil?",
-                options: ["Santanésia", "Arrozal", "Jaqueira", "Cacaria"],
-                correct: 0,
-                category: "Piraí"
-            }
         ],
         
         hard: [
             // Nota: As perguntas do JSON não incluem nível 3 (difícil)
             // Mantendo algumas perguntas originais como exemplo
+           
             {
-                question: "Qual é o apelido popular da Praça São Sebastião em Piraí?",
-                options: ["Praça da Preguiça", "Praça da Liberdade", "Praça Central", "Praça da Matriz"],
-                correct: 0,
-                category: "Piraí"
-            },
-            {
-                question: "Em que mês geralmente acontece a Piraí Fest?",
-                options: ["Setembro", "Agosto", "Outubro", "Novembro"],
+                question: "Em que mês acontece a Piraí Fest?",
+                options: ["Outubro", "Agosto", "Setembro", "Novembro"],
                 correct: 2,
                 category: "Piraí"
             },
