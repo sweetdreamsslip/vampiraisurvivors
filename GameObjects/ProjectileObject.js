@@ -15,7 +15,7 @@ var ProjectileObject = function(spriteSheet, x, y, initial_angle, damage) {
         /*
             Projéteis especiais
         */
-        freezing_effect: 0,
+        freezing_effect: player_status.freezing_effect,
         explosive: false,
         is_boomerang: player_status.has_boomerang_shot,
         is_returning: false,

@@ -12,7 +12,7 @@ var EnemyObject = function(spriteSheet, x, y, max_health, move_speed, base_damag
     this.alive = true;
     this.isBoss = false;
     this.enemyType = 'normal';
-
+    this.freeze_timer = 0;
     // Propriedades do Sprite
     this.sprite = spriteSheet;
     this.frameWidth = 32;
@@ -72,6 +72,18 @@ EnemyObject.prototype.render = function(ctx, camera){
 };
 
 EnemyObject.prototype.update = function(dt){
+    if(this.health <= 0){
+        this.alive = false;
+        return;
+    }
+
+    if (this.freeze_timer > 0) {
+        this.freeze_timer -= dt;
+        if (this.freeze_timer <= 0) {
+            this.freeze_timer = 0;
+        }
+        return; // Pula o resto da atualização se estiver congelado
+    }
     // Atualiza a animação
     this.animationTimer += dt;
     if (this.animationTimer > this.animationSpeed) {
@@ -81,9 +93,6 @@ EnemyObject.prototype.update = function(dt){
 
     this.moveTowardsPlayer(dt, this.speed);
 
-    if(this.health <= 0){
-        this.alive = false;
-    }
 };
 
 EnemyObject.prototype.moveTowardsPlayer = function(dt, speed){

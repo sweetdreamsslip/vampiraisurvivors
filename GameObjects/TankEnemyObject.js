@@ -19,7 +19,7 @@ var TankEnemyObject = function(sprite, x, y, health, damage) {
         invincibility_time: 0,
         isBoss: false,
         enemyType: 'tank', // Identificador do tipo
-        
+        freeze_timer: 0,
         // Propriedades de animação
         animationTimer: 0,
         animationSpeed: 250, // ms por frame, mais lento para um inimigo pesado
@@ -102,6 +102,15 @@ var TankEnemyObject = function(sprite, x, y, health, damage) {
         update: function(dt) {
             if (!this.alive) return;
             
+            // Lógica de congelamento
+            if (this.freeze_timer > 0) {
+                this.freeze_timer -= dt;
+                if (this.freeze_timer <= 0) {
+                    this.freeze_timer = 0;
+                }
+                return; // Pula o resto da atualização se estiver congelado
+            }
+
             // Atualiza a animação
             this.animationTimer += dt;
             if (this.animationTimer > this.animationSpeed) {

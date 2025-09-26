@@ -131,10 +131,10 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
             if (!this.alive) return;
             
             // Lógica de congelamento
-            if (this.frozen) {
+            if (this.freeze_timer > 0) {
                 this.freeze_timer -= dt;
                 if (this.freeze_timer <= 0) {
-                    this.frozen = false;
+                    this.freeze_timer = 0;
                 }
                 return; // Pula o resto da atualização se estiver congelado
             }
