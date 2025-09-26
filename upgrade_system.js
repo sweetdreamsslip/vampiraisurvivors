@@ -162,7 +162,7 @@ function createUpgradeInterface() {
     
     // Título
     var title = document.createElement('h1');
-    title.style.cssText = 'color: #FFD700; font-size: 2.25em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; gap: 20px;';
+    title.style.cssText = 'color: #FFD700; font-size: 3.2625em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; gap: 20px;';
     title.innerHTML = `
         <img src="images/lvl.png" alt="Ícone de Level Up" style="height: 1em; image-rendering: pixelated;">
         LEVEL UP!
@@ -176,7 +176,7 @@ function createUpgradeInterface() {
     
     var questionText = document.createElement('h2');
     questionText.textContent = currentQuizQuestion.question;
-    questionText.style.cssText = 'margin-bottom: 20px; font-size: 1.5em;';
+    questionText.style.cssText = 'margin-bottom: 20px; font-size: 2.175em;';
     questionDiv.appendChild(questionText);
     
     // Opções de resposta
@@ -193,9 +193,7 @@ function createUpgradeInterface() {
             border: 3px solid #402c1a;
             border-radius: 8px;
             padding: 12px 20px;
-            cursor: pointer;
-            font-family: "Pixelify Sans", sans-serif;
-            font-size: 1.1em;
+            cursor: pointer;            font-family: "Jersey 10", sans-serif;            font-size: 1.595em;
             text-align: left;
             transition: all 0.2s ease;
         `;
@@ -225,7 +223,7 @@ function createUpgradeInterface() {
     // Instruções
     var instructions = document.createElement('p');
     instructions.textContent = 'Responda corretamente para ganhar um upgrade especial!';
-    instructions.style.cssText = 'font-size: 1.2em; color: #ccc; margin-top: 20px;';
+    instructions.style.cssText = 'font-size: 1.74em; color: #ccc; margin-top: 20px;';
     upgradeDiv.appendChild(instructions);
     
     document.body.appendChild(upgradeDiv);
@@ -270,12 +268,12 @@ function createUpgradeSelectionInterface() {
     `;
 
     selectionDiv.innerHTML = `
-        <h1 style="color: #4CAF50; font-size: 2.5em; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 15px;">
+        <h1 style="color: #4CAF50; font-size: 3.25em; margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 15px;">
             <img src="images/checksign.png" style="height: 2em; image-rendering: pixelated;">
             RESPOSTA CORRETA!
             <img src="images/checksign.png" style="height: 2em; image-rendering: pixelated;">
         </h1>
-        <h2 style="color: #FFD700; font-size: 1.8em; margin-bottom: 30px;">Escolha seu upgrade:</h2>
+        <h2 style="color: #FFD700; font-size: 2.34em; margin-bottom: 30px;">Escolha seu upgrade:</h2>
     `;
 
     var optionsContainer = document.createElement('div');
@@ -287,14 +285,13 @@ function createUpgradeSelectionInterface() {
         optionButton.className = 'upgrade-option-button';
         optionButton.style.cssText = `
             background: rgba(255, 255, 255, 0.1); color: white; border: 3px solid #FFD700;
-            padding: 20px; border-radius: 10px; cursor: pointer; font-size: 1em;
-            transition: all 0.3s ease; width: 220px; display: flex; flex-direction: column; font-family: "Pixelify Sans", sans-serif;
-            justify-content: space-between; text-align: center; align-items: center;
+            padding: 20px; border-radius: 10px; cursor: pointer; font-size: 1.3em;
+            transition: all 0.3s ease; width: 220px; display: flex; flex-direction: column; font-family: "Jersey 10", sans-serif;            justify-content: space-between; text-align: center; align-items: center;
         `;
         optionButton.innerHTML = `
             <img src="${upgrade.icon}" alt="${upgrade.name}" style="width: 64px; height: 64px; margin-bottom: 10px; image-rendering: pixelated;">
-            <h3 style="margin: 0 0 10px 0; color: #FFD700; font-size: 1.3em;">${upgrade.name}</h3>
-            <p style="margin: 0; font-size: 0.9em; color: #eee;">${upgrade.description}</p>
+            <h3 style="margin: 0 0 10px 0; color: #FFD700; font-size: 1.69em;">${upgrade.name}</h3>
+            <p style="margin: 0; font-size: 1.17em; color: #eee;">${upgrade.description}</p>
         `;
         optionButton.addEventListener('click', function() {
             upgrade.effect();
@@ -341,7 +338,7 @@ function showUpgradeResult(isCorrect, chosenUpgrade = null) {
     if (isCorrect) {
         // Título de sucesso
         var title = document.createElement('h1');
-        title.style.cssText = 'color: #4CAF50; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 15px;';
+        title.style.cssText = 'color: #4CAF50; font-size: 4.35em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 15px;';
         title.innerHTML = `
             <img src="images/checksign.png" style="height: 2em; image-rendering: pixelated;">
             UPGRADE ADQUIRIDO!
@@ -355,12 +352,12 @@ function showUpgradeResult(isCorrect, chosenUpgrade = null) {
         
         var upgradeName = document.createElement('h2');
         upgradeName.textContent = upgrade.name;
-        upgradeName.style.cssText = 'color: #FFD700; font-size: 2em; margin-bottom: 15px;';
+        upgradeName.style.cssText = 'color: #FFD700; font-size: 2.9em; margin-bottom: 15px;';
         upgradeInfo.appendChild(upgradeName);
         
         var upgradeDesc = document.createElement('p');
         upgradeDesc.textContent = upgrade.description;
-        upgradeDesc.style.cssText = 'font-size: 1.3em; margin-bottom: 20px;';
+        upgradeDesc.style.cssText = 'font-size: 1.885em; margin-bottom: 20px;';
         upgradeInfo.appendChild(upgradeDesc);
         
         resultDiv.appendChild(upgradeInfo); 
@@ -368,7 +365,7 @@ function showUpgradeResult(isCorrect, chosenUpgrade = null) {
     } else {
         // Título de erro
         var title = document.createElement('h1');
-        title.style.cssText = 'color: #f44336; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 15px;';
+        title.style.cssText = 'color: #f44336; font-size: 4.35em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); display: flex; align-items: center; gap: 15px;';
         title.innerHTML = `
             <img src="images/wrongsign.png" style="height: 2em; image-rendering: pixelated;">
             RESPOSTA INCORRETA
@@ -382,12 +379,12 @@ function showUpgradeResult(isCorrect, chosenUpgrade = null) {
         
         var correctText = document.createElement('p');
         correctText.textContent = `Resposta correta: ${currentQuizQuestion.options[currentQuizQuestion.correct]}`;
-        correctText.style.cssText = 'font-size: 1.3em; margin-bottom: 15px;';
+        correctText.style.cssText = 'font-size: 1.885em; margin-bottom: 15px;';
         correctAnswer.appendChild(correctText);
         
         var explanation = document.createElement('p');
         explanation.textContent = 'Você ainda ganha um upgrade!';
-        explanation.style.cssText = 'font-size: 1.1em; color: #FFD700;';
+        explanation.style.cssText = 'font-size: 1.595em; color: #FFD700;';
         correctAnswer.appendChild(explanation);
         
         resultDiv.appendChild(correctAnswer);
@@ -398,12 +395,12 @@ function showUpgradeResult(isCorrect, chosenUpgrade = null) {
         
         var upgradeName = document.createElement('h2');
         upgradeName.textContent = upgrade.name;
-        upgradeName.style.cssText = 'color: #FFD700; font-size: 2em; margin-bottom: 15px;';
+        upgradeName.style.cssText = 'color: #FFD700; font-size: 2.9em; margin-bottom: 15px;';
         upgradeInfo.appendChild(upgradeName);
         
         var upgradeDesc = document.createElement('p');
         upgradeDesc.textContent = upgrade.description;
-        upgradeDesc.style.cssText = 'font-size: 1.3em; margin-bottom: 20px;';
+        upgradeDesc.style.cssText = 'font-size: 1.885em; margin-bottom: 20px;';
         upgradeInfo.appendChild(upgradeDesc);
         
         resultDiv.appendChild(upgradeInfo);
@@ -416,9 +413,7 @@ function showUpgradeResult(isCorrect, chosenUpgrade = null) {
         background: #ff6b6b;
         color: white;
         border: none;
-        padding: 15px 30px;
-        font-size: 1.2em;
-        font-family: "Pixelify Sans", sans-serif;
+        padding: 15px 30px;        font-size: 1.74em;        font-family: "Jersey 10", sans-serif;
         border-radius: 10px;
         cursor: pointer;
         margin-top: 30px;

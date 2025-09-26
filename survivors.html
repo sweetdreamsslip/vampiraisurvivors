@@ -6,15 +6,16 @@
     <title>Vampiraí Survivors</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jersey+10&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
 </head>
-<body style="background: url('images/umaruchan.jpg') no-repeat center center fixed; background-size: cover;">
+<body style="background: url('images/sectilogo2.png') no-repeat center center fixed; background-size: cover;">
     <!-- Tela de início -->
     <div id="startScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000;">
-        <h1 style="color: #ff6b6b; font-size: 3em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">VAMPIRAÍ SURVIVORS</h1>
-        <p style="color: white; font-size: 1.2em; margin-bottom: 30px; text-align: center;">Sobreviva aos livros vampiros e colete experiência!</p>
-        <button id="startButton" style="background: #ff6b6b; color: white; border: none; padding: 15px 30px; font-size: 1.2em; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">INICIAR JOGO</button>
+        <h1 style="color: #ff6b6b; font-size: 4.35em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">VAMPIRAÍ SURVIVORS</h1>
+        <p style="color: white; font-size: 1.74em; margin-bottom: 30px; text-align: center;">Sobreviva aos livros vampiros e colete experiência!</p>
+        <button id="startButton" style="background: #ff6b6b; color: white; border: none; padding: 15px 30px; font-size: 1.74em; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">INICIAR JOGO</button>
         
         <!-- Controles -->
         <div style="margin-top: 40px; color: white; text-align: center;">
@@ -31,10 +32,10 @@
         </div>
         
         <!-- Fundo com blur para o HUD superior -->
-        <div id="hudTopBackground" style="position: fixed; top: 0; left: 0; width: 100%; height: 85px; background: rgba(0, 0, 0, 0.4); z-index: 99; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);"></div>
+        <div id="hudTopBackground" style="position: fixed; top: 0; left: 0; width: 100%; height: 95px; background: rgba(0, 0, 0, 0.4); z-index: 99; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);"></div>
 
         <!-- HUD Superior (XP e Tempo) -->
-        <div style="position: fixed; top: 15px; left: 50%; transform: translateX(-50%); color: white; z-index: 100; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 1.5em;">
+        <div style="position: fixed; top: 15px; left: 50%; transform: translateX(-50%); color: white; z-index: 100; text-shadow: 2px 2px 5px rgba(0,0,0,0.9); display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 2.175em;">
             <div id="xpBarContainer"></div>
             <div id="timeContainer" style="display: flex; align-items: center;"><canvas id="clockIconCanvas" width="24" height="24" style="margin-right: 8px;"></canvas>Tempo: <span id="timeDisplay">00:00</span></div>
         </div>
@@ -59,14 +60,14 @@
 
         <!-- Tela de Game Over -->
         <div id="gameOverScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000;">
-            <h1 style="color: #ff6b6b; font-size: 3em; margin-bottom: 20px;">GAME OVER</h1>
-            <p style="color: white; font-size: 1.5em; margin-bottom: 10px;">Você sobreviveu até o nível <span id="finalLevel">1</span>!</p>
-            <p style="color: #FFD700; font-size: 1.8em; margin-bottom: 20px;">Pontuação Final: <span id="finalScore">0</span></p>
+            <h1 style="color: #ff6b6b; font-size: 4.35em; margin-bottom: 20px;">GAME OVER</h1>
+            <p style="color: white; font-size: 2.175em; margin-bottom: 10px;">Você sobreviveu até o nível <span id="finalLevel">1</span>!</p>
+            <p style="color: #FFD700; font-size: 2.61em; margin-bottom: 20px;">Pontuação Final: <span id="finalScore">0</span></p>
 
-            <h2 style="color: white; font-size: 2em; margin-bottom: 15px; border-bottom: 2px solid #ff6b6b; padding-bottom: 5px;">Ranking</h2>
-            <div id="rankingList" style="color: white; font-size: 1.2em; width: 350px; text-align: left; margin-bottom: 30px; max-height: 200px; overflow-y: auto;"></div>
+            <h2 style="color: white; font-size: 2.9em; margin-bottom: 15px; border-bottom: 2px solid #ff6b6b; padding-bottom: 5px;">Ranking</h2>
+            <div id="rankingList" style="color: white; font-size: 1.74em; width: 350px; text-align: left; margin-bottom: 30px; max-height: 200px; overflow-y: auto;"></div>
 
-            <button id="restartButton" style="background: #ff6b6b; color: white; border: none; padding: 15px 30px; font-size: 1.2em; border-radius: 10px; cursor: pointer;">JOGAR NOVAMENTE</button>
+            <button id="restartButton" style="background: #ff6b6b; color: white; border: none; padding: 15px 30px; font-size: 1.74em; border-radius: 10px; cursor: pointer;">JOGAR NOVAMENTE</button>
         </div>
     </div>
 

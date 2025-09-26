@@ -379,7 +379,7 @@ function showPowerUpQuiz() {
     // Título
     var title = document.createElement('h1');
     title.textContent = '🎁 POWER-UP ENCONTRADO! 🎁';
-    title.style.cssText = 'color: #FFD700; font-size: 2.5em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
+    title.style.cssText = 'color: #FFD700; font-size: 3.625em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
     quizDiv.appendChild(title);
     
     // Pergunta
@@ -388,12 +388,12 @@ function showPowerUpQuiz() {
     
     var questionText = document.createElement('h2');
     questionText.textContent = question.question;
-    questionText.style.cssText = 'margin-bottom: 20px; font-size: 1.3em;';
+    questionText.style.cssText = 'margin-bottom: 20px; font-size: 1.885em;';
     questionDiv.appendChild(questionText);
     
     var categoryText = document.createElement('p');
     categoryText.textContent = `Categoria: ${question.category}`;
-    categoryText.style.cssText = 'color: #ccc; font-size: 0.9em; margin-bottom: 15px;';
+    categoryText.style.cssText = 'color: #ccc; font-size: 1.305em; margin-bottom: 15px;';
     questionDiv.appendChild(categoryText);
     
     // Opções
@@ -409,9 +409,7 @@ function showPowerUpQuiz() {
             border: 2px solid #ff6b6b;
             padding: 15px 20px;
             border-radius: 8px;
-            cursor: pointer;
-            font-family: "Pixelify Sans", sans-serif;
-            font-size: 1.1em;
+            cursor: pointer;            font-family: "Jersey 10", sans-serif;            font-size: 1.595em;
             transition: all 0.3s ease;
         `;
         
@@ -438,7 +436,7 @@ function showPowerUpQuiz() {
     // Instruções
     var instructions = document.createElement('p');
     instructions.textContent = 'Responda corretamente para ganhar um power-up adicional!';
-    instructions.style.cssText = 'font-size: 1.1em; color: #ccc; margin-top: 20px;';
+    instructions.style.cssText = 'font-size: 1.595em; color: #ccc; margin-top: 20px;';
     quizDiv.appendChild(instructions);
     
     document.body.appendChild(quizDiv);
@@ -485,12 +483,12 @@ function createPowerUpSelectionInterface() {
     `;
 
     selectionDiv.innerHTML = `
-        <h1 style="color: #4CAF50; font-size: 2.5em; margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
+        <h1 style="color: #4CAF50; font-size: 3.625em; margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
             <img src="images/checksign.png" style="height: 2em; image-rendering: pixelated;">
             CORRETO!
             <img src="images/checksign.png" style="height: 2em; image-rendering: pixelated;">
         </h1>
-        <h2 style="color: #FFD700; font-size: 1.8em; margin-bottom: 30px;">Escolha um Power-Up adicional:</h2>
+        <h2 style="color: #FFD700; font-size: 2.61em; margin-bottom: 30px;">Escolha um Power-Up adicional:</h2>
     `;
 
     var optionsContainer = document.createElement('div');
@@ -512,14 +510,13 @@ function createPowerUpSelectionInterface() {
         var optionButton = document.createElement('button');
         optionButton.style.cssText = `
             background: rgba(255, 255, 255, 0.1); color: white;
-            border: 3px solid ${powerUpInfo.colors[type] || '#FFFFFF'}; padding: 20px; border-radius: 10px;
-            cursor: pointer; font-size: 1em; transition: all 0.3s ease; font-family: "Pixelify Sans", sans-serif;
+            border: 3px solid ${powerUpInfo.colors[type] || '#FFFFFF'}; padding: 20px; border-radius: 10px;            cursor: pointer; font-size: 1.45em; transition: all 0.3s ease; font-family: "Jersey 10", sans-serif;
             width: 200px; display: flex; flex-direction: column; align-items: center; text-align: center;
         `;
         optionButton.innerHTML = `
             <span style="font-size: 2em; margin-bottom: 10px;">${powerUpInfo.icons[type] || '?'}</span>
             <h3 style="margin: 0 0 10px 0; color: #FFD700; text-transform: capitalize;">${type.replace('_', ' ')}</h3>
-            <p style="margin: 0; font-size: 0.9em; color: #eee;">${powerUpDescriptions[type] || 'Um power-up misterioso!'}</p>
+            <p style="margin: 0; font-size: 1.305em; color: #eee;">${powerUpDescriptions[type] || 'Um power-up misterioso!'}</p>
         `;
         optionButton.addEventListener('click', function() {
             selectionDiv.remove();
@@ -551,19 +548,19 @@ function showQuizResult(isCorrect, powerupType) {
     
     if (isCorrect) {
         resultDiv.innerHTML = `
-            <h2 style="color: #4CAF50; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <h2 style="color: #4CAF50; font-size: 1.45em; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
                 <img src="images/checksign.png" style="height: 2.4em; image-rendering: pixelated;">
                 CORRETO!
             </h2>
-            <p>Você ganhou um power-up adicional: <strong>${powerupType}</strong></p>
+            <p style="font-size: 1.45em;">Você ganhou um power-up adicional: <strong>${powerupType}</strong></p>
         `;
     } else {
         resultDiv.innerHTML = `
-            <h2 style="color: #f44336; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <h2 style="color: #f44336; font-size: 1.45em; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
                 <img src="images/wrongsign.png" style="height: 2.4em; image-rendering: pixelated;">
                 INCORRETO
             </h2>
-            <p>Você ainda ganha o power-up que coletou!</p>
+            <p style="font-size: 1.45em;">Você ainda ganha o power-up que coletou!</p>
         `;
     }
     

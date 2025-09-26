@@ -96,7 +96,7 @@ var SpawnerObject = function(){
         // Desenha o retângulo de aviso abaixo do HUD
         ctx.fillRect(0, hudTopOffset, WIDTH, warningAreaHeight);
         ctx.globalAlpha = 1.0;
-        ctx.font = "bold 48px 'Pixelify Sans', sans-serif";
+        ctx.font = "bold 70px 'Jersey 10', sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "#FFFFFF";

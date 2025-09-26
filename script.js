@@ -433,11 +433,11 @@ function render() {
         ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "white";
-        ctx.font = "48px Arial";
+        ctx.font = "70px 'Jersey 10', sans-serif";
         ctx.textAlign = "center";
         ctx.fillText("PAUSADO", canvas.width / 2, canvas.height / 2);
-        ctx.font = "24px Arial";
-        ctx.fillText("Pressione Espaço ou ESC para continuar", canvas.width / 2, canvas.height / 2 + 50);
+        ctx.font = "35px 'Jersey 10', sans-serif";
+        ctx.fillText("Pressione Espaço ou ESC para continuar", canvas.width / 2, canvas.height / 2 + 60);
         ctx.textAlign = "left";
     }
 }
@@ -971,14 +971,12 @@ function showPowerUpQuiz() {
         justify-content: center;
         align-items: center;
         z-index: 3000;
-        color: white;
-        font-family: 'Arial', sans-serif;
+        color: white;        font-family: 'Jersey 10', sans-serif;
     `;
     
     // Título
     var title = document.createElement('h1');
-    title.textContent = '🎁 POWER-UP ENCONTRADO! 🎁';
-    title.style.cssText = 'color: #FFD700; font-size: 2.5em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
+    title.textContent = '🎁 POWER-UP ENCONTRADO! 🎁';    title.style.cssText = 'color: #FFD700; font-size: 3.625em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);';
     quizDiv.appendChild(title);
     
     // Pergunta
@@ -987,12 +985,12 @@ function showPowerUpQuiz() {
     
     var questionText = document.createElement('h2');
     questionText.textContent = question.question;
-    questionText.style.cssText = 'margin-bottom: 20px; font-size: 1.3em;';
+    questionText.style.cssText = 'margin-bottom: 20px; font-size: 1.885em;';
     questionDiv.appendChild(questionText);
     
     var categoryText = document.createElement('p');
     categoryText.textContent = `Categoria: ${question.category}`;
-    categoryText.style.cssText = 'color: #ccc; font-size: 0.9em; margin-bottom: 15px;';
+    categoryText.style.cssText = 'color: #ccc; font-size: 1.305em; margin-bottom: 15px;';
     questionDiv.appendChild(categoryText);
     
     // Opções
@@ -1008,9 +1006,7 @@ function showPowerUpQuiz() {
             border: 2px solid #ff6b6b;
             padding: 15px 20px;
             border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1em;
-            transition: all 0.3s ease;
+            cursor: pointer;            font-size: 1.595em;            transition: all 0.3s ease;
         `;
         
         optionButton.addEventListener('mouseenter', function() {
@@ -1036,7 +1032,7 @@ function showPowerUpQuiz() {
     // Instruções
     var instructions = document.createElement('p');
     instructions.textContent = 'Responda corretamente para ganhar um power-up adicional!';
-    instructions.style.cssText = 'font-size: 1.1em; color: #ccc; margin-top: 20px;';
+    instructions.style.cssText = 'font-size: 1.595em; color: #ccc; margin-top: 20px;';
     quizDiv.appendChild(instructions);
     
     document.body.appendChild(quizDiv);
@@ -1076,18 +1072,18 @@ function showQuizResult(isCorrect, powerupType) {
         border-radius: 15px;
         text-align: center;
         z-index: 3000;
-        font-family: 'Arial', sans-serif;
+        font-family: 'Jersey 10', sans-serif;
     `;
     
     if (isCorrect) {
         resultDiv.innerHTML = `
-            <h2 style="color: #4CAF50; margin-bottom: 15px;">✅ CORRETO!</h2>
-            <p>Você ganhou um power-up adicional: <strong>${powerupType}</strong></p>
+            <h2 style="color: #4CAF50; font-size: 1.45em; margin-bottom: 15px;">✅ CORRETO!</h2>
+            <p style="font-size: 1.45em;">Você ganhou um power-up adicional: <strong>${powerupType}</strong></p>
         `;
     } else {
         resultDiv.innerHTML = `
-            <h2 style="color: #f44336; margin-bottom: 15px;">❌ INCORRETO</h2>
-            <p>Você ainda ganha o power-up que coletou!</p>
+            <h2 style="color: #f44336; font-size: 1.45em; margin-bottom: 15px;">❌ INCORRETO</h2>
+            <p style="font-size: 1.45em;">Você ainda ganha o power-up que coletou!</p>
         `;
     }
     
