@@ -10,12 +10,16 @@ function pollGamepad() {
             start: false, // Start button (index 9)
             up: false, // D-pad up (index 12)
             down: false, // D-pad down (index 13)
+            left: false, // D-pad left (index 14)
+            right: false, // D-pad right (index 15)
         },
         justPressed: { // To detect single presses
             a: false,
             start: false,
             up: false,
             down: false,
+            left: false,
+            right: false,
         }
     };
 
@@ -93,6 +97,8 @@ function pollGamepad() {
         start: 9,
         up: 12,
         down: 13,
+        left: 14,
+        right: 15,
     };
 
     for (const btnName in buttonMap) {

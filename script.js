@@ -704,7 +704,7 @@ function handleGamepadMenuInput(gamepadState) {
         }
 
         // 3. Menus de Quiz ou Upgrade: Clica no botão focado
-        const activeMenu = document.getElementById('powerUpQuiz') || document.getElementById('upgradeInterface') || document.getElementById('upgradeResult');
+        const activeMenu = document.getElementById('powerUpQuiz') || document.getElementById('upgradeInterface') || document.getElementById('upgradeResult') || document.getElementById('upgradeSelectionInterface') || document.getElementById('powerUpSelectionInterface');
         if (activeMenu) {
             const focusableButtons = activeMenu.querySelectorAll('button');
             if (focusableButtons.length > 0 && focusableButtons[menuFocusIndex]) {
@@ -715,7 +715,7 @@ function handleGamepadMenuInput(gamepadState) {
     }
 
     // Navegação com D-pad (Cima/Baixo) nos menus
-    const activeMenu = document.getElementById('powerUpQuiz') || document.getElementById('upgradeInterface') || document.getElementById('upgradeResult');
+    const activeMenu = document.getElementById('powerUpQuiz') || document.getElementById('upgradeInterface') || document.getElementById('upgradeResult') || document.getElementById('upgradeSelectionInterface') || document.getElementById('powerUpSelectionInterface');
     if (activeMenu) {
         const focusableButtons = Array.from(activeMenu.querySelectorAll('button'));
 
@@ -729,11 +729,20 @@ function handleGamepadMenuInput(gamepadState) {
 
         if (focusableButtons.length > 0) {
             let newIndex = menuFocusIndex;
-            if (gamepadState.justPressed.down) {
-                newIndex = (menuFocusIndex + 1) % focusableButtons.length;
-            }
-            if (gamepadState.justPressed.up) {
-                newIndex = (menuFocusIndex - 1 + focusableButtons.length) % focusableButtons.length;
+            const isHorizontalLayout = activeMenu.id === 'upgradeSelectionInterface' || activeMenu.id === 'powerUpSelectionInterface';
+
+            if (isHorizontalLayout) {
+                // Navegação Esquerda/Direita
+                if (gamepadState.justPressed.right) {
+                    newIndex = (menuFocusIndex + 1) % focusableButtons.length;
+                }
+                if (gamepadState.justPressed.left) {
+                    newIndex = (menuFocusIndex - 1 + focusableButtons.length) % focusableButtons.length;
+                }
+            } else {
+                // Navegação Cima/Baixo
+                if (gamepadState.justPressed.down) newIndex = (menuFocusIndex + 1) % focusableButtons.length;
+                if (gamepadState.justPressed.up) newIndex = (menuFocusIndex - 1 + focusableButtons.length) % focusableButtons.length;
             }
 
             if (newIndex !== menuFocusIndex || !focusableButtons.some(b => b.classList.contains('gamepad-focus'))) {
