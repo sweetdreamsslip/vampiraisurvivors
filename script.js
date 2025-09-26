@@ -652,6 +652,23 @@ function displayRanking(rankings) {
     rankingListElement.appendChild(ol);
 }
 
+function startMusic() {
+    // Se a música já estiver tocando, não faz nada
+    if (background_music_test && !background_music_test.paused) {
+        return;
+    }
+
+    background_music_test.loop = true;
+    background_music_test.volume = 0.5;
+    background_music_test.play().then(() => {
+        console.log("Música iniciada com sucesso.");
+        initializeVolumeControl(background_music_test);
+    }).catch(error => {
+        console.error("Não foi possível iniciar a música:", error);
+        initializeVolumeControl(background_music_test);
+    });
+}
+
 function startGame() {
     console.log("startGame chamada!");
     
@@ -670,6 +687,9 @@ function startGame() {
     game_running = true;
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gameInterface').style.display = 'block';
+
+    // Inicia a música quando o jogo começa
+    startMusic();
 }
 
 function togglePause() {
@@ -683,8 +703,14 @@ function togglePause() {
 }
 
 function handleGamepadMenuInput(gamepadState) {
-    // Botão Start (ou Options) sempre pausa/despausa o jogo se já começou
-    if (gamepadState.justPressed.start && gameStarted) {
+    // Botão Start (ou Options) inicia o jogo ou pausa/despausa
+    if (gamepadState.justPressed.start) {
+        if (!gameStarted && document.getElementById('startScreen').style.display !== 'none') {
+            // Se na tela de início, clica no botão para começar o jogo
+            document.getElementById('startButton').click();
+            return; // Sai da função para não pausar imediatamente
+        }
+        // Se o jogo já começou, o botão pausa/despausa
         togglePause();
     }
 
@@ -772,61 +798,7 @@ function onImageLoaded() {
     imagesToLoad--;
     if (imagesToLoad === 0) {
         initialize();
-        // Toca a música de fundo quando todas as imagens forem carregadas
-        background_music_test.loop = true;
-        background_music_test.volume = 0.5; // Ajuste o volume conforme necessário
-        background_music_test.play().then(() => {
-            // If autoplay works, initialize volume control immediately
-            initializeVolumeControl(background_music_test);
-        }).catch(function(e){
-            // Se o navegador bloquear autoplay, mostre um botão para o usuário iniciar a música manualmente
-            console.log("Autoplay bloqueado. Clique para iniciar a música.");
-            let musicButton = document.getElementById('musicPlayButton');
-            if (!musicButton) {
-                musicButton = document.createElement('button');
-                musicButton.id = 'musicPlayButton';
-                musicButton.textContent = '🎵 Ativar Música';
-                musicButton.style.cssText = `
-                    position: absolute;
-                    top: 20px;
-                    right: 20px;
-                    z-index: 1000;
-                    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-                    color: white;
-                    border: none;
-                    padding: 12px 20px;
-                    border-radius: 25px;
-                    cursor: pointer;
-                    font-size: 14px;
-                    font-weight: bold;
-                    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-                    transition: all 0.3s ease;
-                `;
-                
-                // Add hover effects
-                musicButton.addEventListener('mouseenter', function() {
-                    this.style.transform = 'scale(1.05)';
-                    this.style.boxShadow = '0 6px 20px rgba(255, 107, 107, 0.6)';
-                });
-                
-                musicButton.addEventListener('mouseleave', function() {
-                    this.style.transform = 'scale(1)';
-                    this.style.boxShadow = '0 4px 15px rgba(255, 107, 107, 0.4)';
-                });
-                
-                musicButton.addEventListener('click', function() {
-                    background_music_test.play().then(() => {
-                        musicButton.remove();
-                        // Initialize volume control after music is allowed
-                        initializeVolumeControl(background_music_test);
-                    }).catch(function(err){
-                        alert("Não foi possível iniciar a música: " + err);
-                    });
-                });
-                
-                document.body.appendChild(musicButton);
-            }
-        });
+        // A música agora será iniciada em startGame()
     }
 }
 
