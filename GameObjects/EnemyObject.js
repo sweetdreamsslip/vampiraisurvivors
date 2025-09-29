@@ -29,6 +29,10 @@ var EnemyObject = function(spriteSheet, x, y, max_health, move_speed, base_damag
 
 EnemyObject.prototype.take_damage = function(damage){
     this.health -= damage;
+    if (this.health <= 0) {
+        this.health = 0;
+        this.alive = false;
+    }
 };
 
 EnemyObject.prototype.distanceToPoint = function(x, y){

@@ -19,7 +19,7 @@ var player_status_configurations = {
         speed: 0.4,
         max_health: 300,
         projectile_speed: 0.7,
-        time_between_projectiles: 1000, // 60 projéteis por minuto
+        time_between_projectiles: 500, // 60 projéteis por minuto
         time_between_gun_drone_projectiles: 3333, // 20 projéteis por minuto
         damage: 10,
         invincibility_time: 1000,

@@ -55,6 +55,11 @@ function DashEnemyObject(sprite, x, y, max_health, base_speed, base_damage) {
 
     // Sobrescreve o método update para incluir lógica de dash
     base.update = function(dt) {
+        if (this.health <= 0) {
+            this.health = 0;
+            this.alive = false;
+            return;
+        }
 
         // Lógica de congelamento
         if (this.freeze_timer > 0) {
@@ -96,11 +101,6 @@ function DashEnemyObject(sprite, x, y, max_health, base_speed, base_damage) {
             if (this.dash_timer >= this.dash_cooldown && this.distanceToPoint(player.x, player.y) <= (this.dash_duration * this.dash_speed_multiplier * this.speed)) {
                 this.startRev();
             }
-        }
-
-        // Verifica se o inimigo está morto
-        if (this.health <= 0) {
-            this.alive = false;
         }
     };
 
