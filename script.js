@@ -128,6 +128,11 @@ var keys_down = [];
 var menuFocusIndex = 0;
 var lastMenuElement = null;
 
+// Variáveis para a entrada de iniciais
+var initialsEntryActive = false;
+var currentInitials = ['A', 'A', 'A'];
+var selectedInitialSlot = 0;
+var lastInitialsInputTime = 0; // Para debounce do gamepad/teclado
 
 
 function createParticleExplosion(x, y, color, count) {
@@ -153,20 +158,22 @@ canvas.addEventListener("mouseup", function(e) {
     mouse.mouseDown = false;
 });
 window.addEventListener("keydown", function(e) {
-    keys_down.push(e.key);
-    
-    // Controles especiais
-    if (e.key === ' ' || e.key === 'Escape') { // Espaço ou ESC para pausar
-        if (gameStarted) {
-            togglePause();
+    if (!initialsEntryActive) { // Não processa teclas normais se a entrada de iniciais estiver ativa
+        keys_down.push(e.key);
+        
+        // Controles especiais
+        if (e.key === ' ' || e.key === 'Escape') { // Espaço ou ESC para pausar
+            if (gameStarted) {
+                togglePause();
+            }
         }
-    }
-    if (e.key === 'Enter' && !gameStarted) { // Enter para iniciar
-        startGame();
-    }
-    // Controle do teleporte Proxy (tecla T)
-    if (e.key === 't' || e.key === 'T') {
-        useProxyTeleport();
+        if (e.key === 'Enter' && !gameStarted) { // Enter para iniciar
+            startGame();
+        }
+        // Controle do teleporte Proxy (tecla T)
+        if (e.key === 't' || e.key === 'T') {
+            useProxyTeleport();
+        }
     }
 });
 window.addEventListener("keyup", function(e) {
@@ -196,7 +203,12 @@ function update(dt) {
     }
 
     const gamepadState = pollGamepad();
-    handleGamepadMenuInput(gamepadState);
+    
+    if (initialsEntryActive) {
+        handleInitialsInput(dt, gamepadState);
+    } else {
+        handleGamepadMenuInput(gamepadState);
+    }
 
     if (!gameStarted || gamePaused) return;    
     survivalTime += dt;
@@ -425,7 +437,8 @@ function render() {
         UpdateDebugHUD();
         
         // Verificar se o jogador morreu
-        if (player.health <= 0) {
+        // A verificação 'gameStarted' garante que showGameOver() seja chamado apenas uma vez.
+        if (player.health <= 0 && gameStarted) {
             showGameOver();
         }
     } else if (gamePaused) {
@@ -585,50 +598,199 @@ function updateXPProgressBar() {
 function showGameOver() {
     document.getElementById('finalLevel').textContent = player.level;
 
-    // Calcular pontuação
+    // Calcular e exibir pontuação
     const timeInSeconds = Math.floor(survivalTime / 1000);
     const score = player.experience + (timeInSeconds * 10); // Fórmula: XP + 10 pontos por segundo
     document.getElementById('finalScore').textContent = score;
-
-    // Salvar e carregar ranking
-    updateRanking(score);
-
+    
+    // Verifica se a pontuação é alta o suficiente para o ranking
+    checkAndShowInitialsEntry(score);
+    
+    // Exibe a tela de game over
     document.getElementById('gameOverScreen').style.display = 'flex';
     gameStarted = false;
 }
 
-function updateRanking(newScore) {
+function checkAndShowInitialsEntry(newScore) {
     const MAX_RANKING_ENTRIES = 5;
-    let rankings = [];
+    let rankings = loadRankings();
 
-    // Tenta carregar o ranking do localStorage
+    const lowestScore = rankings.length < MAX_RANKING_ENTRIES ? 0 : rankings[MAX_RANKING_ENTRIES - 1].score;
+
+    if (newScore > lowestScore || rankings.length < MAX_RANKING_ENTRIES) {
+        // Mostra o campo para inserir iniciais
+        showInitialsEntryUI(newScore);
+    } else {
+        // Se não entrou no ranking, apenas exibe o ranking atual
+        document.getElementById('initialsEntry').style.display = 'none';
+        displayRanking(loadRankings()); // Carrega e exibe o ranking mais recente
+    }
+}
+
+function showInitialsEntryUI(score) {
+    initialsEntryActive = true;
+    currentInitials = ['A', 'A', 'A'];
+    selectedInitialSlot = 0;
+    lastInitialsInputTime = performance.now();
+
+    const initialsEntryDiv = document.getElementById('initialsEntry');
+    initialsEntryDiv.style.display = 'block';
+
+    updateInitialsDisplay();
+    highlightSelectedInitialSlot();
+
+    // Adiciona listener para o botão de confirmar
+    const confirmButton = document.getElementById('confirmInitialsButton');
+    confirmButton.onclick = () => confirmInitials(score);
+
+    // Adiciona listener para teclado (apenas para a tela de iniciais)
+    document.addEventListener('keydown', handleKeyboardInitialsInput);
+}
+
+function handleKeyboardInitialsInput(e) {
+    if (!initialsEntryActive) return;
+
+    const debounceTime = 150; // ms
+    const now = performance.now();
+    if (now - lastInitialsInputTime < debounceTime) return;
+
+    let handled = false;
+
+    switch (e.key) {
+        case 'ArrowUp':
+            changeInitial(1);
+            handled = true;
+            break;
+        case 'ArrowDown':
+            changeInitial(-1);
+            handled = true;
+            break;
+        case 'ArrowLeft':
+            moveInitialSlot(-1);
+            handled = true;
+            break;
+        case 'ArrowRight':
+            moveInitialSlot(1);
+            handled = true;
+            break;
+        case 'Enter':
+            document.getElementById('confirmInitialsButton').click();
+            handled = true;
+            break;
+    }
+
+    if (handled) {
+        e.preventDefault(); // Previne o scroll da página, etc.
+        lastInitialsInputTime = now;
+    }
+}
+
+function handleInitialsInput(dt, gamepadState) {
+    if (!initialsEntryActive) return;
+
+    const debounceTime = 200; // ms
+    const now = performance.now();
+    if (now - lastInitialsInputTime < debounceTime) return;
+
+    let handled = false;
+
+    if (gamepadState.justPressed.up) {
+        changeInitial(1);
+        handled = true;
+    } else if (gamepadState.justPressed.down) {
+        changeInitial(-1);
+        handled = true;
+    } else if (gamepadState.justPressed.left) {
+        moveInitialSlot(-1);
+        handled = true;
+    } else if (gamepadState.justPressed.right) {
+        moveInitialSlot(1);
+        handled = true;
+    } else if (gamepadState.justPressed.a) { // Gamepad 'A' button for confirm
+        document.getElementById('confirmInitialsButton').click();
+        handled = true;
+    }
+
+    if (handled) {
+        lastInitialsInputTime = now;
+    }
+}
+
+function changeInitial(direction) {
+    let charCode = currentInitials[selectedInitialSlot].charCodeAt(0);
+    charCode += direction;
+
+    if (charCode < 65) charCode = 90; // Wrap around Z to A
+    if (charCode > 90) charCode = 65; // Wrap around A to Z
+
+    currentInitials[selectedInitialSlot] = String.fromCharCode(charCode);
+    updateInitialsDisplay();
+}
+
+function moveInitialSlot(direction) {
+    highlightSelectedInitialSlot(false); // Remove highlight do slot atual
+    selectedInitialSlot = (selectedInitialSlot + direction + 3) % 3; // 3 slots
+    highlightSelectedInitialSlot(true); // Adiciona highlight ao novo slot
+}
+
+function updateInitialsDisplay() {
+    for (let i = 0; i < 3; i++) {
+        document.getElementById(`initialSlot${i}`).textContent = currentInitials[i];
+    }
+}
+
+function highlightSelectedInitialSlot(add = true) {
+    const slot = document.getElementById(`initialSlot${selectedInitialSlot}`);
+    if (slot) {
+        if (add) {
+            slot.style.borderColor = '#FFFFFF'; // Cor de destaque
+            slot.style.boxShadow = '0 0 15px rgba(255, 255, 255, 0.7)';
+        } else {
+            slot.style.borderColor = '#FFD700'; // Cor padrão
+            slot.style.boxShadow = 'none';
+        }
+    }
+}
+
+function confirmInitials(score) {
+    initialsEntryActive = false;
+    document.removeEventListener('keydown', handleKeyboardInitialsInput);
+    document.getElementById('initialsEntry').style.display = 'none';
+
+    const initials = currentInitials.join('');
+    saveNewScore(initials, score);
+}
+
+function loadRankings() {
+    const MAX_RANKING_ENTRIES = 5;
+    let rankings = []; // Cada entrada será um objeto { initials: "ABC", score: 123 }
+
     try {
         const storedRankings = localStorage.getItem('vampiraiSurvivorsRanking');
         if (storedRankings) {
             rankings = JSON.parse(storedRankings);
         }
     } catch (e) {
-        console.error("Não foi possível carregar o ranking:", e);
+        console.error("Não foi possível carregar o ranking. Resetando.", e);
         rankings = [];
     }
+    return rankings;
+}
 
-    // Adiciona a nova pontuação
-    rankings.push(newScore);
+function saveNewScore(initials, score) {
+    const MAX_RANKING_ENTRIES = 5;
+    let rankings = loadRankings();
 
-    // Ordena em ordem decrescente
-    rankings.sort((a, b) => b - a);
+    rankings.push({ initials: initials, score: score });
+    rankings.sort((a, b) => b.score - a.score); // Ordena por score
+    rankings = rankings.slice(0, MAX_RANKING_ENTRIES); // Mantém apenas os top 5
 
-    // Mantém apenas os top 5 scores
-    rankings = rankings.slice(0, MAX_RANKING_ENTRIES);
-
-    // Salva o ranking atualizado
     try {
         localStorage.setItem('vampiraiSurvivorsRanking', JSON.stringify(rankings));
     } catch (e) {
         console.error("Não foi possível salvar o ranking:", e);
     }
-
-    // Exibe o ranking na tela
+    
     displayRanking(rankings);
 }
 
@@ -642,10 +804,10 @@ function displayRanking(rankings) {
     }
 
     const ol = document.createElement('ol');
-    ol.style.paddingLeft = '40px'; // Espaçamento para os números da lista
-    rankings.forEach((score) => {
+    ol.style.paddingLeft = '20px'; // Espaçamento para os números da lista
+    rankings.forEach((entry) => {
         const li = document.createElement('li');
-        li.textContent = `${score} pontos`;
+        li.innerHTML = `<span style="display: inline-block; width: 60px;">${entry.initials}</span> - ${entry.score} pontos`;
         li.style.marginBottom = '8px';
         ol.appendChild(li);
     });
@@ -673,6 +835,9 @@ function startGame() {
     console.log("startGame chamada!");
     
     // Resetar perguntas utilizadas
+    // Carrega o ranking inicial na tela de game over
+    displayRanking(loadRankings());
+
     usedQuestions = {
         easy: [],
         normal: [],
@@ -703,7 +868,7 @@ function togglePause() {
 }
 
 function handleGamepadMenuInput(gamepadState) {
-    // Botão Start (ou Options) inicia o jogo ou pausa/despausa
+    if (initialsEntryActive) return; // Não processa input de menu se a entrada de iniciais estiver ativa
     if (gamepadState.justPressed.start) {
         if (!gameStarted && document.getElementById('startScreen').style.display !== 'none') {
             // Se na tela de início, clica no botão para começar o jogo
