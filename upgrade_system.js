@@ -1,7 +1,27 @@
 // Sistema de Upgrades e Quiz para Vampiraí Survivors
 
+var upgradesApplied = {};
 
-// usar global QuestionPoolObject
+// Função auxiliar para registrar upgrade aplicado
+function registerUpgrade(upgradeKey) {
+    if (!upgradesApplied[upgradeKey]) {
+        upgradesApplied[upgradeKey] = 0;
+    }
+    upgradesApplied[upgradeKey]++;
+}
+
+// Função auxiliar para verificar se um upgrade único já foi aplicado
+function isUniqueUpgradeApplied(upgradeKey) {
+    return availableUpgrades[upgradeKey].unique && upgradesApplied[upgradeKey];
+}
+
+// Função para debug - mostra upgrades aplicados no console
+function debugShowAppliedUpgrades() {
+    console.log("Upgrades aplicados:", upgradesApplied);
+    console.log("Upgrades únicos já aplicados:", Object.keys(upgradesApplied).filter(key => 
+        availableUpgrades[key] && availableUpgrades[key].unique
+    ));
+}
 
 // Sistema de upgrades disponíveis
 var availableUpgrades = {
@@ -9,7 +29,9 @@ var availableUpgrades = {
         name: "Impulso Tecnológico",
         description: "Aumenta velocidade de movimento em 20%",
         icon: "images/movespeedupgrade.png",
+        unique: false,
         effect: function() {
+            registerUpgrade("tech_boost");
             player_status.speed *= 1.2;
         }
     },
@@ -17,7 +39,10 @@ var availableUpgrades = {
         name: "Velocidade Supersônica",
         description: "Aumenta velocidade de movimento em 30%",
         icon: "images/movespeedupgrade.png",
+        unique: false,
         effect: function() {
+            registerUpgrade("speed_boost");
+            
             player_status.speed *= 1.3;
         }
     },
@@ -25,7 +50,10 @@ var availableUpgrades = {
         name: "Vida Extra",
         description: "Aumenta vida máxima em 50 pontos",
         icon: "images/heart.png",
+        unique: false,
         effect: function() {
+            registerUpgrade("health_boost");
+            
             player_status.max_health += 50;
             player.health = player_status.max_health;
         }
@@ -34,7 +62,10 @@ var availableUpgrades = {
         name: "Dano Devastador",
         description: "Aumenta dano em 5 pontos",
         icon: "images/tiroperfurante.png",
+        unique: false,
         effect: function() {
+            registerUpgrade("damage_boost");
+            
             player_status.damage += 5;
         }
     },
@@ -42,7 +73,10 @@ var availableUpgrades = {
         name: "Projéteis Relâmpago",
         description: "Aumenta velocidade dos projéteis em 40%",
         icon: "images/attackspeedupgrade.png",
+        unique: false,
         effect: function() {
+            registerUpgrade("projectile_speed");
+            
             player_status.projectile_speed *= 1.4;
         }
     },
@@ -50,7 +84,10 @@ var availableUpgrades = {
         name: "Taxa de Tiro Rápida",
         description: "Reduz tempo entre disparos em 30%",
         icon: "images/attackspeedupgrade.png",
+        unique: false,
         effect: function() {
+            registerUpgrade("fire_rate");
+            
             player_status.time_between_projectiles *= 0.7;
         }
     },
@@ -58,7 +95,10 @@ var availableUpgrades = {
         name: "Ímã de Experiência",
         description: "Aumenta alcance de atração de experiência em 50%",
         icon: "images/magnetico.png",
+        unique: false,
         effect: function() {
+            registerUpgrade("magnet_range");
+            
             player_status.magnet_max_distance *= 1.5;
         }
     },
@@ -66,7 +106,10 @@ var availableUpgrades = {
         name: "Invencibilidade Estendida",
         description: "Aumenta tempo de invencibilidade em 50%",
         icon: "images/escudo.png",
+        unique: false,
         effect: function() {
+            registerUpgrade("invincibility_time");
+            
             player_status.invincibility_time *= 1.5;
         }
     },
@@ -74,7 +117,10 @@ var availableUpgrades = {
         name: "Experiência Duplicada",
         description: "Ganha 2x mais experiência",
         icon: "images/xpemdobro.png",
+        unique: false,
         effect: function() {
+            registerUpgrade("experience_boost");
+            
             experienceMultiplier = 2;
         }
     },
@@ -82,7 +128,10 @@ var availableUpgrades = {
         name: "Tiro Congelante",
         description: "25% de chance de congelar inimigos por 2 segundos.",
         icon: "images/tirocongelante.png",
+        unique: false,
         effect: function() {
+            registerUpgrade("freezing_shot");
+            
             if(player_status.freezing_effect === 0){
                 player_status.freezing_effect = player_status_configurations[selected_player_status_configuration].freezing_effect;
             } else {
@@ -101,7 +150,10 @@ var availableUpgrades = {
         name: "Tiro Bumerangue",
         description: "Projéteis perfuram e retornam para você.",
         icon: "images/bumerange.png",
+        unique: true,
         effect: function() {
+            registerUpgrade("boomerang_shot");
+            
             player_status.has_boomerang_shot = true;
         }
     },
@@ -109,7 +161,10 @@ var availableUpgrades = {
         name: "Companheiro Canino",
         description: "Ganha um cão de guarda que atira nos inimigos.",
         icon: "images/Dogpeticon.png",
+        unique: true,
         effect: function() {
+            registerUpgrade("gun_drone_unlock");
+            
             if (gun_drones_list.length === 0) {
                 gun_drones_list.push(new GunDroneObject(player.x + 60, player.y, 60));
             }
@@ -252,12 +307,16 @@ function selectAnswer(selectedIndex) {
 function createUpgradeSelectionInterface() {
     gamePaused = true;
 
+    // Filtrar upgrades disponíveis (excluir upgrades únicos já aplicados)
+    var availableUpgradeKeys = Object.keys(availableUpgrades).filter(upgradeKey => {
+        return !isUniqueUpgradeApplied(upgradeKey);
+    });
+
     // Selecionar 3 upgrades aleatórios e únicos
-    var upgradeKeys = Object.keys(availableUpgrades);
     var selectedUpgrades = [];
-    while (selectedUpgrades.length < 3 && upgradeKeys.length > 0) {
-        var randomIndex = Math.floor(Math.random() * upgradeKeys.length);
-        selectedUpgrades.push(upgradeKeys.splice(randomIndex, 1)[0]);
+    while (selectedUpgrades.length < 3 && availableUpgradeKeys.length > 0) {
+        var randomIndex = Math.floor(Math.random() * availableUpgradeKeys.length);
+        selectedUpgrades.push(availableUpgradeKeys.splice(randomIndex, 1)[0]);
     }
 
     var selectionDiv = document.createElement('div');
@@ -329,10 +388,19 @@ function showUpgradeResult(isCorrect, chosenUpgrade = null) {
         upgrade = chosenUpgrade;
     } else {
         // Para respostas incorretas, seleciona e aplica um upgrade aleatório
-        var upgradeKeys = Object.keys(availableUpgrades);
-        var randomUpgradeKey = upgradeKeys[Math.floor(Math.random() * upgradeKeys.length)];
-        upgrade = availableUpgrades[randomUpgradeKey];
-        upgrade.effect();
+        // Filtrar upgrades disponíveis (excluir upgrades únicos já aplicados)
+        var availableUpgradeKeys = Object.keys(availableUpgrades).filter(upgradeKey => {
+            return !isUniqueUpgradeApplied(upgradeKey);
+        });
+        
+        if (availableUpgradeKeys.length > 0) {
+            var randomUpgradeKey = availableUpgradeKeys[Math.floor(Math.random() * availableUpgradeKeys.length)];
+            upgrade = availableUpgrades[randomUpgradeKey];
+            upgrade.effect();
+        } else {
+            // Se não há upgrades disponíveis, não aplicar nenhum upgrade
+            upgrade = { name: "Nenhum upgrade disponível", description: "Todos os upgrades únicos já foram aplicados." };
+        }
     }
 
     if (isCorrect) {
