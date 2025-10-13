@@ -25,16 +25,6 @@ function debugShowAppliedUpgrades() {
 
 // Sistema de upgrades disponíveis
 var availableUpgrades = {
-    "tech_boost": {
-        name: "Impulso Tecnológico",
-        description: "Aumenta velocidade de movimento em 20%",
-        icon: "images/movespeedupgrade.png",
-        unique: false,
-        effect: function() {
-            registerUpgrade("tech_boost");
-            player_status.speed *= 1.2;
-        }
-    },
     "speed_boost": {
         name: "Velocidade Supersônica",
         description: "Aumenta velocidade de movimento em 30%",
@@ -55,7 +45,7 @@ var availableUpgrades = {
             registerUpgrade("health_boost");
             
             player_status.max_health += 50;
-            player.health = player_status.max_health;
+            player.health += 50;
         }
     },
     "damage_boost": {
