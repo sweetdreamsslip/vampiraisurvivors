@@ -106,7 +106,7 @@ function pollGamepad() {
         if (gp.buttons[btnIndex]) {
             state.buttons[btnName] = gp.buttons[btnIndex].pressed;
             // Check if it was just pressed (pressed now, but not in the previous frame)
-            if (state.buttons[btnName] && !(previousButtons[btnIndex]?.pressed)) {
+            if (state.buttons[btnName] && !previousButtons[btnIndex]?.pressed) {
                 state.justPressed[btnName] = true;
             }
         }

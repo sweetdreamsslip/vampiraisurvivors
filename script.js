@@ -636,6 +636,12 @@ function showInitialsEntryUI(score) {
     const initialsEntryDiv = document.getElementById('initialsEntry');
     initialsEntryDiv.style.display = 'block';
 
+    // Show instructions
+    const instructionsDiv = document.getElementById('initialsInstructions');
+    if (instructionsDiv) {
+        instructionsDiv.style.display = 'block';
+    }
+
     updateInitialsDisplay();
     highlightSelectedInitialSlot();
 
@@ -706,7 +712,7 @@ function handleInitialsInput(dt, gamepadState) {
     } else if (gamepadState.justPressed.right) {
         moveInitialSlot(1);
         handled = true;
-    } else if (gamepadState.justPressed.a) { // Gamepad 'A' button for confirm
+    } else if (gamepadState.justPressed.a || gamepadState.justPressed.start) { // Gamepad 'A' or 'Start' button for confirm
         document.getElementById('confirmInitialsButton').click();
         handled = true;
     }
@@ -755,6 +761,12 @@ function highlightSelectedInitialSlot(add = true) {
 function confirmInitials(score) {
     initialsEntryActive = false;
     document.removeEventListener('keydown', handleKeyboardInitialsInput);
+
+    const instructionsDiv = document.getElementById('initialsInstructions');
+    if (instructionsDiv) {
+        instructionsDiv.style.display = 'none';
+    }
+
     document.getElementById('initialsEntry').style.display = 'none';
 
     const initials = currentInitials.join('');
@@ -876,7 +888,11 @@ function handleGamepadMenuInput(gamepadState) {
             return; // Sai da função para não pausar imediatamente
         }
         // Se o jogo já começou, o botão pausa/despausa
-        togglePause();
+        // Do not pause if on game over screen
+        if (gameStarted && document.getElementById('gameOverScreen').style.display === 'none') {
+            togglePause();
+        }
+        
     }
 
     // Ações do botão 'A' (confirmar)
