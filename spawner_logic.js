@@ -8,6 +8,9 @@ var SpawnerObject = function(){
     this.warningActive = false;
     this.warningTimer = 0;
     this.warningDuration = 3_000; // ms
+    this.time_decrease_multiplier = 0.8;
+    this.time_decrease_interval = 30_000; // ms
+    this.time_decrease_timer = 0;
 
     // Weighted enemy spawning configuration
     this.enemy_classes = [
@@ -39,6 +42,7 @@ var SpawnerObject = function(){
     this.update = function(dt){
         this.time_since_last_spawn += dt;
         this.bossSpawnTimer += dt;
+        this.time_decrease_timer += dt;
 
         // starts warning and updates warning timer when the boss is about to spawn
         if(this.bossSpawnTimer >= this.BOSS_SPAWN_INTERVAL - this.warningDuration){
@@ -62,6 +66,12 @@ var SpawnerObject = function(){
         if(this.time_since_last_spawn >= this.time_between_spawns){
             this.time_since_last_spawn = 0;
             this.spawnEnemy();
+        }
+
+        // time decrease logic - decreases the time between spawns
+        if(this.time_decrease_timer >= this.time_decrease_interval){
+            this.time_decrease_timer -= this.time_decrease_interval;
+            this.time_between_spawns *= this.time_decrease_multiplier;
         }
     },
 
