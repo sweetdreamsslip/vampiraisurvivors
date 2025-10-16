@@ -759,18 +759,29 @@ function highlightSelectedInitialSlot(add = true) {
 }
 
 function confirmInitials(score) {
-    initialsEntryActive = false;
-    document.removeEventListener('keydown', handleKeyboardInitialsInput);
-
-    const instructionsDiv = document.getElementById('initialsInstructions');
-    if (instructionsDiv) {
-        instructionsDiv.style.display = 'none';
-    }
-
-    document.getElementById('initialsEntry').style.display = 'none';
-
     const initials = currentInitials.join('');
-    saveNewScore(initials, score);
+    const rankings = loadRankings();
+    const isDuplicate = rankings.some(entry => entry.initials === initials);
+    const errorElement = document.getElementById('initialsError');
+
+    if (isDuplicate) {
+        // Mostra a mensagem de erro e não continua
+        errorElement.textContent = 'Essas iniciais já existem no ranking. Por favor, escolha outras.';
+        errorElement.style.display = 'block';
+    } else {
+        // Esconde a mensagem de erro e procede com o salvamento
+        errorElement.style.display = 'none';
+        initialsEntryActive = false;
+        document.removeEventListener('keydown', handleKeyboardInitialsInput);
+
+        const instructionsDiv = document.getElementById('initialsInstructions');
+        if (instructionsDiv) {
+            instructionsDiv.style.display = 'none';
+        }
+
+        document.getElementById('initialsEntry').style.display = 'none';
+        saveNewScore(initials, score);
+    }
 }
 
 function loadRankings() {

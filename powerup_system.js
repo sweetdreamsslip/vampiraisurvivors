@@ -51,7 +51,10 @@ function PowerUpObject(x, y, type) {
         firewall: '#FF4500',
         proxy: '#00FFFF'
     };
-    
+    this.colors['chain_lightning'] = '#9400D3'; // Roxo Elétrico
+    this.colors['vampiric_aura'] = '#8B0000'; // Vermelho Sangue
+    this.colors['singularity'] = '#00008B'; // Azul Escuro
+
     this.icons = {
         speed: '⚡',
         damage: '💪',
@@ -64,6 +67,9 @@ function PowerUpObject(x, y, type) {
         firewall: '🔥',
         proxy: '🌀'
     };
+    this.icons['chain_lightning'] = '⛓️';
+    this.icons['vampiric_aura'] = '🩸';
+    this.icons['singularity'] = '🌌';
 }
 
 PowerUpObject.prototype.update = function(dt) {
@@ -140,7 +146,7 @@ function spawnPowerUp() {
     // Verificar se o jogo está rodando e se o player existe
     if (!game_running || !player) return;
     
-    var types = ['speed', 'damage', 'health', 'fire_rate', 'shield', 'antivirus', 'vpn', 'cluster', 'firewall', 'proxy'];
+    var types = ['speed', 'damage', 'health', 'fire_rate', 'shield', 'antivirus', 'vpn', 'cluster', 'firewall', 'proxy', 'chain_lightning', 'vampiric_aura', 'singularity'];
     var randomType = types[Math.floor(Math.random() * types.length)];
     
     // Spawnar em posição aleatória longe do jogador
@@ -159,7 +165,7 @@ function collectPowerUp(powerup) {
     powerup.exists = false;
     
     // Aplicar efeito do power-up
-    applyPowerUpEffect(powerup.type);
+    applyPowerUpEffect(powerup.type, powerup.x, powerup.y);
     
     // Efeito visual
     createParticleExplosion(powerup.x, powerup.y, "#FFD700", 15);
@@ -168,7 +174,7 @@ function collectPowerUp(powerup) {
     showPowerUpQuiz();
 }
 
-function applyPowerUpEffect(type) {
+function applyPowerUpEffect(type, x, y) {
     var duration = 8000; // 8 segundos
     // Usar valores padrão sem depender de difficulty_modes
     
@@ -225,6 +231,20 @@ function applyPowerUpEffect(type) {
                 activePowerUps.proxy = { duration: duration };
             }
             break;
+        case 'chain_lightning':
+            if (!activePowerUps.chain_lightning) {
+                activePowerUps.chain_lightning = { duration: duration, chance: 0.3, max_jumps: 3, range: 150 };
+            }
+            break;
+        case 'vampiric_aura':
+            if (!activePowerUps.vampiric_aura) {
+                activePowerUps.vampiric_aura = { duration: duration, radius: 120, damage: 5, tick_rate: 1000, timer: 0 };
+            }
+            break;
+        case 'singularity':
+            // Efeito instantâneo, não precisa de `activePowerUps`
+            createSingularity(x, y);
+            break;
     }
 }
 
@@ -252,6 +272,9 @@ function updateActivePowerUps(dt) {
                 case 'cluster':
                 case 'firewall':
                 case 'proxy':
+                case 'chain_lightning':
+                case 'vampiric_aura':
+                case 'singularity':
                     // Power-ups especiais não precisam reverter
                     break;
             }
@@ -290,6 +313,22 @@ function updateSpecialPowerUps() {
     if (activePowerUps.proxy) {
         // Esta lógica será implementada com tecla
     }
+
+    // Aura Vampírica - Drena vida de inimigos próximos
+    if (activePowerUps.vampiric_aura) {
+        var aura = activePowerUps.vampiric_aura;
+        aura.timer += dt;
+        if (aura.timer >= aura.tick_rate) {
+            aura.timer = 0;
+            applyVampiricAuraEffect(aura);
+        }
+    }
+}
+
+// Função para ser chamada no loop principal para renderizar auras
+function renderSpecialPowerUpEffects(ctx, camera) {
+    // Renderiza a Aura Vampírica
+    if (activePowerUps.vampiric_aura) renderVampiricAura(ctx, camera);
 }
 
 // Função para aplicar efeito do Antivírus quando inimigo morre
@@ -346,6 +385,74 @@ function useProxyTeleport() {
         // Remover power-up após uso
         delete activePowerUps.proxy;
     }
+}
+
+// Função para aplicar o efeito da Aura Vampírica
+function applyVampiricAuraEffect(aura) {
+    let totalDamageDealt = 0;
+    enemies_list.forEach(function(enemy) {
+        if (dist(player.x, player.y, enemy.x, enemy.y) <= aura.radius) {
+            enemy.take_damage(aura.damage);
+            totalDamageDealt += aura.damage;
+        }
+    });
+
+    if (totalDamageDealt > 0) {
+        const lifeStolen = Math.ceil(totalDamageDealt * 0.25); // Rouba 25% da vida
+        player.health = Math.min(player.health + lifeStolen, player_status.max_health);
+    }
+}
+
+// Função para renderizar a Aura Vampírica
+function renderVampiricAura(ctx, camera) {
+    const aura = activePowerUps.vampiric_aura;
+    const screenX = player.x - camera.x;
+    const screenY = player.y - camera.y;
+
+    const pulse = 1 + Math.sin(Date.now() * 0.005) * 0.1;
+
+    ctx.save();
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = '#8B0000';
+    ctx.beginPath();
+    ctx.arc(screenX, screenY, aura.radius * pulse, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+}
+
+// Função para criar o efeito de Singularidade
+function createSingularity(x, y) {
+    const duration = 4000; // 4 segundos
+    const pullRadius = 350;
+    const pullStrength = 0.05;
+    const explosionRadius = 150;
+    const explosionDamage = 50;
+
+    let singularity = {
+        x: x, y: y, exists: true, timer: 0, duration: duration,
+        update: function(dt) {
+            this.timer += dt;
+            if (this.timer >= this.duration) {
+                // Explode
+                createParticleExplosion(this.x, this.y, '#00008B', 50);
+                createShockwave(this.x, this.y, explosionRadius, explosionDamage);
+                this.exists = false;
+                return;
+            }
+
+            // Puxa inimigos e orbes
+            [...enemies_list, ...experience_orbs_list].forEach(obj => {
+                const distance = dist(this.x, this.y, obj.x, obj.y);
+                if (distance < pullRadius && distance > 10) {
+                    const angle = angleBetweenPoints(obj.x, obj.y, this.x, this.y);
+                    obj.x += Math.cos(angle) * pullStrength * (pullRadius - distance);
+                    obj.y += Math.sin(angle) * pullStrength * (pullRadius - distance);
+                }
+            });
+        },
+        render: function(ctx, camera) { /* Lógica de renderização da singularidade aqui */ }
+    };
+    // Adicionar a um array para ser atualizado e renderizado (ex: `special_effects_list`)
 }
 
 // ========================================
