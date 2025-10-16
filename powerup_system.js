@@ -519,9 +519,9 @@ function renderVampiricAura(ctx, camera) {
 
 // Função para criar o efeito de Singularidade
 function createSingularity(x, y) {
-    const duration = 4000; // 4 segundos
+    const duration = 8000; // 8 segundos
     const pullRadius = 350;
-    const pullStrength = 0.05;
+    const pullStrength = 1.0;
     const explosionRadius = 150;
     const explosionDamage = 50;
 
@@ -531,23 +531,22 @@ function createSingularity(x, y) {
         update: function(dt) {
             this.timer += dt;
             if (this.timer >= this.duration) {
-                // Explode
                 createParticleExplosion(this.x, this.y, '#00008B', 50);
                 createShockwave(this.x, this.y, explosionRadius, explosionDamage);
                 this.exists = false;
                 return;
             }
-
-            // Puxa inimigos e orbes
+        
             [...enemies_list, ...experience_orbs_list].forEach(obj => {
-                const distance = dist(this.x, this.y, obj.x, obj.y);
+
+                const distance = dist(this.x, this.y, obj.x, obj.y)
                 if (distance < this.pullRadius && distance > 10) {
-                    const angle = angleBetweenPoints(obj.x, obj.y, this.x, this.y);
+                    const angle = angleBetweenPoints(obj.x, obj.y, this.x, this.y) // Correção aqui
                     const pullForce = pullStrength * (this.pullRadius - distance) / this.pullRadius;
-                    obj.x += Math.cos(angle) * pullForce;
-                    obj.y += Math.sin(angle) * pullForce;
-                }
-            });
+                        obj.x += Math.cos(angle) * pullForce;
+                    }
+                
+        })
         },
         render: function(ctx, camera) {
             if (!this.exists) return;
@@ -555,10 +554,14 @@ function createSingularity(x, y) {
             const screenX = this.x - camera.x;
             const screenY = this.y - camera.y;
             
+            ctx.imageSmoothingEnabled = false;
+            const pixelSize = 4;
+
             // Desenhar área de atração (círculo translúcido)
             ctx.save();
             ctx.globalAlpha = 0.1;
             ctx.fillStyle = '#00008B';
+
             ctx.beginPath();
             ctx.arc(screenX, screenY, this.pullRadius, 0, Math.PI * 2);
             ctx.fill();
@@ -567,26 +570,32 @@ function createSingularity(x, y) {
             const pulse = 1 + Math.sin(this.timer * 0.01) * 0.3;
             const blackHoleRadius = 30 * pulse;
             
+             // Arredonda para a grade de pixels
+            const pixelX = Math.round(screenX / pixelSize) * pixelSize;
+            const pixelY = Math.round(screenY / pixelSize) * pixelSize;
+
             // Gradiente do buraco negro
-            const gradient = ctx.createRadialGradient(screenX, screenY, 0, screenX, screenY, blackHoleRadius);
+            const gradient = ctx.createRadialGradient(pixelX, pixelY, 0, pixelX, pixelY, blackHoleRadius);
             gradient.addColorStop(0, '#000000');
             gradient.addColorStop(0.7, '#00008B');
             gradient.addColorStop(1, '#191970');
             
             ctx.globalAlpha = 0.8;
             ctx.fillStyle = gradient;
+            
             ctx.beginPath();
-            ctx.arc(screenX, screenY, blackHoleRadius, 0, Math.PI * 2);
+            ctx.arc(pixelX, pixelY, blackHoleRadius, 0, Math.PI * 2);
             ctx.fill();
             
             // Borda do buraco negro
             ctx.strokeStyle = '#4169E1';
             ctx.lineWidth = 2;
             ctx.globalAlpha = 1;
+
             ctx.stroke();
             
             // Efeito de rotação
-            const rotationAngle = this.timer * 0.005;
+            const rotationAngle = this.timer * 0.003;
             ctx.translate(screenX, screenY);
             ctx.rotate(rotationAngle);
             
@@ -601,11 +610,12 @@ function createSingularity(x, y) {
                 ctx.stroke();
             }
             
+            ctx.imageSmoothingEnabled = true;
             ctx.restore();
         }
     };
     
-    // Adicionar à lista de efeitos especiais
+       // Adicionar à lista de efeitos especiais
     if (typeof special_effects_list !== 'undefined') {
         special_effects_list.push(singularity);
     } else {
@@ -616,6 +626,7 @@ function createSingularity(x, y) {
         window.special_effects_list.push(singularity);
     }
 }
+
 
 // ========================================
 // SISTEMA DE QUIZ PARA POWER-UPS
