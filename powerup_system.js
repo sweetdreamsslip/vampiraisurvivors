@@ -424,37 +424,79 @@ function createLightningLine(x1, y1, x2, y2) {
             const screenX2 = this.x2 - camera.x;
             const screenY2 = this.y2 - camera.y;
             
+            const alpha = 1 - (this.timer / this.duration);
+
+            this.drawPixelLightning(ctx, screenX1, screenY1, screenX2, screenY2, alpha);
+        },
+        drawPixelLightning: function(ctx, x1, y1, x2, y2, alpha) {
             ctx.save();
-            ctx.strokeStyle = "#9400D3";
-            ctx.lineWidth = 3;
-            ctx.globalAlpha = 1 - (this.timer / this.duration);
+            // Desativa o anti-aliasing para um visual pixelado nítido
+            ctx.imageSmoothingEnabled = false;
+
+            const pixelSize = 4;
+            const segments = 15;
+            const amplitude = 16; // Amplitude do zigue-zague em pixels
             
-            // Criar linha ziguezague
-            const segments = 8;
-            ctx.beginPath();
-            ctx.moveTo(screenX1, screenY1);
-            
-            for (let i = 1; i <= segments; i++) {
-                const t = i / segments;
-                const x = screenX1 + (screenX2 - screenX1) * t;
-                const y = screenY1 + (screenY2 - screenY1) * t;
-                
-                // Adicionar ziguezague
-                const offset = Math.sin(t * Math.PI * 4) * 10;
-                const perpX = -(screenY2 - screenY1) / Math.sqrt((screenX2 - screenX1) ** 2 + (screenY2 - screenY1) ** 2);
-                const perpY = (screenX2 - screenX1) / Math.sqrt((screenX2 - screenX1) ** 2 + (screenY2 - screenY1) ** 2);
-                
-                ctx.lineTo(x + perpX * offset, y + perpY * offset);
-            }
-            
-            ctx.stroke();
+            // Função para desenhar a linha pixelada
+            const drawLine = (color, size) => {
+                ctx.fillStyle = color;
+                for (let i = 0; i <= segments; i++) {
+                    const t = i / segments;
+                    let x = x1 + (x2 - x1) * t;
+                    let y = y1 + (y2 - y1) * t;
+
+                    // Adiciona o zigue-zague de forma mais "quadrada"
+                    if (i > 0 && i < segments) {
+                        const offset = (Math.random() - 0.5) * amplitude;
+                        const lineVector = { x: x2 - x1, y: y2 - y1 };
+                        const perpendicularVector = { x: -lineVector.y, y: lineVector.x };
+                        const normalizedPerp = {
+                            x: perpendicularVector.x / Math.sqrt(perpendicularVector.x ** 2 + perpendicularVector.y ** 2),
+                            y: perpendicularVector.y / Math.sqrt(perpendicularVector.x ** 2 + perpendicularVector.y ** 2)
+                        };
+                        x += normalizedPerp.x * offset;
+                        y += normalizedPerp.y * offset;
+                    }
+
+                    // Arredonda para a grade de pixels e desenha o "pixel"
+                    const pixelX = Math.round(x / pixelSize) * pixelSize;
+                    const pixelY = Math.round(y / pixelSize) * pixelSize;
+                    ctx.fillRect(pixelX - size / 2, pixelY - size / 2, size, size);
+                }
+            };
+
+            // Desenha a borda roxa mais grossa
+            ctx.globalAlpha = alpha * 0.8;
+            drawLine("#9400D3", pixelSize * 2); // Borda com 2x o tamanho do pixel
+
+            // Desenha o núcleo branco
+            ctx.globalAlpha = alpha;
+            drawLine("#FFFFFF", pixelSize); // Núcleo com o tamanho do pixel
+
             ctx.restore();
+        },
+        drawZigZagLine: function(ctx, x1, y1, x2, y2) {
+            // Esta função não é mais usada, mas mantida para referência se necessário.
+            const segments = 10; 
+            const amplitude = 12; 
+            ctx.beginPath(); ctx.moveTo(x1, y1);
+            for (let i = 1; i <= segments; i++) { 
+                const t = i / segments;
+                let x = x1 + (x2 - x1) * t;
+                let y = y1 + (y2 - y1) * t;
+                if (i < segments) { const offset = (Math.random() - 0.5) * amplitude; const lineVector = { x: x2 - x1, y: y2 - y1 }; const perpendicularVector = { x: -lineVector.y, y: lineVector.x }; const normalizedPerp = { x: perpendicularVector.x / Math.sqrt(perpendicularVector.x**2 + perpendicularVector.y**2), y: perpendicularVector.y / Math.sqrt(perpendicularVector.x**2 + perpendicularVector.y**2) }; x += normalizedPerp.x * offset; y += normalizedPerp.y * offset; }
+                ctx.lineTo(x, y);
+            }
+            ctx.stroke();
         }
     };
     
     // Adicionar à lista de efeitos visuais (se existir)
-    if (typeof lightning_lines_list !== 'undefined') {
-        lightning_lines_list.push(line);
+    // Garante que o efeito seja adicionado à lista global de efeitos especiais
+    if (typeof special_effects_list !== 'undefined') {
+        special_effects_list.push(line);
+    } else if (typeof window.special_effects_list !== 'undefined') {
+        window.special_effects_list.push(line);
     }
 }
 

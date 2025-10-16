@@ -162,7 +162,7 @@ var availableUpgrades = {
     },
     "chain_lightning": {
         name: "Corrente de Raios",
-        description: "Seus projéteis têm chance de criar corrente elétrica que salta entre inimigos.",
+        description: "Seus projéteis criam uma corrente elétrica que salta entre inimigos.",
         icon: "⛓️",
         unique: true,
         effect: function() {
@@ -170,7 +170,7 @@ var availableUpgrades = {
             
             // Ativar corrente de raios permanentemente
             player_status.has_chain_lightning = true;
-            player_status.chain_lightning_chance = 0.3;
+            player_status.chain_lightning_chance = 1.0; // Alterado para 100% de chance
             player_status.chain_lightning_max_jumps = 3;
             player_status.chain_lightning_range = 150;
         }
