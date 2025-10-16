@@ -160,6 +160,46 @@ var availableUpgrades = {
             }
         }
     },
+    "chain_lightning": {
+        name: "Corrente de Raios",
+        description: "Seus projéteis têm chance de criar corrente elétrica que salta entre inimigos.",
+        icon: "⛓️",
+        unique: true,
+        effect: function() {
+            registerUpgrade("chain_lightning");
+            
+            // Ativar corrente de raios permanentemente
+            player_status.has_chain_lightning = true;
+            player_status.chain_lightning_chance = 0.3;
+            player_status.chain_lightning_max_jumps = 3;
+            player_status.chain_lightning_range = 150;
+        }
+    },
+    "vampiric_aura": {
+        name: "Aura Vampírica",
+        description: "Drena vida de inimigos próximos, convertendo dano em cura.",
+        icon: "🩸",
+        unique: true,
+        effect: function() {
+            registerUpgrade("vampiric_aura");
+            
+            if (!activePowerUps.vampiric_aura) {
+                activePowerUps.vampiric_aura = { duration: 8000, radius: 120, damage: 5, tick_rate: 1000, timer: 0 };
+            }
+        }
+    },
+    "singularity": {
+        name: "Singularidade",
+        description: "Cria um buraco negro que puxa inimigos e orbes antes de explodir.",
+        icon: "🌌",
+        unique: true,
+        effect: function() {
+            registerUpgrade("singularity");
+            
+            // Efeito instantâneo - usar posição do jogador
+            createSingularity(player.x, player.y);
+        }
+    },
 };
 
 // Variáveis do sistema de upgrade

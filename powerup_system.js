@@ -116,65 +116,13 @@ function updatePowerUps(dt) {
     // Verificar se o jogo está rodando
     if (!game_running) return;
     
-    // Spawn de power-ups
-    powerupSpawnTimer += dt;
-    if (powerupSpawnTimer >= POWERUP_SPAWN_INTERVAL) {
-        spawnPowerUp();
-        powerupSpawnTimer = 0;
-    }
-    
-    // Atualizar power-ups existentes
-    powerups_list.forEach(function(powerup) {
-        powerup.update(dt);
-        
-        // Verificar colisão com jogador
-        if (aabbCircleCollision(player, powerup) && !powerup.collected) {
-            collectPowerUp(powerup);
-        }
-    });
-    
-    // Remover power-ups coletados ou expirados
-    powerups_list = powerups_list.filter(function(powerup) {
-        return powerup.exists && !powerup.collected;
-    });
-    
     // Atualizar power-ups ativos
     updateActivePowerUps(dt);
 }
 
-function spawnPowerUp() {
-    // Verificar se o jogo está rodando e se o player existe
-    if (!game_running || !player) return;
-    
-    var types = ['speed', 'damage', 'health', 'fire_rate', 'shield', 'antivirus', 'vpn', 'cluster', 'firewall', 'proxy', 'chain_lightning', 'vampiric_aura', 'singularity'];
-    var randomType = types[Math.floor(Math.random() * types.length)];
-    
-    // Spawnar em posição aleatória longe do jogador
-    var x, y;
-    do {
-        x = randomIntBetween(50, WIDTH - 50);
-        y = randomIntBetween(50, HEIGHT - 50);
-    } while (Math.sqrt((x - player.x) ** 2 + (y - player.y) ** 2) < 100);
-    
-    var powerup = new PowerUpObject(x, y, randomType);
-    powerups_list.push(powerup);
-}
+// Funções de spawn e coleta removidas - power-ups agora são aplicados diretamente via quiz
 
-function collectPowerUp(powerup) {
-    powerup.collected = true;
-    powerup.exists = false;
-    
-    // Aplicar efeito do power-up
-    applyPowerUpEffect(powerup.type, powerup.x, powerup.y);
-    
-    // Efeito visual
-    createParticleExplosion(powerup.x, powerup.y, "#FFD700", 15);
-    
-    // Mostrar quiz para escolher power-up adicional
-    showPowerUpQuiz();
-}
-
-function applyPowerUpEffect(type, x, y) {
+function applyPowerUpEffect(type, x = null, y = null) {
     var duration = 8000; // 8 segundos
     // Usar valores padrão sem depender de difficulty_modes
     
@@ -242,8 +190,10 @@ function applyPowerUpEffect(type, x, y) {
             }
             break;
         case 'singularity':
-            // Efeito instantâneo, não precisa de `activePowerUps`
-            createSingularity(x, y);
+            // Efeito instantâneo - usar posição do jogador se não fornecida
+            const posX = x !== null ? x : player.x;
+            const posY = y !== null ? y : player.y;
+            createSingularity(posX, posY);
             break;
     }
 }
@@ -286,7 +236,7 @@ function updateActivePowerUps(dt) {
 // ========================================
 // EFEITOS ESPECIAIS DOS POWER-UPS
 // ========================================
-function updateSpecialPowerUps() {
+function updateSpecialPowerUps(dt) {
     // Antivírus - Regenera vida por inimigo morto
     if (activePowerUps.antivirus) {
         // Esta lógica será chamada quando inimigo morrer
@@ -403,6 +353,111 @@ function applyVampiricAuraEffect(aura) {
     }
 }
 
+// ========================================
+// CORRENTE DE RAIOS (CHAIN LIGHTNING)
+// ========================================
+function applyChainLightningEffect(hitEnemy, projectile) {
+    // Verificar se o jogador tem o upgrade de corrente de raios
+    if (!player_status.has_chain_lightning) return;
+    
+    if (Math.random() > player_status.chain_lightning_chance) return; // Verifica chance de ativar
+    
+    let currentEnemy = hitEnemy;
+    let jumpsRemaining = player_status.chain_lightning_max_jumps;
+    let damage = projectile.damage;
+    let hitEnemies = [hitEnemy];
+    
+    // Criar partícula inicial
+    createParticleExplosion(currentEnemy.x, currentEnemy.y, "#9400D3", 8);
+    
+    while (jumpsRemaining > 0) {
+        // Encontrar inimigo mais próximo dentro do alcance
+        let nearestEnemy = null;
+        let nearestDistance = player_status.chain_lightning_range;
+        
+        enemies_list.forEach(function(enemy) {
+            if (hitEnemies.indexOf(enemy) === -1 && enemy.alive) {
+                const distance = dist(currentEnemy.x, currentEnemy.y, enemy.x, enemy.y);
+                if (distance < nearestDistance) {
+                    nearestEnemy = enemy;
+                    nearestDistance = distance;
+                }
+            }
+        });
+        
+        if (!nearestEnemy) break; // Não há mais inimigos próximos
+        
+        // Aplicar dano reduzido
+        damage = Math.floor(damage * 0.7); // Reduz dano a cada salto
+        nearestEnemy.take_damage(damage);
+        hitEnemies.push(nearestEnemy);
+        
+        // Criar linha elétrica visual
+        createLightningLine(currentEnemy.x, currentEnemy.y, nearestEnemy.x, nearestEnemy.y);
+        
+        // Criar partícula no inimigo atingido
+        createParticleExplosion(nearestEnemy.x, nearestEnemy.y, "#9400D3", 6);
+        
+        currentEnemy = nearestEnemy;
+        jumpsRemaining--;
+    }
+}
+
+// Função para criar linha elétrica visual
+function createLightningLine(x1, y1, x2, y2) {
+    const line = {
+        x1: x1, y1: y1, x2: x2, y2: y2,
+        timer: 0,
+        duration: 200,
+        exists: true,
+        update: function(dt) {
+            this.timer += dt;
+            if (this.timer >= this.duration) {
+                this.exists = false;
+            }
+        },
+        render: function(ctx, camera) {
+            if (!this.exists) return;
+            
+            const screenX1 = this.x1 - camera.x;
+            const screenY1 = this.y1 - camera.y;
+            const screenX2 = this.x2 - camera.x;
+            const screenY2 = this.y2 - camera.y;
+            
+            ctx.save();
+            ctx.strokeStyle = "#9400D3";
+            ctx.lineWidth = 3;
+            ctx.globalAlpha = 1 - (this.timer / this.duration);
+            
+            // Criar linha ziguezague
+            const segments = 8;
+            ctx.beginPath();
+            ctx.moveTo(screenX1, screenY1);
+            
+            for (let i = 1; i <= segments; i++) {
+                const t = i / segments;
+                const x = screenX1 + (screenX2 - screenX1) * t;
+                const y = screenY1 + (screenY2 - screenY1) * t;
+                
+                // Adicionar ziguezague
+                const offset = Math.sin(t * Math.PI * 4) * 10;
+                const perpX = -(screenY2 - screenY1) / Math.sqrt((screenX2 - screenX1) ** 2 + (screenY2 - screenY1) ** 2);
+                const perpY = (screenX2 - screenX1) / Math.sqrt((screenX2 - screenX1) ** 2 + (screenY2 - screenY1) ** 2);
+                
+                ctx.lineTo(x + perpX * offset, y + perpY * offset);
+            }
+            
+            ctx.stroke();
+            ctx.restore();
+        }
+    };
+    
+    // Adicionar à lista de efeitos visuais (se existir)
+    if (typeof lightning_lines_list !== 'undefined') {
+        lightning_lines_list.push(line);
+    }
+}
+
 // Função para renderizar a Aura Vampírica
 function renderVampiricAura(ctx, camera) {
     const aura = activePowerUps.vampiric_aura;
@@ -430,6 +485,7 @@ function createSingularity(x, y) {
 
     let singularity = {
         x: x, y: y, exists: true, timer: 0, duration: duration,
+        pullRadius: pullRadius,
         update: function(dt) {
             this.timer += dt;
             if (this.timer >= this.duration) {
@@ -443,16 +499,80 @@ function createSingularity(x, y) {
             // Puxa inimigos e orbes
             [...enemies_list, ...experience_orbs_list].forEach(obj => {
                 const distance = dist(this.x, this.y, obj.x, obj.y);
-                if (distance < pullRadius && distance > 10) {
+                if (distance < this.pullRadius && distance > 10) {
                     const angle = angleBetweenPoints(obj.x, obj.y, this.x, this.y);
-                    obj.x += Math.cos(angle) * pullStrength * (pullRadius - distance);
-                    obj.y += Math.sin(angle) * pullStrength * (pullRadius - distance);
+                    const pullForce = pullStrength * (this.pullRadius - distance) / this.pullRadius;
+                    obj.x += Math.cos(angle) * pullForce;
+                    obj.y += Math.sin(angle) * pullForce;
                 }
             });
         },
-        render: function(ctx, camera) { /* Lógica de renderização da singularidade aqui */ }
+        render: function(ctx, camera) {
+            if (!this.exists) return;
+            
+            const screenX = this.x - camera.x;
+            const screenY = this.y - camera.y;
+            
+            // Desenhar área de atração (círculo translúcido)
+            ctx.save();
+            ctx.globalAlpha = 0.1;
+            ctx.fillStyle = '#00008B';
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, this.pullRadius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Desenhar buraco negro central
+            const pulse = 1 + Math.sin(this.timer * 0.01) * 0.3;
+            const blackHoleRadius = 30 * pulse;
+            
+            // Gradiente do buraco negro
+            const gradient = ctx.createRadialGradient(screenX, screenY, 0, screenX, screenY, blackHoleRadius);
+            gradient.addColorStop(0, '#000000');
+            gradient.addColorStop(0.7, '#00008B');
+            gradient.addColorStop(1, '#191970');
+            
+            ctx.globalAlpha = 0.8;
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, blackHoleRadius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Borda do buraco negro
+            ctx.strokeStyle = '#4169E1';
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 1;
+            ctx.stroke();
+            
+            // Efeito de rotação
+            const rotationAngle = this.timer * 0.005;
+            ctx.translate(screenX, screenY);
+            ctx.rotate(rotationAngle);
+            
+            // Desenhar anel rotativo
+            ctx.strokeStyle = '#4169E1';
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.6;
+            for (let i = 0; i < 3; i++) {
+                const ringRadius = blackHoleRadius + 10 + i * 15;
+                ctx.beginPath();
+                ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
     };
-    // Adicionar a um array para ser atualizado e renderizado (ex: `special_effects_list`)
+    
+    // Adicionar à lista de efeitos especiais
+    if (typeof special_effects_list !== 'undefined') {
+        special_effects_list.push(singularity);
+    } else {
+        // Se não existir a lista, criar uma temporária
+        if (typeof window.special_effects_list === 'undefined') {
+            window.special_effects_list = [];
+        }
+        window.special_effects_list.push(singularity);
+    }
 }
 
 // ========================================
@@ -574,12 +694,13 @@ function handleQuizAnswer(isCorrect, quizDiv) {
 function createPowerUpSelectionInterface() {
     gamePaused = true;
 
-    var availablePowerUpTypes = ['speed', 'damage', 'fire_rate', 'shield', 'antivirus', 'vpn', 'firewall', 'proxy'];
+    var availablePowerUpTypes = ['speed', 'damage', 'fire_rate', 'shield', 'antivirus', 'vpn', 'firewall', 'proxy', 'chain_lightning', 'vampiric_aura', 'singularity'];
     var choices = [];
     while (choices.length < 3 && availablePowerUpTypes.length > 0) {
         var randomIndex = Math.floor(Math.random() * availablePowerUpTypes.length);
         choices.push(availablePowerUpTypes.splice(randomIndex, 1)[0]);
     }
+    
 
     var selectionDiv = document.createElement('div');
     selectionDiv.id = 'powerUpSelectionInterface';
@@ -610,7 +731,10 @@ function createPowerUpSelectionInterface() {
         antivirus: 'Recupera vida ao derrotar inimigos.',
         vpn: 'Permite atravessar inimigos sem sofrer dano.',
         firewall: 'Causa uma onda de choque ao receber dano.',
-        proxy: 'Permite que você se teleporte (tecla T).'
+        proxy: 'Permite que você se teleporte (tecla T).',
+        chain_lightning: 'Seus projéteis têm chance de criar corrente elétrica que salta entre inimigos.',
+        vampiric_aura: 'Drena vida de inimigos próximos, convertendo dano em cura.',
+        singularity: 'Cria um buraco negro que puxa inimigos e orbes antes de explodir.'
     };
 
     choices.forEach(type => {
@@ -683,7 +807,7 @@ function showQuizResult(isCorrect, powerupType) {
 // FUNÇÕES AUXILIARES
 // ========================================
 function getUnusedQuestion(difficulty) {
-    var availableQuestions = CompleteQuizSystem.questions[difficulty] || CompleteQuizSystem.questions['normal'];
+    var availableQuestions = QuizSystem.questions[difficulty] || QuizSystem.questions['normal'];
     var used = usedQuestions[difficulty] || [];
     
     // Se todas as perguntas foram usadas, resetar a lista
@@ -718,7 +842,7 @@ function getUnusedQuestion(difficulty) {
     }
     
     // Aplicar embaralhamento para evitar que jogador decore posições
-    return CompleteQuizSystem.shuffleOptions(selectedQuestion);
+    return QuizSystem.shuffleOptions(selectedQuestion);
 }
 
 console.log('Sistema de power-ups carregado!');

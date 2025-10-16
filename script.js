@@ -214,6 +214,11 @@ function update(dt) {
     survivalTime += dt;
     camera.update(dt);
     spawner.update(dt);
+    
+    // update power-ups
+    if (typeof updatePowerUps === 'function') {
+        updatePowerUps(dt);
+    }
 
     // Define o ângulo de mira: prioriza o controle, senão usa o mouse
     if (gamepadState.aimAngle !== null) {
@@ -286,6 +291,11 @@ function update(dt) {
                     enemies_list[j].freeze_timer = projectiles_list[i].freezing_effect;
                 }
                 
+                // Efeito de Corrente de Raios
+                if (typeof applyChainLightningEffect === 'function') {
+                    applyChainLightningEffect(enemies_list[j], projectiles_list[i]);
+                }
+                
                 projectiles_list[i].hit();
                 enemies_list[j].take_damage(projectiles_list[i].damage);
                 projectiles_list[i].hitted_enemies.push(enemies_list[j]);
@@ -356,6 +366,22 @@ function update(dt) {
         zone.update(dt);
     });
     
+    // update special power-ups
+    if (typeof updateSpecialPowerUps === 'function') {
+        updateSpecialPowerUps(dt);
+    }
+    
+    // update special effects (singularity, lightning lines, etc.)
+    if (typeof window.special_effects_list !== 'undefined') {
+        window.special_effects_list.forEach(function(effect) {
+            effect.update(dt);
+        });
+        // Remove efeitos que não existem mais
+        window.special_effects_list = window.special_effects_list.filter(function(effect) {
+            return effect.exists;
+        });
+    }
+    
 
     // remove enemies that are no longer exists
     enemies_list = enemies_list.filter(function(enemy) {
@@ -422,6 +448,18 @@ function render() {
         particles_list.forEach(function(p) {
             p.render(ctx, camera);
         });
+        
+        // render special power-up effects
+        if (typeof renderSpecialPowerUpEffects === 'function') {
+            renderSpecialPowerUpEffects(ctx, camera);
+        }
+        
+        // render special effects (singularity, lightning lines, etc.)
+        if (typeof window.special_effects_list !== 'undefined') {
+            window.special_effects_list.forEach(function(effect) {
+                effect.render(ctx, camera);
+            });
+        }
         
         // boss rendering
         enemies_list.forEach(function(enemy) {
