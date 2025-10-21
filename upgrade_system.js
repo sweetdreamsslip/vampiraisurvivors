@@ -163,7 +163,7 @@ var availableUpgrades = {
     "chain_lightning": {
         name: "Corrente de Raios",
         description: "Seus projéteis criam uma corrente elétrica que salta entre inimigos.",
-        icon: "⛓️",
+        icon: "images/danoupgrade.png",
         unique: true,
         effect: function() {
             registerUpgrade("chain_lightning");
@@ -178,7 +178,7 @@ var availableUpgrades = {
     "vampiric_aura": {
         name: "Aura Vampírica",
         description: "Drena vida de inimigos próximos, convertendo dano em cura.",
-        icon: "🩸",
+        icon: "images/auravamp.png",
         unique: true,
         effect: function() {
             registerUpgrade("vampiric_aura");
@@ -191,7 +191,7 @@ var availableUpgrades = {
     "singularity": {
         name: "Singularidade",
         description: "Cria um buraco negro que puxa inimigos e orbes antes de explodir.",
-        icon: "🌌",
+        icon: "images/singularidade.png",
         unique: true,
         effect: function() {
             registerUpgrade("singularity");
