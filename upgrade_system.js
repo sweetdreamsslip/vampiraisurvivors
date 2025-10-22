@@ -184,7 +184,7 @@ var availableUpgrades = {
             registerUpgrade("vampiric_aura");
             
             if (!activePowerUps.vampiric_aura) {
-                activePowerUps.vampiric_aura = { duration: 8000, radius: 120, damage: 5, tick_rate: 1000, timer: 0 };
+                activePowerUps.vampiric_aura = { duration: 8000, radius: 280, damage: 20, tick_rate: 200, timer: 0 };
             }
         }
     },
