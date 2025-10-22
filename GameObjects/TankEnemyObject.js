@@ -108,6 +108,10 @@ var TankEnemyObject = function(sprite, x, y, health, damage) {
                 if (this.freeze_timer <= 0) {
                     this.freeze_timer = 0;
                 }
+                // Atualizar timer de invencibilidade
+                if (this.invincibility_time > 0) {
+                    this.invincibility_time -= dt;
+                }
                 return; // Pula o resto da atualização se estiver congelado
             }
 

@@ -29,7 +29,10 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
         frozen: false,
         freeze_timer: 0,
         // Propriedades específicas do FlyingEnemy
+        flight_patterns: ['circle', 'zigzag', 'dive'],
         flight_pattern: 'circle', // 'circle', 'zigzag', 'dive'
+        circle_center: { x: 0, y: 0 }, // Centro do movimento circular
+        distance_to_circle_center: 125, // Distância do centro do movimento circular
         pattern_timer: 0,
         pattern_duration: 3000, // 3 segundos por padrão
         base_y: y, // Altura base para voo
@@ -128,30 +131,32 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
         },
         
         update: function(dt) {
-            if (!this.alive) return;
+            if (!this.alive) return;            
             
-            // Lógica de congelamento
-            if (this.freeze_timer > 0) {
+            // freeze timer
+            if (this.is_frozen()) {
                 this.freeze_timer -= dt;
                 if (this.freeze_timer <= 0) {
                     this.freeze_timer = 0;
                 }
-                return; // Pula o resto da atualização se estiver congelado
-            }
-
-            // Atualiza a animação
-            this.animationTimer += dt;
-            if (this.animationTimer > this.animationSpeed) {
-                this.currentFrame = (this.currentFrame + 1) % this.frameCount;
-                this.animationTimer = 0;
+                this.frozen_update(dt);
+                return;
             }
 
             // Atualizar timer de invencibilidade
             if (this.invincibility_time > 0) {
                 this.invincibility_time -= dt;
             }
+
+            // animation timer
+            this.animationTimer += dt;
+            if (this.animationTimer > this.animationSpeed) {
+                this.currentFrame = (this.currentFrame + 1) % this.frameCount;
+                this.animationTimer = 0;
+            }
+
             
-            // Atualizar timers
+            // pattern and dive timers
             this.pattern_timer += dt;
             this.dive_timer += dt;
             
@@ -164,6 +169,14 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
                 this.updateDive(dt);
             } else {
                 this.updateFlight(dt);
+            }
+
+        },
+
+        frozen_update: function(dt){
+            // Atualizar timer de invencibilidade
+            if (this.invincibility_time > 0) {
+                this.invincibility_time -= dt;
             }
         },
         
@@ -195,13 +208,22 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
                 this.y = Math.min(this.y, this.base_y);
             }
         },
+
+        change_flight_pattern: function() {
+            var patterns = ['circle', 'zigzag', 'hover'];
+            this.flight_pattern = patterns[Math.floor(Math.random() * patterns.length)];
+            this.pattern_timer = 0;
+
+            if (this.flight_pattern === 'circle') {
+                this.circle_center.x = this.x + this.distance_to_circle_center;
+                this.circle_center.y = this.y + this.distance_to_circle_center;
+            }
+        },
         
         updateFlight: function(dt) {
             // Trocar padrão de voo periodicamente
             if (this.pattern_timer >= this.pattern_duration) {
-                this.pattern_timer = 0;
-                var patterns = ['circle', 'zigzag', 'hover'];
-                this.flight_pattern = patterns[Math.floor(Math.random() * patterns.length)];
+                this.change_flight_pattern();
             }
             
             // Aplicar padrão de voo
@@ -220,13 +242,11 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
         
         updateCircleFlight: function(dt) {
             // Movimento circular
-            var centerX = WIDTH / 2;
-            var centerY = HEIGHT / 2;
-            var radius = 100;
+            var radius = this.distance_to_circle_center;
             var angle = this.pattern_timer * this.frequency;
             
-            this.x = centerX + Math.cos(angle) * radius;
-            this.y = centerY + Math.sin(angle) * radius;
+            this.x = this.circle_center.x + Math.cos(angle) * radius;
+            this.y = this.circle_center.y + Math.sin(angle) * radius;
         },
         
         updateZigzagFlight: function(dt) {
@@ -289,7 +309,10 @@ var FlyingEnemyObject = function(sprite, x, y, health, damage) {
                 // Efeito visual de dano
                 createParticleExplosion(this.x, this.y, "#FF0000", 6);
             }
-        }
+        },
+        is_frozen: function(){
+            return self.freeze_timer > 0;
+        },
     };
 };
 

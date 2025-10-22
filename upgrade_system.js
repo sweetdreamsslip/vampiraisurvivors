@@ -94,13 +94,13 @@ var availableUpgrades = {
     },
     "invincibility_time": {
         name: "Invencibilidade Estendida",
-        description: "Aumenta tempo de invencibilidade em 50%",
+        description: "Aumenta tempo de invencibilidade",
         icon: "images/escudo.png",
         unique: false,
         effect: function() {
             registerUpgrade("invincibility_time");
             
-            player_status.invincibility_time *= 1.5;
+            player_status.invincibility_time += 500;
         }
     },
     "experience_boost": {
@@ -206,7 +206,6 @@ var availableUpgrades = {
 var upgradeScreenVisible = false;
 var currentQuizQuestion = null;
 var selectedUpgrade = null;
-var quiz_difficulty = 'normal'; // Adicionado para compatibilidade
 
 // Função para mostrar tela de upgrade
 function showUpgradeScreen() {

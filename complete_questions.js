@@ -18,7 +18,7 @@
 
 var QuestionPoolObject = {
     questions: {
-        easy: [
+        normal: [
             // MATEMÁTICA - FÁCIL (competência 1)
             {
                 question: "Quanto é 6 + 8?",
@@ -96,7 +96,7 @@ var QuestionPoolObject = {
             },
             {
                 question: "Qual é o astro que ilumina a noite?",
-                options: ["Lua", "Estrela do mar", "Vênus", "Plutão"],
+                options: ["Lua", "Estrela do mar", "Vênus", "Estrelas"],
                 correct: 0,
                 category: "Ciência"
             },
@@ -142,8 +142,6 @@ var QuestionPoolObject = {
                 correct: 0,
                 category: "Ciência"
             },
-            
-            // TECNOLOGIA - FÁCIL (competência 1)
             {
                 question: "O que é um teclado?",
                 options: ["Um dispositivo de digitação", "Um programa de computador", "Um tipo de vírus", "Um cabo de energia"],
@@ -151,32 +149,8 @@ var QuestionPoolObject = {
                 category: "Tecnologia"
             },
             {
-                question: "Qual ícone geralmente usamos para salvar arquivos?",
-                options: ["Disquete", "Lápis", "Relógio", "Pasta"],
-                correct: 0,
-                category: "Tecnologia"
-            },
-            {
                 question: "Qual é a função da tecla \"Enter\"?",
                 options: ["Confirmar comandos", "Apagar texto", "Desligar o PC", "Aumentar volume"],
-                correct: 0,
-                category: "Tecnologia"
-            },
-            {
-                question: "Qual dispositivo usamos para conectar na internet sem fio?",
-                options: ["Roteador", "Impressora", "Scanner", "Pen drive"],
-                correct: 0,
-                category: "Tecnologia"
-            },
-            {
-                question: "O que significa a sigla SMS?",
-                options: ["Short Message Service", "Sistema de Memória Secundária", "Serviço de Música Simples", "Software de Mensagens Seguras"],
-                correct: 0,
-                category: "Tecnologia"
-            },
-            {
-                question: "Qual aplicativo usamos para ver vídeos no celular?",
-                options: ["YouTube", "Word", "Excel", "Paint"],
                 correct: 0,
                 category: "Tecnologia"
             },
@@ -220,13 +194,7 @@ var QuestionPoolObject = {
             },
             {
                 question: "Qual rodovia liga Piraí a grandes centros como Rio e São Paulo?",
-                options: ["Rodovia Presidente Dutra", "BR-101", "BR-040", "RJ-116"],
-                correct: 0,
-                category: "Piraí"
-            },
-            {
-                question: "Qual bairro é considerado central em Piraí?",
-                options: ["Centro", "Arrozal", "Jaqueira", "Varjão"],
+                options: ["Rodovia Presidente Dutra", "Avenida Brasil", "Rodovia Transoceânica", "Arco Rodoviário"],
                 correct: 0,
                 category: "Piraí"
             },
@@ -265,10 +233,7 @@ var QuestionPoolObject = {
                 options: ["Tropical", "Semiárido", "Polar", "Desértico"],
                 correct: 0,
                 category: "Piraí"
-            }
-        ],
-        
-        normal: [
+            },
             // MATEMÁTICA - NORMAL (competência 2)
             {
                 question: "Quanto é 72 ÷ 9?",
@@ -500,25 +465,12 @@ var QuestionPoolObject = {
                 correct: 0,
                 category: "Piraí"
             },
-        ],
-        
-        hard: [
-            // Nota: As perguntas do JSON não incluem nível 3 (difícil)
-            // Mantendo algumas perguntas originais como exemplo
-           
-            {
-                question: "Em que mês acontece a Piraí Fest?",
-                options: ["Outubro", "Agosto", "Setembro", "Novembro"],
-                correct: 2,
-                category: "Piraí"
-            },
             {
                 question: "Qual o nome da igreja famosa dedicada a uma santa em Piraí?",
                 options: ["Paróquia Senhora Sant'Ana.", "Igreja São Sebastião", "Igreja Nossa Senhora da Conceição", "Igreja São Benedito"],
                 correct: 0,
                 category: "Piraí"
             },
-            
             // MATEMÁTICA - DIFÍCIL (competência 3)
             {
                 question: "Quanto é (8 + 2) × 3?",
@@ -538,8 +490,6 @@ var QuestionPoolObject = {
                 correct: 0,
                 category: "Matemática"
             },
-            
-            // TECNOLOGIA - DIFÍCIL (competência 3)
             {
                 question: "O que é programação?",
                 options: ["Dar instruções para o computador executar tarefas", "Montar peças de hardware", "Instalar cabos de rede", "Criar senhas fortes"],
@@ -552,8 +502,6 @@ var QuestionPoolObject = {
                 correct: 0,
                 category: "Tecnologia"
             },
-            
-            // CIÊNCIA - DIFÍCIL (competência 3)
             {
                 question: "O que é um eclipse solar?",
                 options: ["Quando a Lua passa entre a Terra e o Sol", "Quando a Terra passa entre o Sol e a Lua", "Quando o Sol se apaga temporariamente", "Quando a Lua desaparece no céu"],
