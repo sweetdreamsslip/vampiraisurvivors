@@ -520,10 +520,10 @@ function renderVampiricAura(ctx, camera) {
 // Função para criar o efeito de Singularidade
 function createSingularity(x, y) {
     const duration = 8000; // 8 segundos
-    const pullRadius = 350;
-    const pullStrength = 1.0;
-    const explosionRadius = 150;
-    const explosionDamage = 50;
+    const pullRadius = 950;
+    const pullStrength = 100.0;
+    const explosionRadius = 550;
+    const explosionDamage = 350;
 
     let singularity = {
         x: x, y: y, exists: true, timer: 0, duration: duration,
